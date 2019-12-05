@@ -72,6 +72,7 @@ function report_UpdateUI() {
 function add_events() {
     window.onbeforeprint = function () {
         hide_sidebar();
+        $("#topgraphic").hide();
 
         // Because the 'Karla' font loads asyncronously, it often finishes loading after
         // the JS has been executed, and thus after the diagams have been drawn.
@@ -81,6 +82,7 @@ function add_events() {
     };
     window.onafterprint = function () {
         show_sidebar();
+        $("#topgraphic").show();
     };
     $('body').on('click', '#reload', function () {
         report_UpdateUI();
