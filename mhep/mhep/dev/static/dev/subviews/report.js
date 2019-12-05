@@ -72,6 +72,15 @@ function report_UpdateUI() {
 function add_events() {
     window.onbeforeprint = function () {
         hide_sidebar();
+
+        // Because the 'Karla' font loads asyncronously, it often finishes loading after
+        // the JS has been executed, and thus after the diagams have been drawn.
+        // So we update the UI here to ensure that the diagrams are using the correct
+        // font.
+        report_UpdateUI();
+    };
+    window.onafterprint = function () {
+        show_sidebar();
     };
     $('body').on('click', '#reload', function () {
         report_UpdateUI();
