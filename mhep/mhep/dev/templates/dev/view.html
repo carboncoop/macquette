@@ -243,7 +243,6 @@
     var selected_library = -1;
     var selected_library_tag = "Wall";
     var printmode = false;
-    var report = undefined;
     var page = undefined;
     var locked = {{ locked_javascript }}; // populated via Django template
     scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
@@ -712,11 +711,6 @@
         page = tmp[1];
         scenario = tmp[0];
 
-        if (page == "report" && tmp[2] != undefined)
-            report = tmp[2];
-        else
-            report = undefined;
-
         if (!scenario)
             scenario = "master";
         if (!page)
@@ -728,37 +722,18 @@
         data = project[scenario];
 
         // Render page
-        if (page != 'report') {
-            load_view("#content", page);
-            $('#topgraphic').show();
-        }
-        else {
-            // Load MHEP report and make the html available for the report we are loading
-            scenarios_comparison = {};
-            scenarios_measures_summary = {};
-            scenarios_measures_complete = {}
-            if (view_html['compare'] == undefined) {
-                $.ajax({
-                    url: urlHelper.static('subviews/compare.js'),
-                    async: false,
-                    cache: false,
-                    error: handleServerError('loading subview compare.js'),
-                });
-            }
-            for (var s in project) {
-                if (s != 'master') {
-                    scenarios_comparison[s] = compareCarbonCoop(s);
-                    scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
-                    scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
-                }
-            }
+        load_view("#content", page);
 
-            load_report("#content", report);
+        let $topgraphic = $('#topgraphic');
+        if (page == 'report') {
+            $topgraphic.hide();
+        } else {
+            $topgraphic.show();
+            draw_openbem_graphics('#topgraphic');
         }
 
         InitUI();
         UpdateUI(data);
-        draw_openbem_graphics('#topgraphic');
 
         // Add lock functionality to buttons and icons
         if (page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary') {

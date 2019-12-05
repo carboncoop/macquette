@@ -14,6 +14,15 @@ function report_initUI() {
         }
     }
 
+    if (view_html['compare'] == undefined) {
+        $.ajax({
+            url: urlHelper.static('subviews/compare.js'),
+            async: false,
+            cache: false,
+            error: handleServerError('loading subview compare.js'),
+        });
+    }
+
     // Add static content
     add_events();
     add_prioirities_figure();
@@ -26,10 +35,23 @@ function report_initUI() {
 }
 
 function report_UpdateUI() {
-    var scenarios = [];
+    let scenarios = [];
     $('#scenario-choices-boxes input:checked').each(function () {
         scenarios.push(this.value);
     });
+
+    let scenarios_comparison = {};
+    let scenarios_measures_summary = {};
+    let scenarios_measures_complete = {};
+
+    for (let s of scenarios) {
+        if (s != 'master') {
+            scenarios_comparison[s] = compareCarbonCoop(s);
+            scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
+            scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
+        }
+    }
+
     add_scenario_names(scenarios);
     add_performance_summary_figure(scenarios);
     add_heat_loss_summary_figure(scenarios);
@@ -42,9 +64,9 @@ function report_UpdateUI() {
     add_energy_costs_figure(scenarios);
     add_comfort_tables(scenarios);
     add_health_data(scenarios);
-    add_measures_summary_tables(scenarios);
-    add_measures_complete_tables(scenarios);
-    add_comparison_tables(scenarios);
+    add_measures_summary_tables(scenarios, scenarios_measures_summary);
+    add_measures_complete_tables(scenarios, scenarios_measures_complete);
+    add_comparison_tables(scenarios, scenarios_comparison);
 }
 
 function add_events() {
@@ -848,7 +870,7 @@ function add_health_data(scenarios) {
         $(".js-laundry-habits").html(laundryHabits);
     }
 }
-function add_measures_summary_tables(scenarios) {
+function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
     $('#ccop-report-measures-summary-tables').html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
     scenarios.forEach(function (scenario, index) {
@@ -874,7 +896,7 @@ function add_commentary() {
         $('#commentary').html(commentary);
     }
 }
-function add_measures_complete_tables(scenarios) {
+function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
     $('#ccop-report-measures-complete-tables').html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
     scenarios.forEach(function (scenario, index) {
@@ -894,7 +916,7 @@ function add_measures_complete_tables(scenarios) {
         }
     });
 }
-function add_comparison_tables(scenarios) {
+function add_comparison_tables(scenarios, scenarios_comparison) {
     $('#comparison-tables').html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r']
     scenarios.forEach(function (scenario, index) {

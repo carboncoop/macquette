@@ -1,5 +1,4 @@
 var view_html = {};
-var report_html = {};
 
 function load_view(eid, view)
 {
@@ -33,41 +32,6 @@ function load_view(eid, view)
 
     return result_html;
 }
-function load_report(eid, view)
-{
-    // if report in cache, we load it from there
-    if (report_html[view] != undefined) {
-        $(eid).html(report_html[view]);
-        return report_html[view];
-    }
-
-    // Load report html
-    var result_html = "";
-    $.ajax({
-        url: jspath + "reports/" + view + "/" + view + ".html",
-        async: false,
-        cache: false,
-        error: handleServerError('loading report HTML'),
-        success: function (data) {
-            result_html = data;
-        },
-    });
-
-    $(eid).html(result_html);
-
-    // Load the report javascript
-    $.ajax({
-        url: jspath + "reports/" + view + "/" + view + ".js",
-        dataType: 'script',
-        async: false,
-        error: handleServerError('loading report Javascript'),
-    });
-
-    report_html[view] = result_html;
-
-    return result_html;
-}
-
 function varset(key, value)
 {
     var lastval = "";
@@ -155,10 +119,7 @@ function varget(key)
 function InitUI()
 {
     // Call page specific updateui function
-    if (report == undefined)
-        var functionname = page + "_initUI";
-    else
-        var functionname = report + "_initUI";
+    var functionname = page + "_initUI";
     if (window[functionname] != undefined)
         window[functionname]();
 
@@ -187,10 +148,7 @@ function InitUI()
 function UpdateUI(data)
 {
     // Call page specific updateui function
-    if (report == undefined)
-        var functionname = page + "_UpdateUI";
-    else
-        var functionname = report + "_UpdateUI";
+    var functionname = page + "_UpdateUI";
     if (window[functionname] != undefined)
         window[functionname]();
 
