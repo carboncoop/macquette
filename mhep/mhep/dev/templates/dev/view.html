@@ -83,8 +83,8 @@
                 <div class="side-section--header">Other</div>
 
                 <ul>
-                    <div id="links-to-reports"></div>
-                    <li><a class="project-menu-item" href="#master/compare">MHEP Report</a></li>
+                    <li><a class="project-menu-item" href="#master/compare">Compare Scenarios</a></li>
+                    <li><a class="project-menu-item" href="#master/report">Reports</a></li>
                     <li><a class="project-menu-item" href="#master/export">Import/Export</a></li>
                     <li><a class="project-menu-item" href="#master/librariesmanager">Libraries manager</a></li>
                     <li><a class="project-menu-item" href="#master/fuelsmanager">Fuels manager</a></li>
@@ -300,11 +300,6 @@
     //************************
     redraw_scenario_menu();
     toggle_scenario_menu(scenario);
-
-    //***********************************
-    // Add links to reports in the menu
-    //***********************************
-    add_reports_to_menu();
 
     //*****************
     // Top graphic
@@ -699,13 +694,6 @@
               $emissions.html("-")
             }
         }
-    }
-    function add_reports_to_menu() {
-        var reports = {{ reports_javascript }}; // populated via Django template
-        reports.forEach(function (report) {
-            var html = '<div class="scenario-nav"> <a class="project-menu-item" class="link-to-report" href="#master/report/' + report.view + '">' + report.name + '</a></div>';
-            $('#links-to-reports').append(html);
-        })
     }
     function load_page_from_hash() {
         var tmp = (window.location.hash).substring(1).split('/');
