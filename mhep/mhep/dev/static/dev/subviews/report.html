@@ -43,9 +43,8 @@
     box-sizing: border-box; }
 
 .carbon-report-wrapper {
-    font: 1rem/1.4 "Karla", sans-serif;
-    -webkit-font-smoothing: antialiased;
-    font-size: 18px; }
+    font: 14px/1.4 "Karla", sans-serif;
+    -webkit-font-smoothing: antialiased; }
 .carbon-report-wrapper .top-border-title {
     display: block;
     width: 100%;
@@ -73,8 +72,8 @@
 .carbon-report-wrapper strong {
     font-weight: bold;
     color: #e41b3a; }
+
 .carbon-report-wrapper p {
-    font: 1rem/1.4 "Karla", sans-serif;
     color: #574d56;
     margin-bottom: 1em; }
 .carbon-report-wrapper .section-sub-title {
@@ -106,21 +105,8 @@
     widows: 20; }
 .carbon-report-wrapper .two-col-text {
     margin-bottom: 1em;
-    -webkit-column-count: 2;
-    -moz-column-count: 2;
-    -ms-column-count: 2;
-    -o-column-count: 2;
     column-count: 2;
-    -webkit-column-gap: 2rem;
-    -moz-column-gap: 2rem;
-    -ms-column-gap: 2rem;
-    -o-column-gap: 2rem;
-    column-gap: 2rem;
-    -webkit-column-width: 300px;
-    -moz-column-width: 300px;
-    -ms-column-width: 300px;
-    -o-column-width: 300px;
-    column-width: 300px; }
+    column-gap: 2rem; }
 .carbon-report-wrapper .two-col-text p {
     orphans: 4;
     widows: 4; }
@@ -141,6 +127,7 @@
         font: bold 1.5rem/1.2 "Karla", sans-serif; }
     .carbon-report-wrapper h4, .carbon-report-wrapper h3 {
         font: bold 1rem/1.2 "Karla", sans-serif; } }
+
 .carbon-report-wrapper .highlight-box {
     padding: 30px;
     display: block;
@@ -636,19 +623,19 @@
     display:none;
 }
 
-@media print{
-    #left-pane, #footer,#topgraphic,div.navbar{
-        display:none
+@media print {
+    @page { margin: 1.5cm }
+    .container-fluid, #bound { padding: 0 !important; margin: 0 !important;}
+
+    #footer, #topgraphic, div.navbar{
+        display: none !important;
     }
-    @page{
-        margin: 1.5cm
-    }
+
     h1,h2,h3{
         margin-top:0.5cm;
         page-break-after: avoid;
     }
-    .carbon-report-wrapper .top-border-title
-    {
+    .carbon-report-wrapper .top-border-title {
         color: #e41b3a;
     }
     img {
