@@ -110,10 +110,9 @@ function add_events() {
     });
 }
 function add_featured_image() {
-    if (data.featuredimage) {
-        $(".js-home-image-wrapper").html('');
-        var img = $('<img class="home-image">').attr("src", path + "Modules/assessment/images/" + projectid + "/" + data.featuredimage)
-        img.appendTo(".js-home-image-wrapper");
+    let featuredImage = p.images.find(e => e.is_featured)
+    if (featuredImage) {
+        $(".home-image").attr("src", featuredImage.url)
     }
 }
 function add_date() {
