@@ -43,7 +43,7 @@
     box-sizing: border-box; }
 
 .carbon-report-wrapper {
-    font: 14px/1.4 "Karla", sans-serif;
+    font: 16px/1.4 "Karla", sans-serif;
     -webkit-font-smoothing: antialiased; }
 .carbon-report-wrapper .top-border-title {
     display: block;
@@ -624,7 +624,11 @@
 }
 
 @media print {
-    @page { margin: 1.5cm }
+    @page {
+        size: A4;        /* No browser supports this */
+        margin: 1.5cm;
+    }
+
     .container-fluid, #bound { padding: 0 !important; margin: 0 !important;}
 
     #footer, #topgraphic, div.navbar{
