@@ -4,6 +4,7 @@ function report_initUI() {
     data = project['master'];
 
     add_scenario_options();
+    add_organisation_options();
 
     if (view_html['compare'] == undefined) {
         $.ajax({
@@ -42,6 +43,8 @@ function report_UpdateUI() {
         }
     }
 
+    choose_organisation();
+
     add_scenario_names(scenarios);
     add_performance_summary_figure(scenarios);
     add_heat_loss_summary_figure(scenarios);
@@ -60,6 +63,77 @@ function report_UpdateUI() {
 
     let t1 = performance.now();
     console.log("report_UpdateUI took " + (t1 - t0) + " milliseconds.");
+}
+
+let report_organisations = null
+
+// Add reports for each organisation we can access
+function add_organisation_options() {
+    mhep_helper.list_organisations().then(organisations => {
+        report_organisations = organisations
+
+        noneOrg = { id: "__none", name: "None", checked: true }
+
+        let html = [noneOrg, ...organisations]
+            .map(org =>`
+                <li>
+                    <input type="radio"
+                           name="report-organisation"
+                           value="${org.id}"
+                           class="big-checkbox"
+                           id="org-choice-${org.id}"
+                           ${org.checked ? "checked": ""}>
+                    <label class="d-i" for="org-choice-${org.id}">${org.name}</label>
+                </li>`)
+            .join("")
+
+        document.querySelector('#organisation-choices').innerHTML = html
+        choose_organisation()
+    })
+}
+
+const defaultOrg = {
+    "name": "SAMPLE REPORT",
+    "report": {
+        "logo": "",
+        "colour": "black",
+    }
+}
+
+function choose_organisation() {
+    const selected = document.querySelector("input[name=report-organisation]:checked")
+    if (!selected) {
+        return;
+    }
+
+    const selected_id = selected.value
+    const org = report_organisations.find(e => e.id === selected_id) || defaultOrg
+    const report = org.report
+
+    $('.report-org-name').html(org.name);
+
+    document.documentElement.style.setProperty('--report-primary-colour', report.colour);
+
+    $('#contact-for-questions').html(report.text_contact);
+    $('#section-3-text').html(report.text_section3)
+
+    const frontMatterContainer = document.querySelector('#report-front-matter-container')
+    if (report.text_front) {
+        $('#report-front-matter').html(report.text_front);
+        frontMatterContainer.removeAttribute("style");
+    } else {
+        // We set the style attribute directly, because we want to hide the element.
+        // If you use jQuery's show() and hide(), then when you call show() it sets
+        // the element's display CSS property to "block"... when we want it to be
+        // "flex".
+        frontMatterContainer.setAttribute("style", "display:none;");
+    }
+
+    if (report.logo) {
+        $('#report-logo').attr("src", report.logo).show();
+    } else {
+        $('#report-logo').hide();
+    }
 }
 
 // Initialize choices scenario check boxes

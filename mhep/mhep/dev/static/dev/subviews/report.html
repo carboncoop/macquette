@@ -519,8 +519,8 @@
 .carbon-report-wrapper .doc-sub-title {
     color: var(--report-text-colour); }
 .carbon-report-wrapper .doc-title-wrapper {
-    margin-bottom: 5em;
-    margin-top: 2em; }
+    margin-bottom: 4em;
+    margin-top: 2rem; }
 
 .carbon-report-wrapper footer {
     width: 100%;
@@ -613,7 +613,13 @@
 .house-heatloss-diagrams-wrapper p {
     display: none; }
 
+#report-logo {
+    width: 150px;
+}
+
+
 /*# sourceMappingURL=carbon.css.map */
+
 
 
 #topgraphic #measures-costs{
@@ -636,14 +642,6 @@
     #sidebar {display:none;}
 }
 
-#logo-in-report{
-    display:none;
-    width: 300px;
-    margin-top:100px;
-}
-#extra_logo{
-    display:none;
-}
 .carbon-report-wrapper .performance-summary-wrapper, .carbon-report-wrapper  #bar-chart-container, .carbon-report-wrapper  .bar-chart-container, .carbon-report-wrapper #heat-balance{
     padding:10px 0 !important;
 }
@@ -657,6 +655,22 @@
 #topgraphic { display: none !important; }
 .container-fluid { padding: 0 !important;  }
 
+
+#report-front-matter-container {
+    border-top: 1px dashed #aaa;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+#report-front-matter-container .note {
+    color: #aaa;
+    margin-bottom: 1rem;
+}
+
+#report-front-matter {
+    width: 50em;
+}
+
 /* This simulates the A4 page size */
 @media screen {
     #bound { padding: 1.5cm !important; }
@@ -669,8 +683,28 @@
     }
     #bound { padding: 0 !important; }
 
-    #footer, div.navbar, #report-options {
+    #footer, div.navbar, #report-options, .noprint {
         display: none !important;
+    }
+
+    #report-logo-extra {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
+
+    #report-front-matter-container {
+        display: flex;
+        align-items: flex-end;
+
+        /* This is the height of an A4 piece of paper minus the height of the borders.
+         * I tried many other ways to get this behaviour without hard coding values but
+         * alas, I couldn't. */
+        height: calc(297mm - 3cm);
+        width: 100%;
+
+        page-break-before: always;
+        /* border: 5px solid black; - useful for debugging */
     }
 
     h1,h2,h3{
@@ -725,9 +759,7 @@
     thead {
         display: table-row-group;
     }
-    #logo-in-report, #extra_logo{
-        display:inline-block;
-    }
+
     .carbon-report-wrapper .section-title{
         margin-top: 1.25em;
         margin-bottom: 1em;
@@ -759,20 +791,24 @@
         <ul class="list-unstyled" id="scenario-choices"></ul>
     </div>
 
+    <div class="mb-15">
+        <p>Generate report for:</p>
+        <ul class="list-unstyled" id="organisation-choices"></ul>
+    </div>
+
     <button id="report-apply" class="btn">Apply</button>
     <button class="btn" id="report-exit-print-mode">Exit print mode</button>
 </section>
 
 <div class="carbon-report-wrapper">
     <div class="page-wrapper">
-        <section id="cover">
-            <div class="doc-title-wrapper doc-title">
-                <img id="extra_logo" style="float:right;" src="">
-                <span class="doc-sub-title MHEP">My Home Energy Planner</span>
-                <!--<p>
-                       <a href="" class='js-printer-friendly-link'>View printer friendly version</a>
-               </p>-->
+        <section>
+            <div class="doc-title-wrapper doc-title justify-content-between" style="display: flex">
+                <div>
                     <h1 class="report-org-name"></h1>
+                    <span class="doc-sub-title MHEP">My Home Energy Planner</span>
+                </div>
+                <img id="report-logo" style="flex-shrink: 0">
             </div>
             <div class="grid grid-margin-bottom">
                 <div class="col-2">
@@ -798,18 +834,15 @@
                     <img class="home-image">
                 </div>
             </div>
-            <img id="logo-in-report" src="" alt="" />
-
         </section>
 
-        <!--        <section>
+        <div id="report-front-matter-container">
+            <p class="noprint note">
+                (This will appear on a new page, aligned to the bottom left of the page.)
+            </p>
 
-                                <div class="highlight-box pink-highlight">
-                                        <h4 class="top-border-title title-margin-bottom ">Estimated Energy Cost Comparison</h4>
-
-                                </div>
-
-                        </section> -->
+            <div id="report-front-matter"></div>
+        </div>
 
         <!-- Welcome -->
         <section>
