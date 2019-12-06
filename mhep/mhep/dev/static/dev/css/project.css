@@ -4,7 +4,7 @@
 
 html, body {
     height: 100%;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Ubuntu", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     background-color:#EEECE5;
     padding:0px;
     margin:0px;
