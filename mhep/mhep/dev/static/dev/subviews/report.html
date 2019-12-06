@@ -141,12 +141,27 @@
 .carbon-report-wrapper .image-figure {
     margin: 20px auto;
     display: block; }
+
 .carbon-report-wrapper .comfort-tables {
-    overflow: hidden; }
-.carbon-report-wrapper .comfort-table-wrapper {
+    overflow: hidden;
+}
+.carbon-report-wrapper .comfort-table {
     margin-bottom: 40px;
-    float: left;
-    width: 50%; }
+    font-size: 1.2em;
+}
+.carbon-report-wrapper .comfort-table-heading {
+    font-weight: bold;
+    text-align: center;
+}
+.carbon-report-wrapper .comfort-table-image {
+    display: flex;
+    align-items: center;
+}
+.carbon-report-wrapper .comfort-table-text {
+    width: 9em;
+    padding: 0 0.5em;
+}
+
 @media screen and (max-width: 700px) {
     .carbon-report-wrapper .highlight-box {
         padding: 15px; } }
@@ -358,16 +373,6 @@
     background: #fef2ef;
     color: #e41b3a;
     vertical-align: top; }
-.carbon-report-wrapper .comfort-table-option {
-    border: solid 1px #e41b3a;
-    width: 30px;
-    height: 30px; }
-.carbon-report-wrapper .extreme-left, .carbon-report-wrapper .extreme-right {
-    width: 100px;
-    padding: 5px;
-    font-size: 14px; }
-.carbon-report-wrapper .extreme-left {
-    text-align: right; }
 
 .carbon-report-wrapper .right-align-item-list {
     margin-bottom: 2rem;
@@ -954,87 +959,45 @@
 
                 <div class="highlight-box pink-highlight" style="margin:0px;padding:10px 30px">
                     <h4 class="top-border-title">Figure 11: Comfort tables</h4>
-                    <div class="comfort-tables">
-                        <div class="comfort-table-wrapper">
-                            <p>Temperature in winter:</p>
-                            <table id="comfort-table-winter-temp">
-                                <tr>
-                                    <td class='extreme-left'>Too cold</td>
-                                    <td class='extreme-right'>Too hot</td>
-                                </tr>
-                            </table>
-                        </div>
 
-                        <div class="comfort-table-wrapper">
-                            <p>Temperature in summer:</p>
-
-                            <table id="comfort-table-summer-temp">
-                                <tr>
-                                    <td class='extreme-left'>Too cold</td>
-                                    <td class='extreme-right'>Too hot</td>
-                                </tr>
-                            </table>
+                    <div class="comfort-tables d-flex justify-content-around" style="margin: 30px 0">
+                        <div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Temperature in winter</p>
+                                <div class="comfort-table-image" id="comfort-table-winter-temp"></div>
+                            </div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Air in winter</p>
+                                <div class="comfort-table-image" id="comfort-table-winter-air"></div>
+                            </div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Draughts in winter</p>
+                                <div class="comfort-table-image" id="comfort-table-draughts-winter"></div>
+                            </div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Amount of daylight</p>
+                                <div class="comfort-table-image" id="comfort-table-daylight-amount"></div>
+                            </div>
                         </div>
-
-                        <div class="comfort-table-wrapper">
-                            <p>Air in winter:</p>
-                            <table id="comfort-table-winter-air">
-                                <tr>
-                                    <td class='extreme-left'>Too dry</td>
-                                    <td class='extreme-right'>Too stuffy</td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <div class="comfort-table-wrapper">
-                            <p>Air in summer:</p>
-
-                            <table id="comfort-table-summer-air">
-                                <tr>
-                                    <td class='extreme-left'>Too dry</td>
-                                    <td class='extreme-right'>Too stuffy</td>
-                                </tr>
-                            </table>
-                        </div>
-
-                        <div class="comfort-table-wrapper">
-                            <p>Amount of daylight:</p>
-                            <table id="comfort-table-daylight-amount">
-                                <tr>
-                                    <td class='extreme-left'>Too little</td>
-                                    <td class='extreme-right'>Too much</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="comfort-table-wrapper">
-                            <p>Amount of artificial light:</p>
-                            <table id="comfort-table-artificial-light-amount">
-                                <tr>
-                                    <td class='extreme-left'>Too little</td>
-                                    <td class='extreme-right'>Too much</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="comfort-table-wrapper">
-                            <p>Draughts in winter:</p>
-                            <table id="comfort-table-draughts-winter">
-                                <tr>
-                                    <td class='extreme-left'>Too Draughty</td>
-                                    <td class='extreme-right'>Too Still</td>
-                                </tr>
-                            </table>
-                        </div>
-                        <div class="comfort-table-wrapper">
-                            <p>Draughts in summer:</p>
-                            <table id="comfort-table-draughts-summer">
-                                <tr>
-                                    <td class='extreme-left'>Too Draughty</td>
-                                    <td class='extreme-right'>Too Still</td>
-                                </tr>
-                            </table>
+                        <div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Temperature in summer</p>
+                                <div class="comfort-table-image" id="comfort-table-summer-temp"></div>
+                            </div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Air in summer</p>
+                                <div class="comfort-table-image" id="comfort-table-summer-air"></div>
+                            </div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Draughts in summer</p>
+                                <div class="comfort-table-image" id="comfort-table-draughts-summer"></div>
+                            </div>
+                            <div class="comfort-table">
+                                <p class="comfort-table-heading">Amount of artificial light</p>
+                                <div class="comfort-table-image" id="comfort-table-artificial-light-amount"></div>
+                            </div>
                         </div>
                     </div>
-
                 </div>
 
                 <div class="highlight-box pink-highlight" style="margin:0px;padding:10px 30px">

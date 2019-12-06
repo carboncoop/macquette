@@ -1142,20 +1142,26 @@ function getPrimaryEnergyUseData(scenarios) {
 
     return primaryEnergyUseData;
 }
-function createComforTable(options, tableID, chosenValue) {
-    $("#" + tableID + " .comfort-table-td").remove();
-    for (var i = options.length - 1; i >= 0; i--) {
 
-        if (options[i].title == chosenValue) {
-            var background = options[i].color;
-            $("#" + tableID + " .extreme-left").after($("<td class='comfort-table-td comfort-table-option " + i + "'><img src='../Modules/assessment/img-assets/" + options[i].color + "_box.jpg' style='height:30px;width:30px;vertical-align:middle' /></td>"));
-        }
-        else {
-            var background = 'transparent';
-            $("#" + tableID + " .extreme-left").after($("<td class='comfort-table-td comfort-table-option " + i + "'></td>"));
-        }
-        //$("#" + tableID + " .extreme-left").after($("<td class='comfort-table-td comfort-table-option " + i + "'  style='background:" + background + "'></td>"));
-    }
+function createComforTable(options, tableID, chosenValue) {
+    const leftText = options[0].title
+    const rightText = options[2].title
+
+    let cells = options.map(opt => ({
+        text: opt.title,
+        selected: chosenValue === opt.title
+    }))
+
+    let html = `
+        <div class="comfort-table-text text-right">${leftText}</div>
+        <svg viewBox="0 0 94 32" height="32" width="94">
+            <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[0].selected ? 'red' : 'white'}"></rect>
+            <rect y="1" x="32" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[1].selected ? 'green' : 'white'}"></rect>
+            <rect y="1" x="63" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[2].selected ? 'red' : 'white'}"></rect>
+        </svg>
+        <div class="comfort-table-text">${rightText}</div>`
+
+    document.getElementById(tableID).innerHTML = html
 }
 function prepare_data_for_graph(data_source) {
     var dataFig = [];

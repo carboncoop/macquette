@@ -240,6 +240,7 @@ body .modal {
 .align-items-center { align-items: center; }
 
 .justify-content-between { justify-content: space-between; }
+.justify-content-around { justify-content: space-around; }
 
 .mt-0 { margin-top: 0px !important; }
 .ml-0 { margin-left: 0px !important; }
