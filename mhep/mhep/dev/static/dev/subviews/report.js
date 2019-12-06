@@ -74,7 +74,7 @@ function add_events() {
         hide_sidebar();
         $("#topgraphic").hide();
 
-        // Because the 'Karla' font loads asyncronously, it often finishes loading after
+        // Because the 'Work Sans' font loads asyncronously, it often finishes loading after
         // the JS has been executed, and thus after the diagams have been drawn.
         // So we update the UI here to ensure that the diagrams are using the correct
         // font.
@@ -214,7 +214,7 @@ function add_performance_summary_figure(scenarios) {
 
     var options = {
         name: "Space heating demand",
-        font: "Karla",
+        font: "Work Sans",
         colors: colors,
         value: Math.round(data.space_heating_demand_m2),
         values: values,
@@ -394,7 +394,7 @@ function add_heat_balance_figure(scenarios) {
         barGutter: 480 / dataFig4.length,
         chartHigh: max_value,
         chartLow: -max_value,
-        font: "Karla",
+        font: "Work Sans",
         defaultBarColor: 'rgb(231,37,57)',
         barColors: {
             'Internal Gains': 'rgb(24,86,62)',
@@ -435,7 +435,7 @@ function add_space_heating_demand_figure(scenarios) {
         barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
         fontSize: 33,
-        font: "Karla",
+        font: "Work Sans",
         division: 50,
         chartHigh: max_value,
         width: 1200,
@@ -491,7 +491,7 @@ function add_energy_demand_figure(scenarios) {
         yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: 'kWh/year',
         fontSize: 33,
-        font: "Karla",
+        font: "Work Sans",
         width: 1200,
         chartHeight: 600,
         division: 5000,
@@ -521,7 +521,7 @@ function add_primary_energy_usage_figure(scenarios) {
         barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
         fontSize: 33,
-        font: "Karla",
+        font: "Work Sans",
         width: 1200,
         chartHeight: 600,
         division: 50,
@@ -584,7 +584,7 @@ function add_carbon_dioxide_per_m2_figure(scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year', fontSize: 33,
-        font: "Karla",
+        font: "Work Sans",
         division: 10,
         width: 1200,
         chartHeight: 600,
@@ -640,7 +640,7 @@ function add_carbon_dioxide_per_person_figure(scenarios) {
         barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/person/year',
         fontSize: 33,
-        font: "Karla",
+        font: "Work Sans",
         division: max < 28000 ? 1000 : 2000,
         chartHigh: max,
         width: 1200,
@@ -690,7 +690,7 @@ function add_energy_costs_figure(scenarios) {
         barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: '£/year',
         fontSize: 33,
-        font: "Karla",
+        font: "Work Sans",
         division: 500,
         //chartHigh: max,
         width: 1200,
@@ -1000,14 +1000,14 @@ function generateHouseMarkup(heatlossData) {
      <polygon id="wall" transform="translate(330,242) scale(' + sWalls + ')" fill="#F0533C" points="22.9,-9.1 0,-9.1 0,9.1 22.9,9.1 22.9,17.9 40.6,0 22.9,-17.9 "/>\
      <polygon id="thermal-bridging" transform="translate(330,144) scale(' + sThermal + ')" fill="#F0533C" points="22.9,-9.1 0,-9.1 0,9.1 22.9,9.1 22.9,17.9 40.6,0 22.9,-17.9 "/>\
      <polygon id="floor" transform="translate(213,278) scale(' + sFloor + ')" fill="#F0533C" points="9.1,22.9 9.1,0 -9.1,0 -9.1,22.9 -17.9,22.9 0,40.6 17.9,22.9 "/>\
-     <text transform="matrix(1 0 0 1 191.0084 172.7823)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="14">TOTAL </tspan><tspan x="-5.4" y="16.8" fill="#F0533C" font-size="14">' + heatlossData.totalwk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 328.5163 95)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Thermal Bridging</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.thermalbridgewk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 230.624 21.1785)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Roof</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.roofwk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 330.5875 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Walls</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.wallswk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 53.3572 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Planned ventilation</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.ventilationwk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 150.0000 21)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Draughts</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.infiltrationwk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 35.0902 90.1215)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Windows and doors</tspan><tspan x="11.2" y="12" fill="#F0533C" font-size="11">' + heatlossData.windowswk + ' W/K</tspan></text>\
-     <text transform="matrix(1 0 0 1 248.466 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Karla-Bold" font-size="11">Floor</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.floorwk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 191.0084 172.7823)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="14">TOTAL </tspan><tspan x="-5.4" y="16.8" fill="#F0533C" font-size="14">' + heatlossData.totalwk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 328.5163 95)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Thermal Bridging</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.thermalbridgewk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 230.624 21.1785)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Roof</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.roofwk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 330.5875 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Walls</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.wallswk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 53.3572 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Planned ventilation</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.ventilationwk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 150.0000 21)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Draughts</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.infiltrationwk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 35.0902 90.1215)"><tspan x="-5" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Windows &amp; doors</tspan><tspan x="11.2" y="12" fill="#F0533C" font-size="11">' + heatlossData.windowswk + ' W/K</tspan></text>\
+     <text transform="matrix(1 0 0 1 248.466 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Floor</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.floorwk + ' W/K</tspan></text>\
      <g opacity="0.4">\
      <polygon fill="#F0533C" points="110.1,133.2 102.8,128.8 102.8,129.9 110.1,134.3 	"/>\
      <polygon fill="#F0533C" points="110.1,141.5 102.8,137.1 102.8,138.2 110.1,142.6 	"/>\
