@@ -92,20 +92,24 @@ function add_scenario_options() {
 
 function add_events() {
     window.onbeforeprint = function () {
-        hide_sidebar();
-        $("#topgraphic").hide();
+        $("#report-exit-print-mode").show();
 
         // Because the 'Work Sans' font loads asyncronously, it often finishes loading after
         // the JS has been executed, and thus after the diagams have been drawn.
         // So we update the UI here to ensure that the diagrams are using the correct
         // font.
         report_UpdateUI();
+
+        printmode = true
+        hide_sidebar();
     };
-    window.onafterprint = function () {
+
+    $('body').on("click", '#report-exit-print-mode', _ => {
+        printmode = false
         show_sidebar();
-        $("#topgraphic").show();
-    };
-    $('body').on('click', '#reload', function () {
+    })
+
+    $('body').on('click', '#report-apply', function () {
         report_UpdateUI();
     });
 }

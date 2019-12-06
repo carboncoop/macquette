@@ -807,6 +807,9 @@
         }
     }
     function show_sidebar() {
+        if (printmode)
+            return;
+
         var width = $(window).width();
         sidebar_visible = true;
         $("#sidebar").css("left", "340px");
