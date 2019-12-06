@@ -217,6 +217,9 @@ body .modal {
 .clickable { cursor: pointer; }
 
 
+.list-unstyled { margin: 0; padding: 0; list-style: none; }
+.list-unstyled li { margin: 0; padding: 0; }
+
 .text-units { font-size: 0.8rem }
 .text-bigger { font-size: 1.25rem }
 

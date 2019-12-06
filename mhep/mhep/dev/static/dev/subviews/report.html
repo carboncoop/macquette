@@ -605,8 +605,7 @@
 }
 .scenario-name{display:none}
 #topgraphic{display:none}
-#scenario-choices{display:block; float:right; margin-top: 50px}
-.carbon-report-wrapper #scenario-choices-boxes{padding-left:25px}
+.carbon-report-wrapper #scenario-choices{padding-left:25px}
 .carbon-report-wrapper button{float:right}
 
 @media print {
@@ -617,7 +616,7 @@
     .house-heatloss-diagrams-wrapper p {
         display: block !important;
     }
-    #sidebar, #scenario-choices{display:none;}
+    #sidebar {display:none;}
 }
 
 #logo-in-report{
@@ -653,7 +652,7 @@
     }
     #bound { padding: 0 !important; }
 
-    #footer, div.navbar {
+    #footer, div.navbar, #report-options {
         display: none !important;
     }
 
@@ -735,14 +734,20 @@
 }
 </style>
 
+<section id="report-options">
+    <h2>Report options</h2>
+
+    <div class="mb-15">
+        <p>Show these scenarios in the report:</p>
+        <ul class="list-unstyled" id="scenario-choices"></ul>
+    </div>
+
+    <button id="reload" class="btn">Apply</button>
+</section>
+
 <div class="carbon-report-wrapper">
     <div class="page-wrapper">
         <section id="cover">
-            <div id="scenario-choices">
-                <p>Select scenarios you want to show in the report</p>
-                <ul id="scenario-choices-boxes"></ul>
-                <button id="reload" class="btn">Reload</button>
-            </div>
             <div class="doc-title-wrapper doc-title">
                 <img id="extra_logo" style="float:right;" src="">
                 <span class="doc-sub-title MHEP">My Home Energy Planner</span>

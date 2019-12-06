@@ -3,16 +3,7 @@ console.log('debug report.js');
 function report_initUI() {
     data = project['master'];
 
-    // Initialize choices scenario check boxes
-    $('#scenario-choices-boxes').append('<li><input type="checkbox" checked disabled value="master" />Master</li>');
-    for (var scenario in project) {
-        var checked = '';
-        if (scenario != "master") {
-            if (scenario == 'scenario1' || scenario == 'scenario2' || scenario == 'scenario3')
-                checked = 'checked';
-            $('#scenario-choices-boxes').append('<li><input type="checkbox" ' + checked + ' value="' + scenario + '" /> Scenario' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</li>');
-        }
-    }
+    add_scenario_options();
 
     if (view_html['compare'] == undefined) {
         $.ajax({
@@ -36,7 +27,7 @@ function report_initUI() {
 
 function report_UpdateUI() {
     let scenarios = [];
-    $('#scenario-choices-boxes input:checked').each(function () {
+    $('#scenario-choices input:checked').each(function () {
         scenarios.push(this.value);
     });
 
@@ -67,6 +58,36 @@ function report_UpdateUI() {
     add_measures_summary_tables(scenarios, scenarios_measures_summary);
     add_measures_complete_tables(scenarios, scenarios_measures_complete);
     add_comparison_tables(scenarios, scenarios_comparison);
+}
+
+// Initialize choices scenario check boxes
+function add_scenario_options() {
+    let scenarioOpts = '<li><input type="checkbox" checked disabled class="big-checkbox" value="master"> Master</li>'
+
+    for (let scenario_id in project) {
+        if (scenario_id == "master")
+            continue;
+
+        const idx = scenario_id.split('scenario')[1]
+        const name = project[scenario_id].scenario_name
+        const is_checked = (
+            scenario_id == 'scenario1'
+            || scenario_id == 'scenario2'
+            || scenario_id == 'scenario3'
+        )
+
+        scenarioOpts += `
+            <li>
+                <input type="checkbox"
+                       ${is_checked ? "checked" : ""}
+                       value="${scenario_id}"
+                       class="big-checkbox"
+                       id="check-${scenario_id}">
+                <label class="d-i" for="check-${scenario_id}">Scenario ${idx}: ${name}</label>
+            </li>`
+    }
+
+    document.querySelector('#scenario-choices').innerHTML = scenarioOpts
 }
 
 function add_events() {
