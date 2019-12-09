@@ -102,9 +102,10 @@
 
       static: function (resourcePath) {
         // returns the full URL for the given static file e.g. 'img/graphic.png'
-        const appStaticURLs = {{ static_urls |safe }};
+        const appStaticURLs = {{ static_urls | safe }};
         if (!appStaticURLs.hasOwnProperty(resourcePath)) {
           console.error("no app static URL for '" + resourcePath + "'");
+          return null;
         }
 
         return appStaticURLs[resourcePath];

@@ -7,9 +7,20 @@ function load_view(eid, view)
         return view_html[view];
     }
 
+    const url = urlHelper.static('subviews/' + view + '.html');
+    if (!url) {
+        console.error(`Couldn't find URL for 'subviews/${view}.html'`);
+        console.error(
+            "If you are running the code locally, this could be because you have" +
+            " added a new page without running collectstatic."
+        );
+        alert("Error loading page.");
+        return;
+    }
+
     var result_html = "";
     $.ajax({
-        url: urlHelper.static('subviews/' + view + '.html'),
+        url: url,
         async: false,
         cache: false,
         error: handleServerError('loading HTML for subview "' + view + '"'),
