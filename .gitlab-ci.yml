@@ -1,0 +1,22 @@
+stages:
+    - test
+
+test:
+    stage: test
+    image: python:3.7-buster
+    services:
+        - postgres:11
+    variables:
+        DEBUG: 1
+        POSTGRES_DB: mhep
+        DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/$POSTGRES_DB"
+        DJANGO_SETTINGS_MODULE: config.settings.test
+
+    before_script:
+        - python -V
+        - pip install virtualenv
+        - virtualenv venv
+        - source venv/bin/activate
+        - pip install -r mhep/requirements/local.txt
+    script:
+        - cd mhep; pytest --cov=mhep
