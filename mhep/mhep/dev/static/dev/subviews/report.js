@@ -20,9 +20,6 @@ function report_initUI() {
     add_featured_image();
     add_date();
     add_commentary();
-
-    // Add scenarios content
-    report_UpdateUI();
 }
 
 function report_UpdateUI() {
