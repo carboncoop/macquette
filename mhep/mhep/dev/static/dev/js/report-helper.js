@@ -720,21 +720,26 @@ function BarChart(options) {
     }
 
 
+    let widestCache = {};
+
     self.widestText = function(textArray, font) {
-        var widest = 0;
+        // This was a significant performance bottleneck.
+        let cacheKey = JSON.stringify({ "textArray": textArray, "font": font })
+        if (widestCache[cacheKey]) {
+            return widestCache[cacheKey];
+        }
+
         var cvs = document.createElement('canvas');
         cvs.width = 2000;
         cvs.height = 2000;
         var ctx = cvs.getContext('2d');
         ctx.font = font;
 
-        for (var i = 0, len = textArray.length; i < len; i ++) {
-            if (ctx.measureText(textArray[i]).width > widest) {
-                widest = ctx.measureText(textArray[i]).width;
-            }
-        }
+        let widths = textArray.map(str => ctx.measureText(str).width)
+        let max = Math.max(...widths);
 
-        return widest;
+        widestCache[cacheKey] = max;
+        return max;
     }
 
 
