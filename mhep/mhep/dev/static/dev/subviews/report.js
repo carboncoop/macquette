@@ -26,6 +26,8 @@ function report_initUI() {
 }
 
 function report_UpdateUI() {
+    let t0 = performance.now();
+
     let scenarios = [];
     $('#scenario-choices input:checked').each(function () {
         scenarios.push(this.value);
@@ -58,6 +60,9 @@ function report_UpdateUI() {
     add_measures_summary_tables(scenarios, scenarios_measures_summary);
     add_measures_complete_tables(scenarios, scenarios_measures_complete);
     add_comparison_tables(scenarios, scenarios_comparison);
+
+    let t1 = performance.now();
+    console.log("report_UpdateUI took " + (t1 - t0) + " milliseconds.");
 }
 
 // Initialize choices scenario check boxes
