@@ -683,9 +683,8 @@ function BarChart(options) {
             textArray.push(data[i].label);
         }
 
-        return self.widestText(textArray, fontSize + 'px ' + self._font) + (fontSize * 2);
+        return self.widestText(textArray, self.font()) + (fontSize * 2);
     }
-
 
     self.getKeyHeight = function(keyData) {
         return (self.getKeyRows(keyData)) ? (self.getKeyRows(keyData) * self._fontSize * 1.6) + (self._fontSize * 7.2) : 0;
