@@ -253,12 +253,15 @@ function BarChart(options) {
         ctx.fillStyle = self._divisionLabelsColor;
 
         for (var i = low; i <= high; i += every) {
+            const x = self.horizontalPixelPosition(0)
+            const y = self.verticalPixelPosition(i)
+
             ctx.beginPath();
-            ctx.moveTo(self.horizontalPixelPosition(0), self.verticalPixelPosition(i) - 0.5);
-            ctx.lineTo(self.getChartRightPos(), self.verticalPixelPosition(i) - 0.5);
+            ctx.moveTo(x, y - 0.5);
+            ctx.lineTo(self.getChartRightPos(), y - 0.5);
             ctx.stroke();
             ctx.closePath();
-            ctx.fillText(i, self.horizontalPixelPosition(0) - (self._fontSize / 2), self.verticalPixelPosition(i) + (self._fontSize / 4));
+            ctx.fillText(i, x - (self._fontSize / 2), y + (self._fontSize / 4));
         }
     }
 
