@@ -208,6 +208,7 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
             "assessments",
             "members",
             "permissions",
+            "report",
         ]
 
     def get_assessments(self, obj):

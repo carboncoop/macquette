@@ -4,17 +4,17 @@
 
 html, body {
     height: 100%;
-    font-family: 'Ubuntu', sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Ubuntu", "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     background-color:#EEECE5;
     padding:0px;
     margin:0px;
 }
 
-h1 { 
+h1 {
     color: var(--app-color);
 }
 
-h3 { 
+h3 {
     color: var(--app-color);
     font-size:20px;
     line-height: 22px;
@@ -44,7 +44,7 @@ a:hover {
     background: #d6d4ce;
     position: fixed;
     overflow-y: auto;
-    z-index: 1000; 
+    z-index: 1000;
 }
 
 #wrapper {
@@ -180,13 +180,13 @@ body .modal {
 
 @media (max-width: 450px) {
     .row { padding:10px; }
-    .col2 { width:100%; }  
+    .col2 { width:100%; }
     .col1-inner { padding:5px; }
     .col2-inner { padding:5px; }
 }
 
-@media (min-width: 450px) and (max-width: 960px) { 
-    .col2 { width:100%; } 
+@media (min-width: 450px) and (max-width: 960px) {
+    .col2 { width:100%; }
 }
 @media (min-width: 960px) { }
 
@@ -217,6 +217,9 @@ body .modal {
 .clickable { cursor: pointer; }
 
 
+.list-unstyled { margin: 0; padding: 0; list-style: none; }
+.list-unstyled li { margin: 0; padding: 0; }
+
 .text-units { font-size: 0.8rem }
 .text-bigger { font-size: 1.25rem }
 
@@ -240,6 +243,7 @@ body .modal {
 .align-items-center { align-items: center; }
 
 .justify-content-between { justify-content: space-between; }
+.justify-content-around { justify-content: space-around; }
 
 .mt-0 { margin-top: 0px !important; }
 .ml-0 { margin-left: 0px !important; }

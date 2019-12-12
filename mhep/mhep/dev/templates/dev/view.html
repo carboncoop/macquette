@@ -8,6 +8,7 @@
 <script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
 <script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
 <script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/report-helper.js' %}"></script>
 
 
 <link rel="stylesheet" href="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
@@ -68,7 +69,7 @@
 
         <div class="side-block">
             <div class="side-section">
-                <div class="side-section--header">Assessment input</div>
+                <div class="side-section--header">Input</div>
 
                 <ul>
                     <li><a class="project-menu-item" href="#master/householdquestionnaire">Household Questionnaire</a></li>
@@ -79,17 +80,29 @@
             </div>
 
             <div class="side-section">
-                <div class="side-section--header">Other</div>
+                <div class="side-section--header">Output</div>
 
                 <ul>
-                    <div id="links-to-reports"></div>
-                    <li><a class="project-menu-item" href="#master/compare">MHEP Report</a></li>
+                    <li><a class="project-menu-item" href="#master/compare">Compare Scenarios</a></li>
+                    <li><a class="project-menu-item" href="#master/report">Reports</a></li>
+                </ul>
+            </div>
+
+            <div class="side-section">
+                <div class="side-section--header">Tools & Settings</div>
+
+                <ul>
                     <li><a class="project-menu-item" href="#master/export">Import/Export</a></li>
                     <li><a class="project-menu-item" href="#master/librariesmanager">Libraries manager</a></li>
                     <li><a class="project-menu-item" href="#master/fuelsmanager">Fuels manager</a></li>
                     <li><a class="project-menu-item" href="#master/openBEM_version">openBEM version</a></li>
                 </ul>
             </div>
+
+            <div class="side-section">
+                <div class="side-section--header">Scenarios</div>
+            </div>
+
         </div>
 
         <div id="scenario-list"></div>
@@ -230,7 +243,6 @@
     var selected_library = -1;
     var selected_library_tag = "Wall";
     var printmode = false;
-    var report = undefined;
     var page = undefined;
     var locked = {{ locked_javascript }}; // populated via Django template
     scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
@@ -299,11 +311,6 @@
     //************************
     redraw_scenario_menu();
     toggle_scenario_menu(scenario);
-
-    //***********************************
-    // Add links to reports in the menu
-    //***********************************
-    add_reports_to_menu();
 
     //*****************
     // Top graphic
@@ -699,22 +706,10 @@
             }
         }
     }
-    function add_reports_to_menu() {
-        var reports = {{ reports_javascript }}; // populated via Django template
-        reports.forEach(function (report) {
-            var html = '<div class="scenario-nav"> <a class="project-menu-item" class="link-to-report" href="#master/report/' + report.view + '">' + report.name + '</a></div>';
-            $('#links-to-reports').append(html);
-        })
-    }
     function load_page_from_hash() {
         var tmp = (window.location.hash).substring(1).split('/');
         page = tmp[1];
         scenario = tmp[0];
-
-        if (page == "report" && tmp[2] != undefined)
-            report = tmp[2];
-        else
-            report = undefined;
 
         if (!scenario)
             scenario = "master";
@@ -727,40 +722,21 @@
         data = project[scenario];
 
         // Render page
-        if (page != 'report') {
-            load_view("#content", page);
-            $('#topgraphic').show();
-        }
-        else {
-            // Load MHEP report and make the html available for the report we are loading
-            scenarios_comparison = {};
-            scenarios_measures_summary = {};
-            scenarios_measures_complete = {}
-            if (view_html['compare'] == undefined) {
-                $.ajax({
-                    url: urlHelper.static('subviews/compare.js'),
-                    async: false,
-                    cache: false,
-                    error: handleServerError('loading subview compare.js'),
-                });
-            }
-            for (var s in project) {
-                if (s != 'master') {
-                    scenarios_comparison[s] = compareCarbonCoop(s);
-                    scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
-                    scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
-                }
-            }
+        load_view("#content", page);
 
-            load_report("#content", report);
+        let $topgraphic = $('#topgraphic');
+        if (page == 'report') {
+            $topgraphic.hide();
+        } else {
+            $topgraphic.show();
+            draw_openbem_graphics('#topgraphic');
         }
 
         InitUI();
         UpdateUI(data);
-        draw_openbem_graphics('#topgraphic');
 
         // Add lock functionality to buttons and icons
-        if (page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary') {
+        if (page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary' && page != 'report') {
             $('#content button').addClass('if-not-locked');
             $('#content i').addClass('if-not-locked');
             $('#content .revert-to-original').each(function () {
@@ -831,6 +807,9 @@
         }
     }
     function show_sidebar() {
+        if (printmode)
+            return;
+
         var width = $(window).width();
         sidebar_visible = true;
         $("#sidebar").css("left", "340px");

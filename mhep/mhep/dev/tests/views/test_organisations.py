@@ -62,6 +62,7 @@ class TestListOrganisations(APITestCase):
                     "can_add_remove_members": False,
                     "can_promote_demote_librarians": False,
                 }),
+                ("report", {}),
             ]),
         ]
 
@@ -124,29 +125,22 @@ class TestListOrganisationsPermissions(APITestCase):
         )
 
     def _assert_permissions(self, response, expected_permissions):
-        expected = [
-            OrderedDict([
-                ("id", f"{self.org.id}"),
-                ("name", self.org.name),
-                ("assessments", 0),
-                ("members", [
-                    {
-                        "userid": f"{self.member_1.id}",
-                        "name": self.member_1.username,
-                        "is_admin": False,
-                        "is_librarian": False,
-                        "last_login": self.member_1.last_login.isoformat(),
-                    },
-                    {
-                        "userid": f"{self.org_admin.id}",
-                        "name": self.org_admin.username,
-                        "is_admin": True,
-                        "is_librarian": False,
-                        "last_login": self.org_admin.last_login.isoformat(),
-                    },
-                ]),
-                ("permissions", expected_permissions),
-            ]),
+        expected_members = [
+            {
+                "userid": f"{self.member_1.id}",
+                "name": self.member_1.username,
+                "is_admin": False,
+                "is_librarian": False,
+                "last_login": self.member_1.last_login.isoformat(),
+            },
+            {
+                "userid": f"{self.org_admin.id}",
+                "name": self.org_admin.username,
+                "is_admin": True,
+                "is_librarian": False,
+                "last_login": self.org_admin.last_login.isoformat(),
+            },
         ]
 
-        assert expected == response.data
+        assert response.data[0]["members"] == expected_members
+        assert response.data[0]["permissions"] == expected_permissions
