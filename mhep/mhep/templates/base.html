@@ -70,6 +70,15 @@
     <!-- Placed at the end of the document so the pages load faster -->
     {% block javascript %}
 
+        {# Load Sentry first #}
+        {% if settings.sentry_url %}
+        <script
+            src="https://browser.sentry-cdn.com/5.10.2/bundle.min.js"
+            integrity="sha384-ssBfXiBvlVC7bdA/VX03S88B5MwXQWdnpJRbUYFPgswlOBwETwTp6F3SMUNpo9M9"
+            crossorigin="anonymous"></script>
+        <script>Sentry.init({ dsn: "{{ settings.sentry_url }}" });</script>
+        {% endif %}
+
       <!-- Bootstrap JS and its dependencies-->
       <script src="{% static 'js/jquery-3.3.1/jquery-3.3.1.slim.min.js' %}"></script>
       <script src="{% static 'js/popper-1.14.7/popper.min.js' %}"></script>
