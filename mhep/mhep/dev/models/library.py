@@ -10,14 +10,16 @@ from .organisation import Organisation
 class Library(models.Model):
     owner_user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="%(app_label)s_libraries",
     )
 
     owner_organisation = models.ForeignKey(
         Organisation,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.PROTECT,
         related_name="libraries",
     )
@@ -47,13 +49,9 @@ class Library(models.Model):
 
         constraints = [
             models.CheckConstraint(
-                check=(
-                    Q(owner_user__isnull=False) & Q(owner_organisation__isnull=True)
-                ) | (
-                    Q(owner_user__isnull=True) & Q(owner_organisation__isnull=False)
-                ) | (
-                    Q(owner_user__isnull=True) & Q(owner_organisation__isnull=True)
-                ),
+                check=(Q(owner_user__isnull=False) & Q(owner_organisation__isnull=True))
+                | (Q(owner_user__isnull=True) & Q(owner_organisation__isnull=False))
+                | (Q(owner_user__isnull=True) & Q(owner_organisation__isnull=True)),
                 name="owner_cant_be_both_user_and_organisation",
             ),
         ]

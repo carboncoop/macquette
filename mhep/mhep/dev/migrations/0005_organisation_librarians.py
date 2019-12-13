@@ -8,13 +8,17 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('dev', '0004_rename_related_name_of_library_owner_organisation'),
+        ("dev", "0004_rename_related_name_of_library_owner_organisation"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organisation',
-            name='librarians',
-            field=models.ManyToManyField(blank=True, related_name='dev_organisations_where_librarian', to=settings.AUTH_USER_MODEL),
+            model_name="organisation",
+            name="librarians",
+            field=models.ManyToManyField(
+                blank=True,
+                related_name="dev_organisations_where_librarian",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

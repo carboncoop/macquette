@@ -4,21 +4,22 @@ from django.contrib.postgres.fields import JSONField
 from ..validators import validate_dict
 
 STATUS_CHOICES = [
-        ('Complete', 'Complete'),
-        ('In progress', 'In progress'),
-        ('Test', 'Test'),
+    ("Complete", "Complete"),
+    ("In progress", "In progress"),
+    ("Test", "Test"),
 ]
 
 OPENBEM_VERSION_CHOICES = [
-        ('10.1.0', 'v10.1.0'),
-        ('10.1.1', 'v10.1.1'),
+    ("10.1.0", "v10.1.0"),
+    ("10.1.1", "v10.1.1"),
 ]
 
 
 class Assessment(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=False, blank=False,
+        null=False,
+        blank=False,
         on_delete=models.PROTECT,
         related_name="%(app_label)s_assessments",
     )
@@ -35,15 +36,10 @@ class Assessment(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
 
-    openbem_version = models.CharField(
-        max_length=20,
-        choices=OPENBEM_VERSION_CHOICES,
-        )
+    openbem_version = models.CharField(max_length=20, choices=OPENBEM_VERSION_CHOICES,)
 
     status = models.CharField(
-        max_length=20,
-        choices=STATUS_CHOICES,
-        default='In progress',
+        max_length=20, choices=STATUS_CHOICES, default="In progress",
     )
 
     data = JSONField(default=dict, validators=[validate_dict])

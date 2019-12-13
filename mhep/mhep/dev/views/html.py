@@ -15,7 +15,7 @@ from .helpers import build_static_dictionary
 STATIC_URLS = build_static_dictionary()
 
 
-class CommonContextMixin():
+class CommonContextMixin:
     def get_context_data(self, object=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context["VERSION"] = VERSION
@@ -23,7 +23,9 @@ class CommonContextMixin():
         return context
 
 
-class AssessmentHTMLView(CommonContextMixin, AssessmentQuerySetMixin, LoginRequiredMixin, DetailView):
+class AssessmentHTMLView(
+    CommonContextMixin, AssessmentQuerySetMixin, LoginRequiredMixin, DetailView
+):
     template_name = f"{VERSION}/view.html"
     context_object_name = "assessment"
     model = Assessment

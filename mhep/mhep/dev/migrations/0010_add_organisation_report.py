@@ -8,13 +8,19 @@ import mhep.dev.validators
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dev', '0009_merge_20191202_1407'),
+        ("dev", "0009_merge_20191202_1407"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='organisation',
-            name='report',
-            field=django.contrib.postgres.fields.jsonb.JSONField(default=dict, validators=[mhep.dev.validators.validate_dict, mhep.dev.validators.validate_report]),
+            model_name="organisation",
+            name="report",
+            field=django.contrib.postgres.fields.jsonb.JSONField(
+                default=dict,
+                validators=[
+                    mhep.dev.validators.validate_dict,
+                    mhep.dev.validators.validate_report,
+                ],
+            ),
         ),
     ]

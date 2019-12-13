@@ -109,7 +109,9 @@ class TestShareOrganisationLibrariesPermissions(AssertErrorMixin, APITestCase):
         cls.my_org.admins.add(cls.org_admin)
 
         cls.other_org = OrganisationFactory.create()
-        cls.library = LibraryFactory.create(owner_organisation=cls.my_org, owner_user=None)
+        cls.library = LibraryFactory.create(
+            owner_organisation=cls.my_org, owner_user=None
+        )
 
     def test_organisation_admin_can_share_organisation_library(self):
         self.client.force_authenticate(self.org_admin)
@@ -238,7 +240,9 @@ class TestUnshareOrganisationLibrariesPermissions(AssertErrorMixin, APITestCase)
         cls.my_org.admins.add(cls.org_admin)
 
         cls.other_org = OrganisationFactory.create()
-        cls.shared_library = LibraryFactory.create(owner_organisation=cls.my_org, owner_user=None)
+        cls.shared_library = LibraryFactory.create(
+            owner_organisation=cls.my_org, owner_user=None
+        )
         cls.shared_library.shared_with.add(cls.other_org)
 
     def test_organisation_admin_can_share_organisation_library(self):
@@ -283,7 +287,9 @@ class TestListOrganisationLibrarySharesPermissions(AssertErrorMixin, APITestCase
         cls.my_org.admins.add(cls.org_admin)
 
         cls.other_org = OrganisationFactory.create()
-        cls.shared_library = LibraryFactory.create(owner_organisation=cls.my_org, owner_user=None)
+        cls.shared_library = LibraryFactory.create(
+            owner_organisation=cls.my_org, owner_user=None
+        )
         cls.shared_library.shared_with.add(cls.other_org)
 
     def test_organisation_admin_can_list_library_shares(self):

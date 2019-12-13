@@ -7,7 +7,7 @@ from ... import VERSION
 from ..factories import LibraryFactory
 
 
-class CommonMixin():
+class CommonMixin:
     def _assert_error(self, response, expected_status, expected_detail):
         assert expected_status == response.status_code
         assert {"detail": expected_detail} == response.json()
@@ -15,10 +15,9 @@ class CommonMixin():
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.library = LibraryFactory.create(data={
-            "tag1": {"name": "foo"},
-            "tag2": {"name": "bar"},
-        })
+        cls.library = LibraryFactory.create(
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"},}
+        )
 
 
 class TestCreateLibraryItemPermissions(CommonMixin, APITestCase):
@@ -42,23 +41,16 @@ class TestCreateLibraryItemPermissions(CommonMixin, APITestCase):
 
         response = self._call_endpoint(self.library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def _call_endpoint(self, library):
-        item_data = {
-            "tag": "new_tag",
-            "item": {
-                "name": "bar",
-            }
-        }
+        item_data = {"tag": "new_tag", "item": {"name": "bar",}}
 
         return self.client.post(
             f"/{VERSION}/api/libraries/{self.library.id}/items/",
             item_data,
-            format="json"
+            format="json",
         )
 
 
@@ -83,9 +75,7 @@ class TestUpdateLibraryItemPermissions(CommonMixin, APITestCase):
 
         response = self._call_endpoint(self.library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def _call_endpoint(self, library):
@@ -97,7 +87,7 @@ class TestUpdateLibraryItemPermissions(CommonMixin, APITestCase):
         return self.client.put(
             f"/{VERSION}/api/libraries/{self.library.id}/items/tag1/",
             replacement_data,
-            format="json"
+            format="json",
         )
 
 
@@ -122,10 +112,10 @@ class TestDeleteLibraryItemPermissions(CommonMixin, APITestCase):
 
         response = self._call_endpoint(self.library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def _call_endpoint(self, library):
-        return self.client.delete(f"/{VERSION}/api/libraries/{self.library.id}/items/tag2/")
+        return self.client.delete(
+            f"/{VERSION}/api/libraries/{self.library.id}/items/tag2/"
+        )

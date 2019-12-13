@@ -52,11 +52,11 @@ class TestAssessmentHTMLView(TestCase):
         response = self.client.get(my_assessment_url)
         assert status.HTTP_200_OK == response.status_code
 
-    def test_returns_200_for_organisation_member_viewing_assessment_in_organisation(self):
+    def test_returns_200_for_organisation_member_viewing_assessment_in_organisation(
+        self,
+    ):
         organisation = OrganisationFactory.create()
-        organisation_assessment = AssessmentFactory.create(
-            organisation=organisation,
-        )
+        organisation_assessment = AssessmentFactory.create(organisation=organisation,)
         organisation.members.add(self.me)
 
         self.client.login(username=self.me.username, password="foo")

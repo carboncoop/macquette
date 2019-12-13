@@ -12,11 +12,11 @@ from ..factories import (
 from .mixins import AssertErrorMixin
 
 
-class CreateLibraryMixin():
+class CreateLibraryMixin:
     def create_library(self, *args, **kwargs):
         return LibraryFactory.create(
-            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"}},
-            *args, **kwargs)
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"}}, *args, **kwargs
+        )
 
 
 class TestCreateLibraryPermissions(AssertErrorMixin, APITestCase):
@@ -39,10 +39,12 @@ class TestCreateLibraryPermissions(AssertErrorMixin, APITestCase):
         new_library = {
             "name": "test library 1",
             "type": "test type 1",
-            "data": {"foo": "bar"}
+            "data": {"foo": "bar"},
         }
 
-        return self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+        return self.client.post(
+            f"/{VERSION}/api/libraries/", new_library, format="json"
+        )
 
 
 class TestCreateOrganisationLibraryPermissions(AssertErrorMixin, APITestCase):
@@ -93,11 +95,13 @@ class TestCreateOrganisationLibraryPermissions(AssertErrorMixin, APITestCase):
         new_library = {
             "name": "test library 1",
             "type": "test type 1",
-            "data": {"foo": "bar"}
+            "data": {"foo": "bar"},
         }
 
         return self.client.post(
-            f"/{VERSION}/api/organisations/{org.id}/libraries/", new_library, format="json"
+            f"/{VERSION}/api/organisations/{org.id}/libraries/",
+            new_library,
+            format="json",
         )
 
 
@@ -124,16 +128,13 @@ class TestUpdateLibraryPermissions(AssertErrorMixin, APITestCase):
 
         response = self._call_endpoint(LibraryFactory.create())
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_librarian_of_organisation_can_update_a_library_in_organisation(self):
         organisation = OrganisationFactory.create()
         library = LibraryFactory.create(
-            owner_organisation=organisation,
-            owner_user=None,
+            owner_organisation=organisation, owner_user=None,
         )
         person = UserFactory.create()
         organisation.members.add(person)
@@ -146,8 +147,7 @@ class TestUpdateLibraryPermissions(AssertErrorMixin, APITestCase):
     def test_member_of_organisation_cannot_update_a_library_in_organisation(self):
         organisation = OrganisationFactory.create()
         library = LibraryFactory.create(
-            owner_organisation=organisation,
-            owner_user=None,
+            owner_organisation=organisation, owner_user=None,
         )
         person = UserFactory.create()
         organisation.members.add(person)
@@ -163,24 +163,18 @@ class TestUpdateLibraryPermissions(AssertErrorMixin, APITestCase):
     def test_user_who_isnt_member_cannot_update_a_library_in_organisation(self):
         org_with_no_members = OrganisationFactory.create()
         library = LibraryFactory.create(
-            owner_organisation=org_with_no_members,
-            owner_user=None,
+            owner_organisation=org_with_no_members, owner_user=None,
         )
         person = UserFactory.create()
 
         self.client.force_authenticate(person)
         response = self._call_endpoint(library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_user_who_is_superuser_can_update_a_global_library(self):
-        library = LibraryFactory.create(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = LibraryFactory.create(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=True))
 
@@ -188,10 +182,7 @@ class TestUpdateLibraryPermissions(AssertErrorMixin, APITestCase):
         assert status.HTTP_204_NO_CONTENT == response.status_code
 
     def test_user_who_isnt_superuser_cannot_update_a_global_library(self):
-        library = LibraryFactory.create(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = LibraryFactory.create(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=False))
 
@@ -208,9 +199,7 @@ class TestUpdateLibraryPermissions(AssertErrorMixin, APITestCase):
         }
 
         return self.client.patch(
-            f"/{VERSION}/api/libraries/{library.id}/",
-            update_fields,
-            format="json",
+            f"/{VERSION}/api/libraries/{library.id}/", update_fields, format="json",
         )
 
 
@@ -236,16 +225,13 @@ class TestDeleteLibraryPermissions(AssertErrorMixin, APITestCase):
 
         response = self._call_endpoint(LibraryFactory.create())
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_librarian_of_organisation_cannot_delete_a_library_in_organisation(self):
         organisation = OrganisationFactory.create()
         library = LibraryFactory.create(
-            owner_organisation=organisation,
-            owner_user=None,
+            owner_organisation=organisation, owner_user=None,
         )
         person = UserFactory.create()
         organisation.members.add(person)
@@ -258,8 +244,7 @@ class TestDeleteLibraryPermissions(AssertErrorMixin, APITestCase):
     def test_member_of_organisation_cannot_delete_a_library_in_organisation(self):
         organisation = OrganisationFactory.create()
         library = LibraryFactory.create(
-            owner_organisation=organisation,
-            owner_user=None,
+            owner_organisation=organisation, owner_user=None,
         )
         person = UserFactory.create()
         organisation.members.add(person)
@@ -275,24 +260,18 @@ class TestDeleteLibraryPermissions(AssertErrorMixin, APITestCase):
     def test_user_who_isnt_member_cannot_delete_a_library_in_organisation(self):
         org_with_no_members = OrganisationFactory.create()
         library = LibraryFactory.create(
-            owner_organisation=org_with_no_members,
-            owner_user=None,
+            owner_organisation=org_with_no_members, owner_user=None,
         )
         person = UserFactory.create()
 
         self.client.force_authenticate(person)
         response = self._call_endpoint(library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_user_who_is_superuser_can_delete_a_global_library(self):
-        library = LibraryFactory.create(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = LibraryFactory.create(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=True))
 
@@ -300,10 +279,7 @@ class TestDeleteLibraryPermissions(AssertErrorMixin, APITestCase):
         assert status.HTTP_204_NO_CONTENT == response.status_code
 
     def test_user_who_isnt_superuser_cannot_delete_a_global_library(self):
-        library = LibraryFactory.create(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = LibraryFactory.create(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=False))
 
@@ -318,7 +294,9 @@ class TestDeleteLibraryPermissions(AssertErrorMixin, APITestCase):
         return self.client.delete(f"/{VERSION}/api/libraries/{library.id}/")
 
 
-class TestCreateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, APITestCase):
+class TestCreateLibraryItemPermissions(
+    CreateLibraryMixin, AssertErrorMixin, APITestCase
+):
     def test_owner_can_create_library_item(self):
         library = self.create_library()
         self.client.force_authenticate(library.owner_user)
@@ -341,17 +319,12 @@ class TestCreateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
 
         response = self._call_endpoint(self.create_library())
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_librarian_of_organisation_can_create_a_library_item_in_organisation(self):
         organisation = OrganisationFactory.create()
-        library = self.create_library(
-            owner_organisation=organisation,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=organisation, owner_user=None,)
         person = UserFactory.create()
         organisation.members.add(person)
         organisation.librarians.add(person)
@@ -362,10 +335,7 @@ class TestCreateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
 
     def test_member_of_organisation_cannot_create_a_library_item_in_organisation(self):
         organisation = OrganisationFactory.create()
-        library = self.create_library(
-            owner_organisation=organisation,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=organisation, owner_user=None,)
         person = UserFactory.create()
         organisation.members.add(person)
 
@@ -380,24 +350,18 @@ class TestCreateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
     def test_user_who_isnt_member_cannot_create_a_library_item_in_organisation(self):
         org_with_no_members = OrganisationFactory.create()
         library = self.create_library(
-            owner_organisation=org_with_no_members,
-            owner_user=None,
+            owner_organisation=org_with_no_members, owner_user=None,
         )
         person = UserFactory.create()
 
         self.client.force_authenticate(person)
         response = self._call_endpoint(library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_user_who_is_superuser_can_create_item_in_global_library(self):
-        library = self.create_library(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=True))
 
@@ -405,10 +369,7 @@ class TestCreateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
         assert status.HTTP_204_NO_CONTENT == response.status_code
 
     def test_user_who_isnt_superuser_cannot_create_item_in_global_library(self):
-        library = LibraryFactory.create(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = LibraryFactory.create(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=False))
 
@@ -420,21 +381,16 @@ class TestCreateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
         )
 
     def _call_endpoint(self, library):
-        item_data = {
-            "tag": "new_tag",
-            "item": {
-                "name": "bar",
-            }
-        }
+        item_data = {"tag": "new_tag", "item": {"name": "bar",}}
 
         return self.client.post(
-            f"/{VERSION}/api/libraries/{library.id}/items/",
-            item_data,
-            format="json"
+            f"/{VERSION}/api/libraries/{library.id}/items/", item_data, format="json"
         )
 
 
-class TestUpdateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, APITestCase):
+class TestUpdateLibraryItemPermissions(
+    CreateLibraryMixin, AssertErrorMixin, APITestCase
+):
     def test_owner_can_update_library(self):
         library = self.create_library()
         self.client.force_authenticate(library.owner_user)
@@ -456,17 +412,12 @@ class TestUpdateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
 
         response = self._call_endpoint(self.create_library())
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_librarian_of_organisation_can_update_a_library_item_in_organisation(self):
         organisation = OrganisationFactory.create()
-        library = self.create_library(
-            owner_organisation=organisation,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=organisation, owner_user=None,)
         person = UserFactory.create()
         organisation.members.add(person)
         organisation.librarians.add(person)
@@ -477,10 +428,7 @@ class TestUpdateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
 
     def test_member_of_organisation_cannot_update_a_library_item_in_organisation(self):
         organisation = OrganisationFactory.create()
-        library = self.create_library(
-            owner_organisation=organisation,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=organisation, owner_user=None,)
         person = UserFactory.create()
         organisation.members.add(person)
 
@@ -495,24 +443,18 @@ class TestUpdateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
     def test_user_who_isnt_member_cannot_update_a_library_item_in_organisation(self):
         org_with_no_members = OrganisationFactory.create()
         library = self.create_library(
-            owner_organisation=org_with_no_members,
-            owner_user=None,
+            owner_organisation=org_with_no_members, owner_user=None,
         )
         person = UserFactory.create()
 
         self.client.force_authenticate(person)
         response = self._call_endpoint(library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_user_who_is_superuser_can_update_item_in_global_library(self):
-        library = self.create_library(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=True))
 
@@ -520,10 +462,7 @@ class TestUpdateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
         assert status.HTTP_204_NO_CONTENT == response.status_code
 
     def test_user_who_isnt_superuser_cannot_update_item_in_global_library(self):
-        library = self.create_library(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=False))
 
@@ -543,11 +482,13 @@ class TestUpdateLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
         return self.client.put(
             f"/{VERSION}/api/libraries/{library.id}/items/tag1/",
             replacement_data,
-            format="json"
+            format="json",
         )
 
 
-class TestDeleteLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, APITestCase):
+class TestDeleteLibraryItemPermissions(
+    CreateLibraryMixin, AssertErrorMixin, APITestCase
+):
     def test_owner_can_delete_library_item(self):
         library = self.create_library()
         self.client.force_authenticate(library.owner_user)
@@ -569,17 +510,12 @@ class TestDeleteLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
 
         response = self._call_endpoint(self.create_library())
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_librarian_of_organisation_can_delete_a_library_item_in_organisation(self):
         organisation = OrganisationFactory.create()
-        library = self.create_library(
-            owner_organisation=organisation,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=organisation, owner_user=None,)
         person = UserFactory.create()
         organisation.members.add(person)
         organisation.librarians.add(person)
@@ -590,10 +526,7 @@ class TestDeleteLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
 
     def test_member_of_organisation_can_delete_a_library_item_in_organisation(self):
         organisation = OrganisationFactory.create()
-        library = self.create_library(
-            owner_organisation=organisation,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=organisation, owner_user=None,)
         person = UserFactory.create()
         organisation.members.add(person)
 
@@ -608,24 +541,18 @@ class TestDeleteLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
     def test_user_who_isnt_member_cannot_delete_a_library_item_in_organisation(self):
         org_with_no_members = OrganisationFactory.create()
         library = self.create_library(
-            owner_organisation=org_with_no_members,
-            owner_user=None,
+            owner_organisation=org_with_no_members, owner_user=None,
         )
         person = UserFactory.create()
 
         self.client.force_authenticate(person)
         response = self._call_endpoint(library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def test_user_who_is_superuser_can_delete_item_in_global_library(self):
-        library = self.create_library(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=True))
 
@@ -633,10 +560,7 @@ class TestDeleteLibraryItemPermissions(CreateLibraryMixin, AssertErrorMixin, API
         assert status.HTTP_204_NO_CONTENT == response.status_code
 
     def test_user_who_isnt_superuser_cannot_delete_item_in_global_library(self):
-        library = self.create_library(
-            owner_organisation=None,
-            owner_user=None,
-        )
+        library = self.create_library(owner_organisation=None, owner_user=None,)
 
         self.client.force_authenticate(UserFactory.create(is_superuser=False))
 

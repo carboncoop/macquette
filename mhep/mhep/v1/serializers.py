@@ -6,7 +6,7 @@ from . import VERSION
 from .models import Assessment, Library, Organisation
 
 
-class AuthorUserIDMixin():
+class AuthorUserIDMixin:
     def get_author(self, obj):
         return obj.owner.username
 
@@ -14,23 +14,19 @@ class AuthorUserIDMixin():
         return "{:d}".format(obj.owner.id)
 
 
-class StringIDMixin():
+class StringIDMixin:
     def get_id(self, obj):
-        return '{:d}'.format(obj.id)
+        return "{:d}".format(obj.id)
 
 
-class MdateMixin():
+class MdateMixin:
     def get_mdate(self, obj):
-        return "{:d}".format(
-            int(datetime.datetime.timestamp(obj.updated_at))
-        )
+        return "{:d}".format(int(datetime.datetime.timestamp(obj.updated_at)))
 
 
 class AssessmentMetadataSerializer(
-        MdateMixin,
-        StringIDMixin,
-        AuthorUserIDMixin,
-        serializers.ModelSerializer):
+    MdateMixin, StringIDMixin, AuthorUserIDMixin, serializers.ModelSerializer
+):
 
     author = serializers.SerializerMethodField()
     userid = serializers.SerializerMethodField()
@@ -38,7 +34,7 @@ class AssessmentMetadataSerializer(
     mdate = serializers.SerializerMethodField()
 
     def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user
+        validated_data["owner"] = self.context["request"].user
         validated_data["organisation"] = self.context.get("organisation", None)
         return super().create(validated_data)
 
@@ -62,6 +58,7 @@ class AssessmentFullSerializer(AssessmentMetadataSerializer):
     """
     Identical to AssessmentMetadataSerializer except that it includes the `data` field"
     """
+
     class Meta:
         model = Assessment
         fields = [
@@ -99,7 +96,7 @@ class LibrarySerializer(StringIDMixin, serializers.ModelSerializer):
         return True
 
     def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user
+        validated_data["owner"] = self.context["request"].user
         return super().create(validated_data)
 
 
@@ -130,7 +127,9 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
             return {
                 "userid": f"{user.id}",
                 "name": user.username,
-                "last_login": user.last_login.isoformat() if user.last_login else "never"
+                "last_login": user.last_login.isoformat()
+                if user.last_login
+                else "never",
             }
 
         return [userinfo(u) for u in obj.members.all()]

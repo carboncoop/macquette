@@ -26,7 +26,7 @@ from .helpers import build_static_dictionary
 STATIC_URLS = build_static_dictionary()
 
 
-class MyLibrariesMixin():
+class MyLibrariesMixin:
     def my_libraries(self):
         user_libraries = getattr(self.request.user, f"{VERSION}_libraries").all()
         user_orgs = getattr(self.request.user, f"{VERSION}_organisations").all()
@@ -40,16 +40,15 @@ class MyLibrariesMixin():
             shared_libraries = org.libraries_shared_with.all()
             all_libraries |= shared_libraries
 
-        global_libraries = Library.objects.filter(owner_user=None, owner_organisation=None)
+        global_libraries = Library.objects.filter(
+            owner_user=None, owner_organisation=None
+        )
         all_libraries |= global_libraries
 
         return all_libraries
 
 
-class ListCreateLibraries(
-        MyLibrariesMixin,
-        generics.ListCreateAPIView
-):
+class ListCreateLibraries(MyLibrariesMixin, generics.ListCreateAPIView):
 
     serializer_class = LibrarySerializer
     permission_classes = [IsAuthenticated]
@@ -59,9 +58,7 @@ class ListCreateLibraries(
 
 
 class UpdateDestroyLibrary(
-    MyLibrariesMixin,
-    generics.UpdateAPIView,
-    generics.DestroyAPIView,
+    MyLibrariesMixin, generics.UpdateAPIView, generics.DestroyAPIView,
 ):
     serializer_class = LibrarySerializer
     permission_classes = [
@@ -84,8 +81,7 @@ class UpdateDestroyLibrary(
 
 
 class CreateUpdateDeleteLibraryItem(
-    MyLibrariesMixin,
-    generics.GenericAPIView,
+    MyLibrariesMixin, generics.GenericAPIView,
 ):
     serializer_class = LibraryItemSerializer
     permission_classes = [
@@ -102,8 +98,8 @@ class CreateUpdateDeleteLibraryItem(
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        tag = serializer.validated_data['tag']
-        item = serializer.validated_data['item']
+        tag = serializer.validated_data["tag"]
+        item = serializer.validated_data["item"]
 
         library = self.get_object()
 
@@ -114,9 +110,7 @@ class CreateUpdateDeleteLibraryItem(
 
         if tag in d:
             logging.warning(f"tag {tag} already exists in library {library.id}")
-            raise BadRequest(
-                    f"tag `{tag}` already exists in library {library.id}",
-            )
+            raise BadRequest(f"tag `{tag}` already exists in library {library.id}",)
 
         d[tag] = item
         library.data = d

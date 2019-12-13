@@ -20,7 +20,9 @@ class TestListCreateLibraries(APITestCase):
         with freeze_time("2019-06-01T16:35:34Z"):
             l1 = LibraryFactory.create(owner=self.me)
             l2 = LibraryFactory.create(owner=self.me)
-            LibraryFactory.create(owner=UserFactory.create())  # another library (someone else's)
+            LibraryFactory.create(
+                owner=UserFactory.create()
+            )  # another library (someone else's)
 
         self.client.force_authenticate(self.me)
         response = self.client.get(f"/{VERSION}/api/libraries/")
@@ -61,12 +63,14 @@ class TestListCreateLibraries(APITestCase):
             new_library = {
                 "name": "test library 1",
                 "type": "test type 1",
-                "data": {"foo": "bar"}
+                "data": {"foo": "bar"},
             }
 
             self.client.force_authenticate(self.me)
             with freeze_time("2019-06-01T16:35:34Z"):
-                response = self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+                response = self.client.post(
+                    f"/{VERSION}/api/libraries/", new_library, format="json"
+                )
 
             assert response.status_code == status.HTTP_201_CREATED
 
@@ -76,7 +80,7 @@ class TestListCreateLibraries(APITestCase):
                 "name": "test library 1",
                 "type": "test type 1",
                 "writeable": True,
-                "data": {"foo": "bar"}
+                "data": {"foo": "bar"},
             }
 
             assert "id" in response.data
@@ -93,12 +97,16 @@ class TestListCreateLibraries(APITestCase):
             self.client.force_authenticate(self.me)
 
             with freeze_time("2019-06-01T16:35:34Z"):
-                response = self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+                response = self.client.post(
+                    f"/{VERSION}/api/libraries/", new_library, format="json"
+                )
 
             assert status.HTTP_400_BAD_REQUEST == response.status_code
             assert {
-                'data': [
-                    exceptions.ErrorDetail(string='This field is not a dict.', code='invalid')
+                "data": [
+                    exceptions.ErrorDetail(
+                        string="This field is not a dict.", code="invalid"
+                    )
                 ]
             } == response.data
 
@@ -106,13 +114,15 @@ class TestListCreateLibraries(APITestCase):
         new_library = {
             "name": "test library 1",
             "type": "test type 1",
-            "data": {"foo": "bar"}
+            "data": {"foo": "bar"},
         }
 
         self.client.force_authenticate(self.me)
 
         with freeze_time("2019-06-01T16:35:34Z"):
-            response = self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+            response = self.client.post(
+                f"/{VERSION}/api/libraries/", new_library, format="json"
+            )
 
         assert response.status_code == status.HTTP_201_CREATED
 

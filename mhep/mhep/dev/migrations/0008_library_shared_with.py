@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dev', '0007_add_image_model_and_featured_image'),
+        ("dev", "0007_add_image_model_and_featured_image"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='library',
-            name='shared_with',
-            field=models.ManyToManyField(blank=True, help_text='Sharing the library with another organisation gives members of that organisation read-only access: they can use the library but not update it.', related_name='libraries_shared_with', to='dev.Organisation'),
+            model_name="library",
+            name="shared_with",
+            field=models.ManyToManyField(
+                blank=True,
+                help_text="Sharing the library with another organisation gives members of that organisation read-only access: they can use the library but not update it.",
+                related_name="libraries_shared_with",
+                to="dev.Organisation",
+            ),
         ),
     ]

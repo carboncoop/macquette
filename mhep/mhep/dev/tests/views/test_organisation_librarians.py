@@ -9,7 +9,7 @@ from mhep.users.tests.factories import UserFactory
 from .mixins import AssertErrorMixin
 
 
-class SetUpMixin():
+class SetUpMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -29,12 +29,7 @@ class SetUpMixin():
         cls.org.librarians.add(cls.librarian)
 
 
-class TestCreateOrganisationLibrarians(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase
-):
-
+class TestCreateOrganisationLibrarians(SetUpMixin, AssertErrorMixin, APITestCase):
     def test_can_promote_organisation_member_as_librarian(self):
         self.org.librarians.clear()
 
@@ -74,11 +69,7 @@ class TestCreateOrganisationLibrarians(
         assert self.non_member not in self.org.librarians.all()
 
 
-class TestDeleteOrganisationLibrarians(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase
-):
+class TestDeleteOrganisationLibrarians(SetUpMixin, AssertErrorMixin, APITestCase):
     def test_can_demote_librarian_successfully(self):
         self.client.force_authenticate(self.org_admin)
 

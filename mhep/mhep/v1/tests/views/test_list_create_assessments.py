@@ -21,27 +21,29 @@ class TestListAssessments(APITestCase):
 
         with freeze_time("2019-06-01T16:35:34Z"):
             a1 = AssessmentFactory.create(
-                    name="test assessment 1",
-                    description="test description",
-                    data={"foo": "bar"},
-                    openbem_version="10.1.1",
-                    owner=user,
+                name="test assessment 1",
+                description="test description",
+                data={"foo": "bar"},
+                openbem_version="10.1.1",
+                owner=user,
             )
 
         response = self.client.get(f"/{VERSION}/api/assessments/")
 
-        expected_structure = [{
-            "id": "{}".format(a1.pk),
-            "created_at": "2019-06-01T16:35:34Z",
-            "updated_at": "2019-06-01T16:35:34Z",
-            "mdate": "1559406934",
-            "status": "In progress",
-            "openbem_version": "10.1.1",
-            "name": "test assessment 1",
-            "description": "test description",
-            "author": user.username,
-            "userid": f"{user.id}",
-        }]
+        expected_structure = [
+            {
+                "id": "{}".format(a1.pk),
+                "created_at": "2019-06-01T16:35:34Z",
+                "updated_at": "2019-06-01T16:35:34Z",
+                "mdate": "1559406934",
+                "status": "In progress",
+                "openbem_version": "10.1.1",
+                "name": "test assessment 1",
+                "description": "test description",
+                "author": user.username,
+                "userid": f"{user.id}",
+            }
+        ]
 
         assert expected_structure == response.data
 
@@ -99,14 +101,12 @@ class TestCreateAssessment(APITestCase):
             "name": "test assessment 1",
             "description": "test description 1",
             "openbem_version": "10.1.1",
-            "data": {"foo": "baz"}  # data is specifically *not* returned
+            "data": {"foo": "baz"},  # data is specifically *not* returned
         }
 
         with freeze_time("2019-06-01T16:35:34Z"):
             response = self.client.post(
-                    f"/{VERSION}/api/assessments/",
-                    new_assessment,
-                    format="json"
+                f"/{VERSION}/api/assessments/", new_assessment, format="json"
             )
 
         assert response.status_code == status.HTTP_201_CREATED
@@ -137,7 +137,9 @@ class TestCreateAssessment(APITestCase):
             "description": "test description 1",
         }
 
-        response = self.client.post(f"/{VERSION}/api/assessments/", new_assessment, format="json")
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/", new_assessment, format="json"
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         created_assessment = Assessment.objects.get(pk=response.data["id"])
@@ -152,7 +154,9 @@ class TestCreateAssessment(APITestCase):
             "description": "test description 1",
         }
 
-        response = self.client.post(f"/{VERSION}/api/assessments/", new_assessment, format="json")
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/", new_assessment, format="json"
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         created_assessment = Assessment.objects.get(pk=response.data["id"])
@@ -167,94 +171,89 @@ class TestCreateAssessment(APITestCase):
             "data": {"foo": "baz"},
         }
 
-        response = self.client.post(f"/{VERSION}/api/assessments/", new_assessment, format="json")
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/", new_assessment, format="json"
+        )
 
         assert response.status_code == status.HTTP_201_CREATED
         assert "" == response.data["description"]
 
     def test_returns_forbidden_if_not_logged_in(self):
         new_assessment = {
-                "name": "test assessment 1",
-                "openbem_version": "10.1.1",
-            }
+            "name": "test assessment 1",
+            "openbem_version": "10.1.1",
+        }
 
-        response = self.client.post(f"/{VERSION}/api/assessments/", new_assessment, format="json")
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/", new_assessment, format="json"
+        )
         assert response.status_code == status.HTTP_403_FORBIDDEN
 
     def test_create_assessment_fails_if_name_missing(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "openbem_version": "10.1.1",
-                "description": "test description 2",
-            },
+            {"openbem_version": "10.1.1", "description": "test description 2",},
             status.HTTP_400_BAD_REQUEST,
             {
-                'name': [
-                    exceptions.ErrorDetail(string='This field is required.', code='required')
+                "name": [
+                    exceptions.ErrorDetail(
+                        string="This field is required.", code="required"
+                    )
                 ]
-            }
+            },
         )
 
     def test_create_assessment_fails_if_openbem_version_missing(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "name": "test assessment 1",
-                "description": "test description 2",
-            },
+            {"name": "test assessment 1", "description": "test description 2",},
             status.HTTP_400_BAD_REQUEST,
             {
-                'openbem_version': [
-                    exceptions.ErrorDetail(string='This field is required.', code='required')
+                "openbem_version": [
+                    exceptions.ErrorDetail(
+                        string="This field is required.", code="required"
+                    )
                 ]
-            }
-         )
+            },
+        )
 
     def test_create_assessment_fails_if_openbem_version_is_not_valid_choice(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "name": "test assessment 1",
-                "openbem_version": "foo",
-            },
+            {"name": "test assessment 1", "openbem_version": "foo",},
             status.HTTP_400_BAD_REQUEST,
             {
-                'openbem_version': [
+                "openbem_version": [
                     exceptions.ErrorDetail(
-                        string='"foo" is not a valid choice.',
-                        code='invalid_choice',
+                        string='"foo" is not a valid choice.', code="invalid_choice",
                     )
                 ]
-            }
+            },
         )
 
     def test_create_assessment_fails_if_status_is_not_valid_choice(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "name": "test assessment 1",
-                "openbem_version": "10.1.1",
-                "status": "bar"
-            },
+            {"name": "test assessment 1", "openbem_version": "10.1.1", "status": "bar"},
             status.HTTP_400_BAD_REQUEST,
             {
-                'status': [
+                "status": [
                     exceptions.ErrorDetail(
-                        string='"bar" is not a valid choice.',
-                        code='invalid_choice',
+                        string='"bar" is not a valid choice.', code="invalid_choice",
                     )
                 ]
-            }
+            },
         )
 
     def assert_create_fails(self, new_assessment, expected_status, expected_response):
         self.client.force_authenticate(self.user)
 
-        response = self.client.post(f"/{VERSION}/api/assessments/", new_assessment, format="json")
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/", new_assessment, format="json"
+        )
         assert response.status_code == expected_status
         assert response.data == expected_response

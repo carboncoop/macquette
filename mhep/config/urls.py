@@ -16,15 +16,13 @@ urlpatterns = [
     path("users/", include("mhep.users.urls", namespace="users")),
     path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
-
-    path("", RedirectView.as_view(url=reverse_lazy("v1:list-assessments")), name="index"),
-
+    path(
+        "", RedirectView.as_view(url=reverse_lazy("v1:list-assessments")), name="index"
+    ),
     # Add app versions after this line
     path("dev/", include("mhep.dev.urls", namespace="dev")),
     path("v1/", include("mhep.v1.urls", namespace="v1")),
-
     path("versions/", include("mhep.versions.urls", namespace="versions")),
-
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 if settings.DEBUG:

@@ -26,7 +26,7 @@ class OrganisationAdmin(admin.ModelAdmin):
     list_display = ["name", "number_of_assessments"]
     search_fields = ["name"]
     formfield_overrides = {
-        models.ManyToManyField: {'widget': CheckboxSelectMultiple},
+        models.ManyToManyField: {"widget": CheckboxSelectMultiple},
     }
 
     def number_of_assessments(self, obj):

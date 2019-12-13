@@ -14,7 +14,9 @@ from mhep.users.tests.factories import UserFactory
 
 class TestListOrganisations(APITestCase):
     def test_shows_logged_in_users_organisations(self):
-        me = UserFactory.create(last_login=datetime.datetime(2019, 6, 3, 16, 35, 0, 0, pytz.UTC))
+        me = UserFactory.create(
+            last_login=datetime.datetime(2019, 6, 3, 16, 35, 0, 0, pytz.UTC)
+        )
         my_org = OrganisationFactory.create()
         AssessmentFactory.create(owner=me, organisation=my_org)
         AssessmentFactory.create(owner=me, organisation=my_org)
@@ -27,18 +29,23 @@ class TestListOrganisations(APITestCase):
         assert response.status_code == status.HTTP_200_OK
 
         expected = [
-            OrderedDict([
-                ("id", f"{my_org.id}"),
-                ("name", my_org.name),
-                ("assessments", 2),
-                ("members", [
-                    {
-                        "userid": f"{me.id}",
-                        "name": me.username,
-                        "last_login": me.last_login.isoformat(),
-                    }
-                ]),
-            ]),
+            OrderedDict(
+                [
+                    ("id", f"{my_org.id}"),
+                    ("name", my_org.name),
+                    ("assessments", 2),
+                    (
+                        "members",
+                        [
+                            {
+                                "userid": f"{me.id}",
+                                "name": me.username,
+                                "last_login": me.last_login.isoformat(),
+                            }
+                        ],
+                    ),
+                ]
+            ),
         ]
 
         assert expected == response.data

@@ -11,7 +11,7 @@ from mhep.users.tests.factories import UserFactory
 from .mixins import AssertErrorMixin
 
 
-class SetUpMixin():
+class SetUpMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -22,15 +22,12 @@ class SetUpMixin():
         cls.my_org.members.add(cls.org_admin)
         cls.my_org.admins.add(cls.org_admin)
 
-        cls.library = LibraryFactory.create(owner_organisation=cls.my_org, owner_user=None)
+        cls.library = LibraryFactory.create(
+            owner_organisation=cls.my_org, owner_user=None
+        )
 
 
-class TestShareOrganisationLibrary(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase
-):
-
+class TestShareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
     def test_can_share_library_with_other_organisation(self):
         self.client.force_authenticate(self.org_admin)
 
@@ -42,7 +39,9 @@ class TestShareOrganisationLibrary(
         assert status.HTTP_204_NO_CONTENT == response.status_code
         assert self.library in self.other_org.libraries_shared_with.all()
 
-    def test_returns_204_if_sharing_library_thats_already_shared_with_organisation(self):
+    def test_returns_204_if_sharing_library_thats_already_shared_with_organisation(
+        self,
+    ):
         self.client.force_authenticate(self.org_admin)
 
         self.library.shared_with.add(self.other_org)
@@ -103,12 +102,7 @@ class TestShareOrganisationLibrary(
         assert self.library not in self.other_org.libraries_shared_with.all()
 
 
-class TestUnshareOrganisationLibrary(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase
-):
-
+class TestUnshareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
     def test_can_unshare_library_with_other_organisation(self):
         self.library.shared_with.add(self.other_org)
 
@@ -121,7 +115,9 @@ class TestUnshareOrganisationLibrary(
         assert status.HTTP_204_NO_CONTENT == response.status_code
         assert self.library not in self.other_org.libraries_shared_with.all()
 
-    def test_returns_204_if_unsharing_library_thats_not_already_shared_with_organisation(self):
+    def test_returns_204_if_unsharing_library_thats_not_already_shared_with_organisation(
+        self,
+    ):
         self.library.shared_with.add(self.other_org)
 
         self.client.force_authenticate(self.org_admin)
@@ -141,9 +137,7 @@ class TestUnshareOrganisationLibrary(
         )
 
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            f"Organisation not found",
+            response, status.HTTP_404_NOT_FOUND, f"Organisation not found",
         )
 
     def test_returns_404_if_other_organisation_id_doesnt_exist(self):
@@ -180,9 +174,7 @@ class TestUnshareOrganisationLibrary(
 
 
 class TestListOrganisationLibraryShares(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase,
+    SetUpMixin, AssertErrorMixin, APITestCase,
 ):
     def test_returns_organisations_a_library_is_shared_with(self):
         self.library.shared_with.add(self.other_org)
@@ -194,10 +186,9 @@ class TestListOrganisationLibraryShares(
 
         assert status.HTTP_200_OK == response.status_code
         expected = [
-            OrderedDict([
-                ("id", f"{self.other_org.id}"),
-                ("name", self.other_org.name),
-            ]),
+            OrderedDict(
+                [("id", f"{self.other_org.id}"), ("name", self.other_org.name),]
+            ),
         ]
 
         assert expected == response.data
@@ -209,9 +200,7 @@ class TestListOrganisationLibraryShares(
         )
 
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            f"Organisation not found",
+            response, status.HTTP_404_NOT_FOUND, f"Organisation not found",
         )
 
     def test_returns_404_if_library_id_doesnt_exist(self):
