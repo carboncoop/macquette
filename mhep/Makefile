@@ -12,8 +12,8 @@ dev: docker-up ## Bring docker up and run the local server
 	python manage.py runserver
 
 pip-compile:  ## Recompile requirements file after a change
-	pip-compile --output-file=requirements/local.txt requirements/local.in
-	pip-compile --output-file=requirements/production.txt requirements/production.in
+	pip-compile -q --output-file=requirements/local.txt requirements/local.in
+	pip-compile -q --output-file=requirements/production.txt requirements/production.in
 
 pip-upgrade:  ## Try to upgrade requirements files to latest available versions
 	pip-compile -U --output-file=requirements/local.txt requirements/local.in
@@ -38,5 +38,3 @@ coverage:  ## Run tests & generate line-by-line coverage
 test:  ## Run tests and flake8
 	pytest --cov=mhep
 	flake8 mhep
-
-
