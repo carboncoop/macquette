@@ -1,3 +1,8 @@
 # Registration templates
 
-These are very basic and designed for use when Auth0 isn't being used as the IdP.
+These are very basic.
+
+login.html is only used when Auth0 isn't used.
+
+login_error.html is used for when Auth0 auth doesn't work.
+
