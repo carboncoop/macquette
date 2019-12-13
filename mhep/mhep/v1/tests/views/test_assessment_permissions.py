@@ -7,7 +7,7 @@ from ... import VERSION
 from ..factories import AssessmentFactory, OrganisationFactory
 
 
-class AssessmentPermissionTestsMixin():
+class AssessmentPermissionTestsMixin:
     def test_owner_who_isnt_organisation_member_can_access(self):
         assessment = AssessmentFactory.create()
         self.client.force_authenticate(assessment.owner)
@@ -46,9 +46,7 @@ class AssessmentPermissionTestsMixin():
 
         response = self._call_endpoint(assessment)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
 

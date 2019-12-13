@@ -4,9 +4,5 @@ from mhep.versions.views import ListVersionsView
 app_name = "versions"
 
 urlpatterns = [
-    path(
-        "",
-        ListVersionsView.as_view(),
-        name="list-versions",
-    ),
+    path("", ListVersionsView.as_view(), name="list-versions",),
 ]

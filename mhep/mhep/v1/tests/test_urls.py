@@ -1,4 +1,5 @@
 import pytest
+
 # from django.conf import settings
 from django.urls import reverse, resolve
 
@@ -9,22 +10,28 @@ pytestmark = pytest.mark.django_db
 
 
 def test_assessments_home():
+    assert reverse(f"{VERSION}:list-assessments") == f"/{VERSION}/assessments/"
     assert (
-        reverse(f"{VERSION}:list-assessments") == f"/{VERSION}/assessments/"
+        resolve(f"/{VERSION}/assessments/").view_name == f"{VERSION}:list-assessments"
     )
-    assert resolve(f"/{VERSION}/assessments/").view_name == f"{VERSION}:list-assessments"
 
 
 def test_list_create_assessments(assessment: Assessment):
     assert (
         reverse(f"{VERSION}:list-create-assessments") == f"/{VERSION}/api/assessments/"
     )
-    assert resolve(f"/{VERSION}/api/assessments/").view_name == f"{VERSION}:list-create-assessments"
+    assert (
+        resolve(f"/{VERSION}/api/assessments/").view_name
+        == f"{VERSION}:list-create-assessments"
+    )
 
 
 def test_assessment_detail_update_destroy(assessment: Assessment):
     assert (
-        reverse(f"{VERSION}:retrieve-update-destroy-assessment", kwargs={"pk": assessment.id})
+        reverse(
+            f"{VERSION}:retrieve-update-destroy-assessment",
+            kwargs={"pk": assessment.id},
+        )
         == f"/{VERSION}/api/assessments/{assessment.id}/"
     )
     assert (
@@ -34,10 +41,11 @@ def test_assessment_detail_update_destroy(assessment: Assessment):
 
 
 def test_list_create_libraries():
+    assert reverse(f"{VERSION}:list-create-libraries") == f"/{VERSION}/api/libraries/"
     assert (
-        reverse(f"{VERSION}:list-create-libraries") == f"/{VERSION}/api/libraries/"
+        resolve(f"/{VERSION}/api/libraries/").view_name
+        == f"{VERSION}:list-create-libraries"
     )
-    assert resolve(f"/{VERSION}/api/libraries/").view_name == f"{VERSION}:list-create-libraries"
 
 
 def test_update_destroy_library(library: Library):
@@ -53,7 +61,9 @@ def test_update_destroy_library(library: Library):
 
 def test_create_library_item(library: Library):
     assert (
-        reverse(f"{VERSION}:create-update-delete-library-item", kwargs={"pk": library.id})
+        reverse(
+            f"{VERSION}:create-update-delete-library-item", kwargs={"pk": library.id}
+        )
         == f"/{VERSION}/api/libraries/{library.id}/items/"
     )
     assert (
@@ -66,7 +76,10 @@ def test_update_destroy_library_item(library: Library):
     tag = "SW_01"
 
     assert (
-        reverse(f"{VERSION}:create-update-delete-library-item", kwargs={"pk": library.id, "tag": tag})
+        reverse(
+            f"{VERSION}:create-update-delete-library-item",
+            kwargs={"pk": library.id, "tag": tag},
+        )
         == f"/{VERSION}/api/libraries/{library.id}/items/{tag}/"
     )
     assert (
@@ -76,11 +89,10 @@ def test_update_destroy_library_item(library: Library):
 
 
 def test_list_organisations():
+    assert reverse(f"{VERSION}:list-organisations") == f"/{VERSION}/api/organisations/"
     assert (
-        reverse(f"{VERSION}:list-organisations") == f"/{VERSION}/api/organisations/"
-    )
-    assert (
-        resolve(f"/{VERSION}/api/organisations/").view_name == f"{VERSION}:list-organisations"
+        resolve(f"/{VERSION}/api/organisations/").view_name
+        == f"{VERSION}:list-organisations"
     )
 
 

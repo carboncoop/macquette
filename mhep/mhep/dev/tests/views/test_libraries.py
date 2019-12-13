@@ -21,7 +21,9 @@ class TestListLibraries(APITestCase):
             l1 = LibraryFactory.create(owner_user=self.me)
             l2 = LibraryFactory.create(owner_user=self.me)
             global_lib = LibraryFactory.create(owner_user=None, owner_organisation=None)
-            LibraryFactory.create(owner_user=UserFactory.create())  # another library (someone else's)
+            LibraryFactory.create(
+                owner_user=UserFactory.create()
+            )  # another library (someone else's)
 
         self.client.force_authenticate(self.me)
         response = self.client.get(f"/{VERSION}/api/libraries/")
@@ -35,10 +37,7 @@ class TestListLibraries(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "name": l1.name,
             "type": l1.type,
-            "permissions": {
-                "can_write": True,
-                "can_share": False,
-            },
+            "permissions": {"can_write": True, "can_share": False,},
             "data": l1.data,
             "owner": {
                 "id": f"{self.me.id}",
@@ -53,10 +52,7 @@ class TestListLibraries(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "name": l2.name,
             "type": l2.type,
-            "permissions": {
-                "can_write": True,
-                "can_share": False,
-            },
+            "permissions": {"can_write": True, "can_share": False,},
             "data": l2.data,
             "owner": {
                 "id": f"{self.me.id}",
@@ -71,16 +67,9 @@ class TestListLibraries(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "name": global_lib.name,
             "type": global_lib.type,
-            "permissions": {
-                "can_write": False,
-                "can_share": False,
-            },
+            "permissions": {"can_write": False, "can_share": False,},
             "data": global_lib.data,
-            "owner": {
-                "id": None,
-                "name": "Global",
-                "type": "global",
-            },
+            "owner": {"id": None, "name": "Global", "type": "global",},
         } == response.data[2]
 
     def test_includes_libraries_from_my_organisations(self):
@@ -129,7 +118,9 @@ class TestListLibraries(APITestCase):
 
         my_org.members.add(self.me)
 
-        shared_lib = LibraryFactory.create(owner_organisation=sharing_org, owner_user=None)
+        shared_lib = LibraryFactory.create(
+            owner_organisation=sharing_org, owner_user=None
+        )
         shared_lib.shared_with.add(my_org)
 
         self.client.force_authenticate(self.me)
@@ -231,12 +222,14 @@ class TestCreateLibraries(APITestCase):
             new_library = {
                 "name": "test library 1",
                 "type": "test type 1",
-                "data": {"foo": "bar"}
+                "data": {"foo": "bar"},
             }
 
             self.client.force_authenticate(self.me)
             with freeze_time("2019-06-01T16:35:34Z"):
-                response = self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+                response = self.client.post(
+                    f"/{VERSION}/api/libraries/", new_library, format="json"
+                )
 
             assert response.status_code == status.HTTP_201_CREATED
 
@@ -245,10 +238,7 @@ class TestCreateLibraries(APITestCase):
                 "updated_at": "2019-06-01T16:35:34Z",
                 "name": "test library 1",
                 "type": "test type 1",
-                "permissions": {
-                    "can_write": True,
-                    "can_share": False,
-                },
+                "permissions": {"can_write": True, "can_share": False,},
                 "data": {"foo": "bar"},
                 "owner": {
                     "id": f"{self.me.id}",
@@ -271,12 +261,16 @@ class TestCreateLibraries(APITestCase):
             self.client.force_authenticate(self.me)
 
             with freeze_time("2019-06-01T16:35:34Z"):
-                response = self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+                response = self.client.post(
+                    f"/{VERSION}/api/libraries/", new_library, format="json"
+                )
 
             assert status.HTTP_400_BAD_REQUEST == response.status_code
             assert {
-                'data': [
-                    exceptions.ErrorDetail(string='This field is not a dict.', code='invalid')
+                "data": [
+                    exceptions.ErrorDetail(
+                        string="This field is not a dict.", code="invalid"
+                    )
                 ]
             } == response.data
 
@@ -284,13 +278,15 @@ class TestCreateLibraries(APITestCase):
         new_library = {
             "name": "test library 1",
             "type": "test type 1",
-            "data": {"foo": "bar"}
+            "data": {"foo": "bar"},
         }
 
         self.client.force_authenticate(self.me)
 
         with freeze_time("2019-06-01T16:35:34Z"):
-            response = self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+            response = self.client.post(
+                f"/{VERSION}/api/libraries/", new_library, format="json"
+            )
 
         assert response.status_code == status.HTTP_201_CREATED
 
@@ -325,9 +321,7 @@ class TestUpdateLibrary(APITestCase):
             self.client.force_authenticate(self.me)
 
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/",
-                updateFields,
-                format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
@@ -350,9 +344,7 @@ class TestUpdateLibrary(APITestCase):
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/",
-                updateFields,
-                format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
@@ -383,35 +375,25 @@ class TestCreateLibraryItem(APITestCase):
         cls.library = LibraryFactory.create(data={"tag1": {"name": "foo"}})
 
     def test_create_library_item(self):
-        item_data = {
-            "tag": "tag2",
-            "item": {
-                "name": "bar",
-            }
-        }
+        item_data = {"tag": "tag2", "item": {"name": "bar",}}
 
         self.client.force_authenticate(self.library.owner_user)
         response = self.client.post(
             f"/{VERSION}/api/libraries/{self.library.id}/items/",
             item_data,
-            format="json"
+            format="json",
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_create_library_item_fails_if_tag_already_exists(self):
-        item_data = {
-            "tag": "tag1",
-            "item": {
-                "name": "bar",
-            }
-        }
+        item_data = {"tag": "tag1", "item": {"name": "bar",}}
 
         self.client.force_authenticate(self.library.owner_user)
         response = self.client.post(
             f"/{VERSION}/api/libraries/{self.library.id}/items/",
             item_data,
-            format="json"
+            format="json",
         )
 
         assert response.status_code == status.HTTP_400_BAD_REQUEST
@@ -423,14 +405,13 @@ class TestCreateLibraryItem(APITestCase):
 class TestUpdateDestroyLibraryItem(APITestCase):
     def test_destroy_library_item(self):
         library = LibraryFactory.create(
-            data={
-                "tag1": {"name": "foo"},
-                "tag2": {"name": "bar"},
-            },
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"},},
         )
 
         self.client.force_authenticate(library.owner_user)
-        response = self.client.delete(f"/{VERSION}/api/libraries/{library.id}/items/tag2/")
+        response = self.client.delete(
+            f"/{VERSION}/api/libraries/{library.id}/items/tag2/"
+        )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
@@ -438,11 +419,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
         assert retrieved.data == {"tag1": {"name": "foo"}}
 
     def test_update_library_item(self):
-        library = LibraryFactory.create(
-            data={
-                "tag1": {"name": "foo"},
-            },
-        )
+        library = LibraryFactory.create(data={"tag1": {"name": "foo"},},)
 
         replacement_data = {
             "name": "bar",
@@ -454,7 +431,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
             response = self.client.put(
                 f"/{VERSION}/api/libraries/{library.id}/items/tag1/",
                 replacement_data,
-                format="json"
+                format="json",
             )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -474,7 +451,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
         response = self.client.put(
             f"/{VERSION}/api/libraries/{library.id}/items/tag5/",
             replacement_data,
-            format="json"
+            format="json",
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND

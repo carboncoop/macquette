@@ -25,7 +25,7 @@ CACHES = {
 
 # EMAIL
 # ------------------------------------------------------------------------------
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 
 # django-debug-toolbar
 # ------------------------------------------------------------------------------

@@ -8,23 +8,33 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('v1', '0001_initial'),
+        ("v1", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='assessment',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='v1_assessments', to=settings.AUTH_USER_MODEL),
+            model_name="assessment",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="v1_assessments",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='library',
-            name='owner',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.PROTECT, related_name='v1_libraries', to=settings.AUTH_USER_MODEL),
+            model_name="library",
+            name="owner",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="v1_libraries",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AlterField(
-            model_name='organisation',
-            name='members',
-            field=models.ManyToManyField(blank=True, related_name='v1_organisations', to=settings.AUTH_USER_MODEL),
+            model_name="organisation",
+            name="members",
+            field=models.ManyToManyField(
+                blank=True, related_name="v1_organisations", to=settings.AUTH_USER_MODEL
+            ),
         ),
     ]

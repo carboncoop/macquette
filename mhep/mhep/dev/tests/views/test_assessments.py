@@ -21,11 +21,10 @@ class TestCreateAssessment(CreateAssessmentTestsMixin, APITestCase):
     note that the actual tests are provided by the CreateAssessmentTestsMixin, since they are
     common with the tests for TestCreateAssessmentForOrganisation
     """
+
     def post_to_create_endpoint(self, assessment):
         return self.client.post(
-            f"/{VERSION}/api/assessments/",
-            assessment,
-            format="json"
+            f"/{VERSION}/api/assessments/", assessment, format="json"
         )
 
 
@@ -36,11 +35,11 @@ class TestListAssessments(APITestCase):
 
         with freeze_time("2019-06-01T16:35:34Z"):
             a1 = AssessmentFactory.create(
-                    name="test assessment 1",
-                    description="test description",
-                    data={"foo": "bar"},
-                    openbem_version="10.1.1",
-                    owner=user,
+                name="test assessment 1",
+                description="test description",
+                data={"foo": "bar"},
+                openbem_version="10.1.1",
+                owner=user,
             )
 
         response = self.client.get(f"/{VERSION}/api/assessments/")
@@ -105,12 +104,12 @@ class TestGetAssessment(APITestCase):
     def test_returns_result_structured_as_expected(self):
         with freeze_time("2019-06-01T16:35:34Z"):
             a = AssessmentFactory.create(
-                    owner=self.me,
-                    name="test name",
-                    description="test description",
-                    data={"foo": "bar"},
-                    status="In progress",
-                    openbem_version="10.1.1",
+                owner=self.me,
+                name="test name",
+                description="test description",
+                data={"foo": "bar"},
+                status="In progress",
+                openbem_version="10.1.1",
             )
 
         i = ImageFactory.create(assessment=a)
@@ -150,11 +149,11 @@ class TestGetAssessment(APITestCase):
     def test_assessment_without_data_returns_sensible_default(self):
         with freeze_time("2019-06-01T16:35:34Z"):
             a = AssessmentFactory.create(
-                    owner=self.me,
-                    name="test name",
-                    openbem_version="10.1.1",
-                    description="",
-                    data={},
+                owner=self.me,
+                name="test name",
+                openbem_version="10.1.1",
+                description="",
+                data={},
             )
 
         self.client.force_authenticate(self.me)
@@ -184,12 +183,12 @@ class TestGetAssessment(APITestCase):
 
     def test_structure_of_featured_and_normal_image(self):
         a = AssessmentFactory.create(
-                owner=self.me,
-                name="test name",
-                description="test description",
-                data={"foo": "bar"},
-                status="In progress",
-                openbem_version="10.1.1",
+            owner=self.me,
+            name="test name",
+            description="test description",
+            data={"foo": "bar"},
+            status="In progress",
+            openbem_version="10.1.1",
         )
 
         i1 = ImageFactory.create(assessment=a)
@@ -235,12 +234,12 @@ class TestUpdateAssessment(APITestCase):
         cls.me = UserFactory.create()
         with freeze_time("2019-06-01T16:35:34Z"):
             cls.assessment = AssessmentFactory.create(
-                    owner=cls.me,
-                    name="test name",
-                    description="test description",
-                    data={"foo": "bar"},
-                    status="In progress",
-                    openbem_version="10.1.1",
+                owner=cls.me,
+                name="test name",
+                description="test description",
+                data={"foo": "bar"},
+                status="In progress",
+                openbem_version="10.1.1",
             )
 
         super().setUpClass()
@@ -283,8 +282,10 @@ class TestUpdateAssessment(APITestCase):
 
         assert status.HTTP_400_BAD_REQUEST == response.status_code
         assert response.data == {
-            'data': [
-                exceptions.ErrorDetail(string='This field is not a dict.', code='invalid')
+            "data": [
+                exceptions.ErrorDetail(
+                    string="This field is not a dict.", code="invalid"
+                )
             ]
         }
 
@@ -305,16 +306,16 @@ class TestUpdateAssessment(APITestCase):
             )
 
         assert status.HTTP_400_BAD_REQUEST == response.status_code
-        assert response.data == {'detail': "can't update data when status is 'complete'"}
+        assert response.data == {
+            "detail": "can't update data when status is 'complete'"
+        }
 
     def test_assessment_status_can_change_from_complete_to_in_progress(self):
         self.assessment.status = "Complete"
         self.assessment.save()
 
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "status": "In progress"
-            }
+            updateFields = {"status": "In progress"}
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(
@@ -332,24 +333,24 @@ class TestDestroyAssessment(APITestCase):
         cls.me = UserFactory.create()
         with freeze_time("2019-06-01T16:35:34Z"):
             cls.assessment = AssessmentFactory.create(
-                    owner=cls.me,
-                    name="test name",
-                    description="test description",
-                    data={"foo": "bar"},
-                    status="In progress",
-                    openbem_version="10.1.1",
+                owner=cls.me,
+                name="test name",
+                description="test description",
+                data={"foo": "bar"},
+                status="In progress",
+                openbem_version="10.1.1",
             )
 
         super().setUpClass()
 
     def test_returns_204_if_user_is_owner(self):
         a = AssessmentFactory.create(
-                owner=self.me,
-                name="test name",
-                description="test description",
-                data={"foo": "bar"},
-                status="In progress",
-                openbem_version="10.1.1",
+            owner=self.me,
+            name="test name",
+            description="test description",
+            data={"foo": "bar"},
+            status="In progress",
+            openbem_version="10.1.1",
         )
 
         assessment_count = Assessment.objects.count()

@@ -7,13 +7,15 @@ import mhep.dev.models.image
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dev', '0007_add_image_model_and_featured_image'),
+        ("dev", "0007_add_image_model_and_featured_image"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='image',
-            name='image',
-            field=models.ImageField(max_length=200, upload_to=mhep.dev.models.image.Image._image_path),
+            model_name="image",
+            name="image",
+            field=models.ImageField(
+                max_length=200, upload_to=mhep.dev.models.image.Image._image_path
+            ),
         ),
     ]

@@ -6,12 +6,29 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dev', '0002_owner_user_and_owner_organisation'),
+        ("dev", "0002_owner_user_and_owner_organisation"),
     ]
 
     operations = [
         migrations.AddConstraint(
-            model_name='library',
-            constraint=models.CheckConstraint(check=models.Q(models.Q(('owner_user__isnull', False), ('owner_organisation__isnull', True)), models.Q(('owner_user__isnull', True), ('owner_organisation__isnull', False)), models.Q(('owner_user__isnull', True), ('owner_organisation__isnull', True)), _connector='OR'), name='owner_cant_be_both_user_and_organisation'),
+            model_name="library",
+            constraint=models.CheckConstraint(
+                check=models.Q(
+                    models.Q(
+                        ("owner_user__isnull", False),
+                        ("owner_organisation__isnull", True),
+                    ),
+                    models.Q(
+                        ("owner_user__isnull", True),
+                        ("owner_organisation__isnull", False),
+                    ),
+                    models.Q(
+                        ("owner_user__isnull", True),
+                        ("owner_organisation__isnull", True),
+                    ),
+                    _connector="OR",
+                ),
+                name="owner_cant_be_both_user_and_organisation",
+            ),
         ),
     ]

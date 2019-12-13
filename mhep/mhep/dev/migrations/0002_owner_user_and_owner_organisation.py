@@ -8,23 +8,33 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('dev', '0001_initial'),
+        ("dev", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='library',
-            old_name='owner',
-            new_name='owner_user',
+            model_name="library", old_name="owner", new_name="owner_user",
         ),
         migrations.AddField(
-            model_name='library',
-            name='owner_organisation',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='dev_libraries', to='dev.Organisation'),
+            model_name="library",
+            name="owner_organisation",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="dev_libraries",
+                to="dev.Organisation",
+            ),
         ),
         migrations.AlterField(
-            model_name='library',
-            name='owner_user',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.PROTECT, related_name='dev_libraries', to=settings.AUTH_USER_MODEL),
+            model_name="library",
+            name="owner_user",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.PROTECT,
+                related_name="dev_libraries",
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
     ]

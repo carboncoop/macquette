@@ -10,7 +10,8 @@ class Library(models.Model):
 
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=False, blank=False,
+        null=False,
+        blank=False,
         on_delete=models.PROTECT,
         related_name="%(app_label)s_libraries",
     )

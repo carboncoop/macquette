@@ -12,9 +12,7 @@ from sentry_sdk.integrations.logging import LoggingIntegration
 from corsheaders.defaults import default_methods
 from corsheaders.defaults import default_headers
 
-ROOT_DIR = (
-    environ.Path(__file__) - 3
-)  # (mhep/config/settings/base.py - 3 = mhep/)
+ROOT_DIR = environ.Path(__file__) - 3  # (mhep/config/settings/base.py - 3 = mhep/)
 APPS_DIR = ROOT_DIR.path("mhep")
 
 env = environ.Env()
@@ -102,7 +100,6 @@ THIRD_PARTY_APPS = [
 
 LOCAL_APPS = [
     "mhep.users.apps.UsersConfig",
-
     # Your stuff: custom apps go here
     "mhep.dev.apps.AssessmentsConfig",
     "mhep.v1.apps.AssessmentsConfig",
@@ -311,7 +308,7 @@ CORS_ALLOW_METHODS = list(default_methods)
 CORS_ALLOW_HEADERS = list(default_headers)
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ([
-        'rest_framework.authentication.SessionAuthentication',
-    ]),
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        ["rest_framework.authentication.SessionAuthentication",]
+    ),
 }

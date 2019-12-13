@@ -22,9 +22,7 @@ from ..serializers import (
 from .mixins import AssessmentQuerySetMixin
 
 
-class ListCreateAssessments(
-    generics.ListCreateAPIView
-):
+class ListCreateAssessments(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AssessmentMetadataSerializer
 
@@ -33,8 +31,7 @@ class ListCreateAssessments(
 
 
 class RetrieveUpdateDestroyAssessment(
-    AssessmentQuerySetMixin,
-    generics.RetrieveUpdateDestroyAPIView,
+    AssessmentQuerySetMixin, generics.RetrieveUpdateDestroyAPIView,
 ):
     serializer_class = AssessmentFullSerializer
     permission_classes = [
@@ -47,7 +44,7 @@ class RetrieveUpdateDestroyAssessment(
         if "data" in request.data and obj.status == "Complete":
             return Response(
                 {"detail": "can't update data when status is 'complete'"},
-                status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST,
             )
 
         response = super().update(request, *args, **kwargs)
@@ -58,10 +55,7 @@ class RetrieveUpdateDestroyAssessment(
             return response
 
 
-class SetFeaturedImage(
-    AssessmentQuerySetMixin,
-    generics.GenericAPIView
-):
+class SetFeaturedImage(AssessmentQuerySetMixin, generics.GenericAPIView):
     permission_classes = [
         IsAuthenticated,
         IsAssessmentOwner | IsMemberOfConnectedOrganisation,
@@ -78,14 +72,13 @@ class SetFeaturedImage(
             image = Image.objects.get(pk=serializer.validated_data["id"])
         except Image.DoesNotExist:
             return Response(
-                {"detail": "image ID doesn't exist"},
-                status.HTTP_400_BAD_REQUEST
+                {"detail": "image ID doesn't exist"}, status.HTTP_400_BAD_REQUEST
             )
 
         if image not in assessment.images.all():
             return Response(
                 {"detail": "image ID provided doesn't belong to this assessment"},
-                status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST,
             )
 
         assessment.featured_image = image
@@ -94,10 +87,7 @@ class SetFeaturedImage(
         return Response(None, status.HTTP_204_NO_CONTENT)
 
 
-class UploadAssessmentImage(
-    AssessmentQuerySetMixin,
-    generics.GenericAPIView
-):
+class UploadAssessmentImage(AssessmentQuerySetMixin, generics.GenericAPIView):
     parser_class = [parsers.FileUploadParser]
     permission_classes = [
         IsAuthenticated,
@@ -145,7 +135,7 @@ class UploadAssessmentImage(
             return Response({"detail": "no file provided"}, status.HTTP_400_BAD_REQUEST)
 
         assessment = self.get_object()
-        file = request.FILES['file']
+        file = request.FILES["file"]
         record = Image(assessment=assessment, image=file)
         self._make_thumbnail(record)
         self._set_note(record)

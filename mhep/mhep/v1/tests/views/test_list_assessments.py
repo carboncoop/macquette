@@ -20,11 +20,11 @@ class TestListAssessments(APITestCase):
 
         with freeze_time("2019-06-01T16:35:34Z"):
             a1 = AssessmentFactory.create(
-                    name="test assessment 1",
-                    description="test description",
-                    data={"foo": "bar"},
-                    openbem_version="10.1.1",
-                    owner=user,
+                name="test assessment 1",
+                description="test description",
+                data={"foo": "bar"},
+                openbem_version="10.1.1",
+                owner=user,
             )
 
         response = self.client.get(f"/{VERSION}/api/assessments/")

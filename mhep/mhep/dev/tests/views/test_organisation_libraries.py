@@ -25,7 +25,7 @@ class TestCreateOrganisationLibraries(APITestCase):
             new_library = {
                 "name": "test library 1",
                 "type": "test type 1",
-                "data": {"foo": "bar"}
+                "data": {"foo": "bar"},
             }
 
             self.client.force_authenticate(self.me)
@@ -43,15 +43,12 @@ class TestCreateOrganisationLibraries(APITestCase):
                 "updated_at": "2019-06-01T16:35:34Z",
                 "name": "test library 1",
                 "type": "test type 1",
-                "permissions": {
-                    "can_write": True,
-                    "can_share": False,
-                },
+                "permissions": {"can_write": True, "can_share": False,},
                 "data": {"foo": "bar"},
                 "owner": {
                     "id": f"{self.org.id}",
                     "name": f"{self.org.name}",
-                    "type": "organisation"
+                    "type": "organisation",
                 },
             }
 
@@ -77,8 +74,10 @@ class TestCreateOrganisationLibraries(APITestCase):
 
             assert status.HTTP_400_BAD_REQUEST == response.status_code
             assert {
-                'data': [
-                    exceptions.ErrorDetail(string='This field is not a dict.', code='invalid')
+                "data": [
+                    exceptions.ErrorDetail(
+                        string="This field is not a dict.", code="invalid"
+                    )
                 ]
             } == response.data
 
@@ -86,7 +85,7 @@ class TestCreateOrganisationLibraries(APITestCase):
         new_library = {
             "name": "test library 1",
             "type": "test type 1",
-            "data": {"foo": "bar"}
+            "data": {"foo": "bar"},
         }
 
         self.client.force_authenticate(self.me)

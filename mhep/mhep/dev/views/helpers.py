@@ -47,7 +47,7 @@ def find_app_static_files():
     for root, dirs, files in os.walk(static_dir):
         for fn in files:
             full_filename = join(root, fn)
-            relative_filename = full_filename[len(static_dir)+1:]
+            relative_filename = full_filename[len(static_dir) + 1 :]
             # print("relative: {}".format(relative_filename))
             yield relative_filename
 
@@ -72,6 +72,7 @@ def check_library_write_permissions(library, original_request):
     """
 
     from ..views import UpdateDestroyLibrary  # avoid circular import
+
     original_method = original_request.method
 
     original_request.method = "PATCH"
@@ -117,7 +118,9 @@ def check_library_share_permissions(library, original_request):
 
     # check object-level permissions
     for permission in view.get_permissions():
-        if not permission.has_object_permission(original_request, view, owner_organisation):
+        if not permission.has_object_permission(
+            original_request, view, owner_organisation
+        ):
             return False
 
     return True

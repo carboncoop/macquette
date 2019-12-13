@@ -11,7 +11,7 @@ from ....models import Assessment
 User = get_user_model()
 
 
-class CreateAssessmentTestsMixin():
+class CreateAssessmentTestsMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -29,7 +29,7 @@ class CreateAssessmentTestsMixin():
             "name": "test assessment 1",
             "description": "test description 1",
             "openbem_version": "10.1.1",
-            "data": {"foo": "baz"}  # data is specifically *not* returned
+            "data": {"foo": "baz"},  # data is specifically *not* returned
         }
 
         with freeze_time("2019-06-01T16:35:34Z"):
@@ -100,9 +100,9 @@ class CreateAssessmentTestsMixin():
 
     def test_returns_forbidden_if_not_logged_in(self):
         new_assessment = {
-                "name": "test assessment 1",
-                "openbem_version": "10.1.1",
-            }
+            "name": "test assessment 1",
+            "openbem_version": "10.1.1",
+        }
 
         response = self.post_to_create_endpoint(new_assessment)
 
@@ -112,71 +112,60 @@ class CreateAssessmentTestsMixin():
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "openbem_version": "10.1.1",
-                "description": "test description 2",
-            },
+            {"openbem_version": "10.1.1", "description": "test description 2",},
             status.HTTP_400_BAD_REQUEST,
             {
-                'name': [
-                    exceptions.ErrorDetail(string='This field is required.', code='required')
+                "name": [
+                    exceptions.ErrorDetail(
+                        string="This field is required.", code="required"
+                    )
                 ]
-            }
+            },
         )
 
     def test_create_assessment_fails_if_openbem_version_missing(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "name": "test assessment 1",
-                "description": "test description 2",
-            },
+            {"name": "test assessment 1", "description": "test description 2",},
             status.HTTP_400_BAD_REQUEST,
             {
-                'openbem_version': [
-                    exceptions.ErrorDetail(string='This field is required.', code='required')
+                "openbem_version": [
+                    exceptions.ErrorDetail(
+                        string="This field is required.", code="required"
+                    )
                 ]
-            }
-         )
+            },
+        )
 
     def test_create_assessment_fails_if_openbem_version_is_not_valid_choice(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "name": "test assessment 1",
-                "openbem_version": "foo",
-            },
+            {"name": "test assessment 1", "openbem_version": "foo",},
             status.HTTP_400_BAD_REQUEST,
             {
-                'openbem_version': [
+                "openbem_version": [
                     exceptions.ErrorDetail(
-                        string='"foo" is not a valid choice.',
-                        code='invalid_choice',
+                        string='"foo" is not a valid choice.', code="invalid_choice",
                     )
                 ]
-            }
+            },
         )
 
     def test_create_assessment_fails_if_status_is_not_valid_choice(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {
-                "name": "test assessment 1",
-                "openbem_version": "10.1.1",
-                "status": "bar"
-            },
+            {"name": "test assessment 1", "openbem_version": "10.1.1", "status": "bar"},
             status.HTTP_400_BAD_REQUEST,
             {
-                'status': [
+                "status": [
                     exceptions.ErrorDetail(
-                        string='"bar" is not a valid choice.',
-                        code='invalid_choice',
+                        string='"bar" is not a valid choice.', code="invalid_choice",
                     )
                 ]
-            }
+            },
         )
 
     def assert_create_fails(self, new_assessment, expected_status, expected_response):

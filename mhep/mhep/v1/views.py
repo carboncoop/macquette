@@ -31,11 +31,13 @@ from .helpers import build_static_dictionary
 STATIC_URLS = build_static_dictionary()
 
 
-class AssessmentQuerySetMixin():
+class AssessmentQuerySetMixin:
     def get_queryset(self, *args, **kwargs):
         my_assessments = Assessment.objects.filter(owner=self.request.user)
         assessments_in_my_organisations = Assessment.objects.filter(
-            organisation__in=getattr(self.request.user, f"{VERSION}_organisations").all()
+            organisation__in=getattr(
+                self.request.user, f"{VERSION}_organisations"
+            ).all()
         )
         return my_assessments | assessments_in_my_organisations
 
@@ -44,7 +46,7 @@ class BadRequest(exceptions.APIException):
     status_code = status.HTTP_400_BAD_REQUEST
 
 
-class CommonContextMixin():
+class CommonContextMixin:
     def get_context_data(self, object=None, **kwargs):
         context = super().get_context_data(**kwargs)
         context["VERSION"] = VERSION
@@ -52,7 +54,9 @@ class CommonContextMixin():
         return context
 
 
-class AssessmentHTMLView(CommonContextMixin, AssessmentQuerySetMixin, LoginRequiredMixin, DetailView):
+class AssessmentHTMLView(
+    CommonContextMixin, AssessmentQuerySetMixin, LoginRequiredMixin, DetailView
+):
     template_name = f"{VERSION}/view.html"
     context_object_name = "assessment"
     model = Assessment
@@ -72,10 +76,7 @@ class ListAssessmentsHTMLView(CommonContextMixin, LoginRequiredMixin, TemplateVi
     template_name = f"{VERSION}/assessments.html"
 
 
-
-class ListCreateAssessments(
-    generics.ListCreateAPIView
-):
+class ListCreateAssessments(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
     serializer_class = AssessmentMetadataSerializer
 
@@ -84,8 +85,7 @@ class ListCreateAssessments(
 
 
 class RetrieveUpdateDestroyAssessment(
-    AssessmentQuerySetMixin,
-    generics.RetrieveUpdateDestroyAPIView,
+    AssessmentQuerySetMixin, generics.RetrieveUpdateDestroyAPIView,
 ):
     serializer_class = AssessmentFullSerializer
     permission_classes = [
@@ -98,7 +98,7 @@ class RetrieveUpdateDestroyAssessment(
         if "data" in request.data and obj.status == "Complete":
             return Response(
                 {"detail": "can't update data when status is 'complete'"},
-                status.HTTP_400_BAD_REQUEST
+                status.HTTP_400_BAD_REQUEST,
             )
 
         response = super().update(request, *args, **kwargs)
@@ -118,8 +118,7 @@ class ListCreateLibraries(generics.ListCreateAPIView):
 
 
 class UpdateDestroyLibrary(
-    generics.UpdateAPIView,
-    generics.DestroyAPIView,
+    generics.UpdateAPIView, generics.DestroyAPIView,
 ):
     serializer_class = LibrarySerializer
     permission_classes = [
@@ -149,9 +148,7 @@ class ListOrganisations(generics.ListAPIView):
         return getattr(self.request.user, f"{VERSION}_organisations").all()
 
 
-class CreateUpdateDeleteLibraryItem(
-    generics.GenericAPIView,
-):
+class CreateUpdateDeleteLibraryItem(generics.GenericAPIView,):
     serializer_class = LibraryItemSerializer
     permission_classes = [
         IsAuthenticated,
@@ -167,8 +164,8 @@ class CreateUpdateDeleteLibraryItem(
             print(serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        tag = serializer.validated_data['tag']
-        item = serializer.validated_data['item']
+        tag = serializer.validated_data["tag"]
+        item = serializer.validated_data["item"]
 
         library = self.get_object()
 
@@ -179,9 +176,7 @@ class CreateUpdateDeleteLibraryItem(
 
         if tag in d:
             logging.warning(f"tag {tag} already exists in library {library.id}")
-            raise BadRequest(
-                    f"tag `{tag}` already exists in library {library.id}",
-            )
+            raise BadRequest(f"tag `{tag}` already exists in library {library.id}",)
 
         d[tag] = item
         library.data = d

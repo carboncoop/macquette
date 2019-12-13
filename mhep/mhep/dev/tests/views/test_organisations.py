@@ -17,7 +17,9 @@ pytestmark = pytest.mark.django_db  # enable DB and run each test in transaction
 
 class TestListOrganisations(APITestCase):
     def test_shows_logged_in_users_organisations(self):
-        me = UserFactory.create(last_login=datetime.datetime(2019, 6, 3, 16, 35, 0, 0, pytz.UTC))
+        me = UserFactory.create(
+            last_login=datetime.datetime(2019, 6, 3, 16, 35, 0, 0, pytz.UTC)
+        )
         my_org = OrganisationFactory.create()
 
         org_admin = UserFactory.create(
@@ -38,32 +40,40 @@ class TestListOrganisations(APITestCase):
         assert response.status_code == status.HTTP_200_OK
 
         expected = [
-            OrderedDict([
-                ("id", f"{my_org.id}"),
-                ("name", my_org.name),
-                ("assessments", 2),
-                ("members", [
-                    {
-                        "userid": f"{me.id}",
-                        "name": me.username,
-                        "is_admin": False,
-                        "is_librarian": True,
-                        "last_login": me.last_login.isoformat(),
-                    },
-                    {
-                        "userid": f"{org_admin.id}",
-                        "name": org_admin.username,
-                        "is_admin": True,
-                        "is_librarian": False,
-                        "last_login": org_admin.last_login.isoformat(),
-                    },
-                ]),
-                ("permissions", {
-                    "can_add_remove_members": False,
-                    "can_promote_demote_librarians": False,
-                }),
-                ("report", {}),
-            ]),
+            OrderedDict(
+                [
+                    ("id", f"{my_org.id}"),
+                    ("name", my_org.name),
+                    ("assessments", 2),
+                    (
+                        "members",
+                        [
+                            {
+                                "userid": f"{me.id}",
+                                "name": me.username,
+                                "is_admin": False,
+                                "is_librarian": True,
+                                "last_login": me.last_login.isoformat(),
+                            },
+                            {
+                                "userid": f"{org_admin.id}",
+                                "name": org_admin.username,
+                                "is_admin": True,
+                                "is_librarian": False,
+                                "last_login": org_admin.last_login.isoformat(),
+                            },
+                        ],
+                    ),
+                    (
+                        "permissions",
+                        {
+                            "can_add_remove_members": False,
+                            "can_promote_demote_librarians": False,
+                        },
+                    ),
+                    ("report", {}),
+                ]
+            ),
         ]
 
         assert expected == response.data
@@ -107,10 +117,7 @@ class TestListOrganisationsPermissions(APITestCase):
 
         self._assert_permissions(
             self.client.get(f"/{VERSION}/api/organisations/"),
-            {
-                "can_add_remove_members": False,
-                "can_promote_demote_librarians": False,
-            }
+            {"can_add_remove_members": False, "can_promote_demote_librarians": False,},
         )
 
     def test_shows_permissions_for_logged_in_admin(self):
@@ -118,10 +125,7 @@ class TestListOrganisationsPermissions(APITestCase):
 
         self._assert_permissions(
             self.client.get(f"/{VERSION}/api/organisations/"),
-            {
-                "can_add_remove_members": True,
-                "can_promote_demote_librarians": True,
-            }
+            {"can_add_remove_members": True, "can_promote_demote_librarians": True,},
         )
 
     def _assert_permissions(self, response, expected_permissions):

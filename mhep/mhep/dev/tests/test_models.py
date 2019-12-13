@@ -83,23 +83,20 @@ def test__libraries_shared_with__related_name_on_organisation_model():
     assert other_org.libraries_shared_with.count() == 1
 
 
-class TestOrganisationOwner():
+class TestOrganisationOwner:
     def test_can_have_user_owner(self):
         Library.objects.create(
-            owner_user=UserFactory.create(),
-            owner_organisation=None,
+            owner_user=UserFactory.create(), owner_organisation=None,
         )
 
     def test_can_have_organisation_owner(self):
         Library.objects.create(
-            owner_organisation=OrganisationFactory.create(),
-            owner_user=None,
+            owner_organisation=OrganisationFactory.create(), owner_user=None,
         )
 
     def test_can_have_no_owner(self):
         Library.objects.create(
-            owner_organisation=None,
-            owner_user=None,
+            owner_organisation=None, owner_user=None,
         )
 
     def test_cannot_have_both_user_and_organisation_owner(self):

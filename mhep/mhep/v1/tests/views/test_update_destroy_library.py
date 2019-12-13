@@ -33,9 +33,7 @@ class TestUpdateLibrary(APITestCase):
             self.client.force_authenticate(self.me)
 
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/",
-                updateFields,
-                format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
@@ -58,9 +56,7 @@ class TestUpdateLibrary(APITestCase):
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/",
-                updateFields,
-                format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code

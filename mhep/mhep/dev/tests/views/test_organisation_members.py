@@ -9,7 +9,7 @@ from mhep.users.tests.factories import UserFactory
 from .mixins import AssertErrorMixin
 
 
-class SetUpMixin():
+class SetUpMixin:
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
@@ -25,12 +25,7 @@ class SetUpMixin():
         cls.org.admins.add(cls.org_admin)
 
 
-class TestCreateOrganisationMembers(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase
-):
-
+class TestCreateOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
     def test_can_add_member_to_organisation(self):
         self.client.force_authenticate(self.org_admin)
 
@@ -52,11 +47,7 @@ class TestCreateOrganisationMembers(
         assert self.member in self.org.members.all()
 
 
-class TestDeleteOrganisationMembers(
-    SetUpMixin,
-    AssertErrorMixin,
-    APITestCase
-):
+class TestDeleteOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
     def test_can_remove_member_successfully(self):
         self.client.force_authenticate(self.org_admin)
 

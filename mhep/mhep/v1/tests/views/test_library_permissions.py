@@ -7,7 +7,7 @@ from ... import VERSION
 from ..factories import LibraryFactory
 
 
-class CommonMixin():
+class CommonMixin:
     def _assert_error(self, response, expected_status, expected_detail):
         assert expected_status == response.status_code
         assert {"detail": expected_detail} == response.json()
@@ -38,10 +38,12 @@ class TestCreateLibraryPermissions(CommonMixin, APITestCase):
         new_library = {
             "name": "test library 1",
             "type": "test type 1",
-            "data": {"foo": "bar"}
+            "data": {"foo": "bar"},
         }
 
-        return self.client.post(f"/{VERSION}/api/libraries/", new_library, format="json")
+        return self.client.post(
+            f"/{VERSION}/api/libraries/", new_library, format="json"
+        )
 
 
 class TestUpdateLibraryPermissions(CommonMixin, APITestCase):
@@ -65,9 +67,7 @@ class TestUpdateLibraryPermissions(CommonMixin, APITestCase):
 
         response = self._call_endpoint(self.library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def _call_endpoint(self, library):
@@ -76,9 +76,7 @@ class TestUpdateLibraryPermissions(CommonMixin, APITestCase):
         }
 
         return self.client.patch(
-            f"/{VERSION}/api/libraries/{library.id}/",
-            update_fields,
-            format="json",
+            f"/{VERSION}/api/libraries/{library.id}/", update_fields, format="json",
         )
 
 
@@ -103,9 +101,7 @@ class TestDeleteLibraryPermissions(CommonMixin, APITestCase):
 
         response = self._call_endpoint(self.library)
         self._assert_error(
-            response,
-            status.HTTP_404_NOT_FOUND,
-            "Not found.",
+            response, status.HTTP_404_NOT_FOUND, "Not found.",
         )
 
     def _call_endpoint(self, library):

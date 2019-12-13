@@ -5,10 +5,11 @@ import datetime
 from rest_framework import serializers
 
 from .models import Assessment, Image, Library, Organisation
+
 User = get_user_model()
 
 
-class AuthorUserIDMixin():
+class AuthorUserIDMixin:
     def get_author(self, obj):
         return obj.owner.username
 
@@ -16,19 +17,17 @@ class AuthorUserIDMixin():
         return "{:d}".format(obj.owner.id)
 
 
-class StringIDMixin():
+class StringIDMixin:
     def get_id(self, obj):
-        return '{:d}'.format(obj.id)
+        return "{:d}".format(obj.id)
 
 
-class MdateMixin():
+class MdateMixin:
     def get_mdate(self, obj):
-        return "{:d}".format(
-            int(datetime.datetime.timestamp(obj.updated_at))
-        )
+        return "{:d}".format(int(datetime.datetime.timestamp(obj.updated_at)))
 
 
-class ImagesMixin():
+class ImagesMixin:
     def get_images(self, obj):
         if obj.featured_image is not None:
             featured_id = obj.featured_image.id
@@ -39,7 +38,7 @@ class ImagesMixin():
         return s.data
 
 
-class IsFeaturedMixin():
+class IsFeaturedMixin:
     def get_is_featured(self, obj):
         if "featured_id" in self.context:
             return self.context["featured_id"] == obj.id
@@ -76,10 +75,8 @@ class ImageUpdateSerializer(serializers.Serializer):
 
 
 class AssessmentMetadataSerializer(
-        MdateMixin,
-        StringIDMixin,
-        AuthorUserIDMixin,
-        serializers.ModelSerializer):
+    MdateMixin, StringIDMixin, AuthorUserIDMixin, serializers.ModelSerializer
+):
 
     author = serializers.SerializerMethodField()
     userid = serializers.SerializerMethodField()
@@ -87,7 +84,7 @@ class AssessmentMetadataSerializer(
     mdate = serializers.SerializerMethodField()
 
     def create(self, validated_data):
-        validated_data['owner'] = self.context['request'].user
+        validated_data["owner"] = self.context["request"].user
         validated_data["organisation"] = self.context.get("organisation", None)
         return super().create(validated_data)
 
@@ -112,6 +109,7 @@ class AssessmentFullSerializer(ImagesMixin, AssessmentMetadataSerializer):
     Identical to AssessmentMetadataSerializer except that it includes the `data` and
     `images` fields
     """
+
     images = serializers.SerializerMethodField()
 
     class Meta:
@@ -151,11 +149,18 @@ class LibrarySerializer(StringIDMixin, serializers.ModelSerializer):
         ]
 
     def get_permissions(self, library):
-        from .views.helpers import check_library_write_permissions, check_library_share_permissions
+        from .views.helpers import (
+            check_library_write_permissions,
+            check_library_share_permissions,
+        )
 
         return {
-            "can_write": check_library_write_permissions(library, self.context["request"]),
-            "can_share": check_library_share_permissions(library, self.context["request"]),
+            "can_write": check_library_write_permissions(
+                library, self.context["request"]
+            ),
+            "can_share": check_library_share_permissions(
+                library, self.context["request"]
+            ),
         }
 
     def get_owner(self, obj):
@@ -183,9 +188,9 @@ class LibrarySerializer(StringIDMixin, serializers.ModelSerializer):
     def create(self, validated_data):
         organisation = self.context.get("organisation", None)
         if organisation is not None:
-            validated_data['owner_organisation'] = organisation
+            validated_data["owner_organisation"] = organisation
         else:
-            validated_data['owner_user'] = self.context['request'].user
+            validated_data["owner_user"] = self.context["request"].user
         return super().create(validated_data)
 
 
@@ -219,15 +224,17 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
             return {
                 "userid": f"{user.id}",
                 "name": user.username,
-                "last_login": user.last_login.isoformat() if user.last_login else "never",
+                "last_login": user.last_login.isoformat()
+                if user.last_login
+                else "never",
                 "is_admin": user in org.admins.all(),
-                "is_librarian": user in org.librarians.all()
+                "is_librarian": user in org.librarians.all(),
             }
 
         return [userinfo(u) for u in org.members.all()]
 
     def get_permissions(self, org):
-        user = self.context['request'].user
+        user = self.context["request"].user
         return {
             "can_add_remove_members": user in org.admins.all(),
             "can_promote_demote_librarians": user in org.admins.all(),
@@ -238,6 +245,7 @@ class OrganisationMetadataSerializer(OrganisationSerializer):
     """
     OrganisationMetadataSerializer serializes the id and name of an organisation.
     """
+
     class Meta:
         model = Organisation
         fields = [

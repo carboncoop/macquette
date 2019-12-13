@@ -1,4 +1,3 @@
-
 from freezegun import freeze_time
 
 from rest_framework.test import APITestCase
@@ -12,14 +11,13 @@ from ..factories import LibraryFactory
 class TestUpdateDestroyLibraryItem(APITestCase):
     def test_destroy_library_item(self):
         library = LibraryFactory.create(
-            data={
-                "tag1": {"name": "foo"},
-                "tag2": {"name": "bar"},
-            },
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"},},
         )
 
         self.client.force_authenticate(library.owner)
-        response = self.client.delete(f"/{VERSION}/api/libraries/{library.id}/items/tag2/")
+        response = self.client.delete(
+            f"/{VERSION}/api/libraries/{library.id}/items/tag2/"
+        )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
@@ -27,11 +25,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
         assert retrieved.data == {"tag1": {"name": "foo"}}
 
     def test_update_library_item(self):
-        library = LibraryFactory.create(
-            data={
-                "tag1": {"name": "foo"},
-            },
-        )
+        library = LibraryFactory.create(data={"tag1": {"name": "foo"},},)
 
         replacement_data = {
             "name": "bar",
@@ -43,7 +37,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
             response = self.client.put(
                 f"/{VERSION}/api/libraries/{library.id}/items/tag1/",
                 replacement_data,
-                format="json"
+                format="json",
             )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -63,7 +57,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
         response = self.client.put(
             f"/{VERSION}/api/libraries/{library.id}/items/tag5/",
             replacement_data,
-            format="json"
+            format="json",
         )
 
         assert response.status_code == status.HTTP_404_NOT_FOUND

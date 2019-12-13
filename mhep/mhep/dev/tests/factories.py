@@ -13,6 +13,7 @@ from faker.providers import BaseProvider
 class Provider(BaseProvider):
     def dict(self):
         from faker import Faker
+
         fake = Faker()
         return {fake.word(): fake.sentence()}
 
@@ -70,6 +71,7 @@ class OrganisationWithExtrasFactory(OrganisationFactory):
     @factory.post_generation
     def assessments(self, create: bool, extracted: Sequence[Any], **kwargs):
         from mhep.users.tests.factories import UserFactory
+
         self._assessment_owner = UserFactory.create()
         self.assessments.add(AssessmentFactory.create(owner=self._assessment_owner))
 
