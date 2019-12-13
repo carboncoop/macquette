@@ -40,7 +40,7 @@
 
 {% block content %}
 
-<div id="wrapper">
+<div style="max-width: 1120px; margin: 30px auto 45px; padding: 0 15px;">
 
     <div id="organisation" class="main-block" style="display:none">
         <button id="back-myview" style="float:right; margin-top:5px; margin-right:5px" class="btn">Home</button>
@@ -50,7 +50,7 @@
             <span id="organisation-name"></span>
         </div>
 
-        <div style="padding:10px">
+        <div>
             <table id="organisation-members" class="table">
                 <tr id="organisation-member-template" class="organisation-member" style="display: none;">
                     <td style="width: 50%;">
@@ -113,7 +113,7 @@
 
     <div class="main-block">
         <div style="background-color:rgba(215, 210, 201, 0.9); color:#897A67; padding:10px;"><b>My Organisations</b></div>
-        <div style="padding:10px">
+        <div>
             <div id="myorganisations"></div>
             {% if request.user.is_staff %}
             <br>
@@ -123,8 +123,8 @@
     </div>
 </div>
 
-<div id="wrapper" class="assessments">
-    <div style="padding-right:10px">
+<div style="max-width: 1120px; margin: 0 auto; padding: 0 15px" class="assessments">
+    <div>
         <div class="main-block">
             <button id="new-assessment" style="float:right; margin-top:5px; margin-right:5px" class="btn">New</button>
             <div style="background-color:rgba(215, 210, 201, 0.9); color:#897A67; padding:10px;"><b><span id="assessments-title"></span></b></div>

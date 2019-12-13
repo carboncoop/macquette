@@ -48,6 +48,17 @@
 
 {% endblock %}
 
+
+{% block extra_nav %}
+    <a id="undo">
+        <svg style="width: 1rem; height: 1rem"><use xlink:href="#iconset-undo" /></svg>
+    </a>
+    <a id="redo">
+        <svg style="width: 1rem; height: 1rem; transform: scaleX(-1);"><use xlink:href="#iconset-undo" /></svg>
+    </a>
+{% endblock %}
+
+
 {% block content %}
 
 <div id="openbem">
@@ -122,11 +133,12 @@
         </div>
     </div>
 
-    <div id="wrapper">
-        <div style="height:10px"></div>
-        <div class="scenario-name"></div>
-        <a class="house_graphic" style="margin:-30px 30px; float:right; cursor:pointer">Show house graphic</a>
-        <div id="topgraphic" class="overview"></div>
+    <div id="wrapper" class="pa-30">
+        <div class="d-flex justify-content-between align-items-center pb-30">
+            <h2 class="scenario-name ma-0">Scenario X</h2>
+            <button class="btn house_graphic">Show house graphic</button>
+        </div>
+        <div id="topgraphic" class="overview pb-30"></div>
         <div id="bound">
             <div id="content">
             </div>
@@ -277,8 +289,7 @@
     var historical_index; // pointer for the historical array, pointing the current version of project
     historical.unshift(JSON.stringify(project));
     historical_index = 0;
-    $('.navbar-inner').append('<div style="display:inline" class="menu-assessment pull-right" id="redo"><a><img src="{% static VERSION|add:"/img/redo.gif" %}" title="Redo" style="width:14px" /></a></div>');
-    $('.navbar-inner').append('<div style="display:inline" class="menu-assessment pull-right" id="undo"><a><img src="{% static VERSION|add:"/img/undo.gif" %}" title="Undo" style="width:14px" / > </a></div> ');
+
     refresh_undo_redo_buttons();
 
     //*******************************************************************
@@ -509,7 +520,7 @@
         location.reload();
     });
     // Do/undo
-    $('#emoncms-navbar').on('click', '#undo', function () {
+    $('body').on('click', '#undo', function () {
         if (historical_index < historical.length - 1) {
             historical_index++;
             project = JSON.parse(historical[historical_index]);
@@ -518,7 +529,7 @@
 
         refresh_undo_redo_buttons();
     });
-    $('#emoncms-navbar').on('click', '#redo', function () {
+    $('body').on('click', '#redo', function () {
         if (historical_index > 0) {
             historical_index--;
             project = JSON.parse(historical[historical_index]);
@@ -777,16 +788,11 @@
     }
     function sidebar_resize() {
         var width = $(window).width();
-        var height = $(window).height();
-        var nav = $(".navbar").height();
-        $("#sidebar").height(height - nav);
 
         if (width < max_wrapper_width) {
             hide_sidebar()
-        }
-        else {
-            if (sidebar_enabled)
-                show_sidebar()
+        } else if (sidebar_enabled) {
+            show_sidebar()
         }
     }
     function show_sidebar() {
@@ -795,19 +801,14 @@
 
         var width = $(window).width();
         sidebar_visible = true;
-        $("#sidebar").css("left", "340px");
-        if (width >= max_wrapper_width)
-            $("#wrapper").css("padding-left", "280px");
-        $("#wrapper").css("margin", "0");
-        $("#sidenav-open").hide();
-        $("#sidenav-close").hide();
+
+        $("#wrapper").css("margin", "15px 15px 15px 305px")
+        $("#sidebar").show();
     }
     function hide_sidebar() {
         sidebar_visible = false;
-        $("#sidebar").css("left", "0");
-        $("#wrapper").css("padding-left", "0");
-        $("#wrapper").css("margin", "0 auto");
-        $("#sidenav-open").show();
+        $("#wrapper").css("margin", "15px auto")
+        $("#sidebar").hide();
     }
     function toggle_scenario_menu(project_id) {
         const $menu_content = $(`div[scenario="${project_id}"] .menu-content`);
