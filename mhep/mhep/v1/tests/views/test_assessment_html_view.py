@@ -19,7 +19,7 @@ class TestListAssessmentsHTMLView(TestCase):
         cls.my_assessment = AssessmentFactory.create(owner=cls.me)
 
     def test_logged_out_users_get_redirected_to_log_in(self):
-        login_url = reverse("account_login")
+        login_url = reverse("login")
         my_assessments_url = reverse(f"{VERSION}:list-assessments")
         response = self.client.get(my_assessments_url)
         self.assertRedirects(response, f"{login_url}?next={my_assessments_url}")
@@ -41,7 +41,7 @@ class TestAssessmentHTMLView(TestCase):
         cls.my_assessment = AssessmentFactory.create(owner=cls.me)
 
     def test_logged_out_users_get_redirected_to_log_in(self):
-        login_url = reverse("account_login")  # '/accounts/login/'
+        login_url = reverse("login")  # '/accounts/login/'
         my_assessment_url = f"/{VERSION}/assessments/{self.my_assessment.pk}/"
         response = self.client.get(my_assessment_url)
         self.assertRedirects(response, f"{login_url}?next={my_assessment_url}")
@@ -56,7 +56,7 @@ class TestAssessmentHTMLView(TestCase):
         self,
     ):
         organisation = OrganisationFactory.create()
-        organisation_assessment = AssessmentFactory.create(organisation=organisation,)
+        organisation_assessment = AssessmentFactory.create(organisation=organisation)
         organisation.members.add(self.me)
 
         self.client.login(username=self.me.username, password="foo")

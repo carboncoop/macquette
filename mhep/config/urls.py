@@ -12,9 +12,6 @@ admin.site.index_title = "My Home Energy Planner administration"
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
-    path("users/", include("mhep.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
     # Your stuff: custom urls includes go here
     path(
         "", RedirectView.as_view(url=reverse_lazy("v1:list-assessments")), name="index"
@@ -24,6 +21,9 @@ urlpatterns = [
     path("v1/", include("mhep.v1.urls", namespace="v1")),
     path("versions/", include("mhep.versions.urls", namespace="versions")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+if True:
+    urlpatterns += [path("", include("django.contrib.auth.urls"))]
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit

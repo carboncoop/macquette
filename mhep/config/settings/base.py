@@ -89,14 +89,7 @@ DJANGO_APPS = [
     "django.contrib.admin",
     "import_export",
 ]
-THIRD_PARTY_APPS = [
-    "corsheaders",
-    "crispy_forms",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "rest_framework",
-]
+THIRD_PARTY_APPS = ["corsheaders", "crispy_forms", "rest_framework"]
 
 LOCAL_APPS = [
     "mhep.users.apps.UsersConfig",
@@ -115,16 +108,15 @@ MIGRATION_MODULES = {"sites": "mhep.contrib.sites.migrations"}
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
-]
+AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
+LOGIN_REDIRECT_URL = "/"
+# https://docs.djangoproject.com/en/dev/ref/settings/#logout-redirect-url
+LOGOUT_REDIRECT_URL = "/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "account_login"
+LOGIN_URL = "/login/"
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -282,21 +274,6 @@ LOGGING = {
 }
 
 
-# django-allauth
-# ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", False)
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_REQUIRED = False
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "none"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = "mhep.users.adapters.AccountAdapter"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = "mhep.users.adapters.SocialAccountAdapter"
-
-
 # Your stuff...
 # ------------------------------------------------------------------------------
 
@@ -309,6 +286,6 @@ CORS_ALLOW_HEADERS = list(default_headers)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        ["rest_framework.authentication.SessionAuthentication",]
-    ),
+        ["rest_framework.authentication.SessionAuthentication"]
+    )
 }

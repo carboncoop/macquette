@@ -20,9 +20,8 @@ coreapi==2.3.3
 coreschema==0.0.4         # via coreapi
 coverage==4.5.4
 decorator==4.4.1          # via ipython, traitlets
-defusedxml==0.6.0         # via odfpy, python3-openid
+defusedxml==0.6.0         # via odfpy
 diff-match-patch==20181111  # via django-import-export
-django-allauth==0.39.1
 django-cors-headers==3.1.0
 django-coverage-plugin==1.6.0
 django-crispy-forms==1.7.2
@@ -58,7 +57,6 @@ mccabe==0.6.1             # via flake8, pylint
 more-itertools==8.0.2     # via pytest, zipp
 mypy-extensions==0.4.3    # via mypy
 mypy==0.750
-oauthlib==3.1.0           # via requests-oauthlib
 odfpy==1.4.0              # via tablib
 openpyxl==3.0.2           # via tablib
 packaging==19.2           # via pytest, sphinx
@@ -84,10 +82,8 @@ pytest-cov==2.8.1
 pytest-django==3.7.0
 pytest==5.3.1
 python-dateutil==2.8.1    # via faker, freezegun
-python3-openid==3.1.0     # via django-allauth
 pytz==2019.3
 pyyaml==5.2               # via tablib
-requests-oauthlib==1.3.0  # via django-allauth
 requests==2.22.0
 sentry-sdk==0.10.2
 six==1.13.0               # via argon2-cffi, astroid, django-coverage-plugin, django-extensions, faker, freezegun, packaging, pip-tools, python-dateutil, traitlets
