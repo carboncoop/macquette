@@ -46,6 +46,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/dev/ref/settings/#locale-paths
 LOCALE_PATHS = [ROOT_DIR.path("locale")]
 
+# The externally-accessible URL of the site
+# This is used to tell external apps where we are. e.g. Auth0 post-login redirects
+SITE_URL = env.str("SITE_URL", "")
+
 
 # Sentry
 # ------------------------------------------------------------------------------
@@ -89,14 +93,7 @@ DJANGO_APPS = [
     "django.contrib.admin",
     "import_export",
 ]
-THIRD_PARTY_APPS = [
-    "corsheaders",
-    "crispy_forms",
-    "allauth",
-    "allauth.account",
-    "allauth.socialaccount",
-    "rest_framework",
-]
+THIRD_PARTY_APPS = ["corsheaders", "crispy_forms", "social_django", "rest_framework"]
 
 LOCAL_APPS = [
     "mhep.users.apps.UsersConfig",
@@ -114,17 +111,38 @@ MIGRATION_MODULES = {"sites": "mhep.contrib.sites.migrations"}
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
-# https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
-AUTHENTICATION_BACKENDS = [
-    "django.contrib.auth.backends.ModelBackend",
-    "allauth.account.auth_backends.AuthenticationBackend",
-]
+# USE_AUTH_SERVICE toggles whether we use the external IdP (Auth0)
+USE_AUTH_SERVICE = env.bool("USE_AUTH_SERVICE", default=False)
+
+if USE_AUTH_SERVICE is True:
+    # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
+    AUTHENTICATION_BACKENDS = [
+        "mhep.users.backends.Auth0",
+        "django.contrib.auth.backends.ModelBackend",
+    ]
+    # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+    LOGIN_URL = "/login/auth0"
+
+    # https://auth0.com/blog/django-tutorial-building-and-securing-web-applications/#Integrating.Django.and.Auth0
+    SOCIAL_AUTH_TRAILING_SLASH = False
+    SOCIAL_AUTH_LOGIN_ERROR_URL = "/login-error/"
+    SOCIAL_AUTH_AUTH0_DOMAIN = env.str("AUTH0_DOMAIN")
+    SOCIAL_AUTH_AUTH0_KEY = env.str("AUTH0_CLIENT_ID")
+    SOCIAL_AUTH_AUTH0_SECRET = env.str("AUTH0_CLIENT_SECRET")
+    SOCIAL_AUTH_AUTH0_SCOPE = ["openid", "profile"]
+
+else:
+    # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
+    AUTHENTICATION_BACKENDS = ["django.contrib.auth.backends.ModelBackend"]
+    # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
+    LOGIN_URL = "/login/"
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-redirect-url
-LOGIN_REDIRECT_URL = "users:redirect"
-# https://docs.djangoproject.com/en/dev/ref/settings/#login-url
-LOGIN_URL = "account_login"
+LOGIN_REDIRECT_URL = "/"
+# https://docs.djangoproject.com/en/dev/ref/settings/#logout-redirect-url
+LOGOUT_REDIRECT_URL = "/"
 
 # PASSWORDS
 # ------------------------------------------------------------------------------
@@ -160,6 +178,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "mhep.users.backends.ExceptionMiddleware",
 ]
 
 # STATIC
@@ -282,21 +301,6 @@ LOGGING = {
 }
 
 
-# django-allauth
-# ------------------------------------------------------------------------------
-ACCOUNT_ALLOW_REGISTRATION = env.bool("DJANGO_ACCOUNT_ALLOW_REGISTRATION", False)
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_AUTHENTICATION_METHOD = "username"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_REQUIRED = False
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_EMAIL_VERIFICATION = "none"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-ACCOUNT_ADAPTER = "mhep.users.adapters.AccountAdapter"
-# https://django-allauth.readthedocs.io/en/latest/configuration.html
-SOCIALACCOUNT_ADAPTER = "mhep.users.adapters.SocialAccountAdapter"
-
-
 # Your stuff...
 # ------------------------------------------------------------------------------
 
@@ -309,6 +313,6 @@ CORS_ALLOW_HEADERS = list(default_headers)
 
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
-        ["rest_framework.authentication.SessionAuthentication",]
-    ),
+        ["rest_framework.authentication.SessionAuthentication"]
+    )
 }

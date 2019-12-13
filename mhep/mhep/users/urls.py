@@ -1,14 +1,17 @@
+from django.conf import settings
+from django.urls import include
 from django.urls import path
 
-from mhep.users.views import (
-    user_redirect_view,
-    user_update_view,
-    user_detail_view,
-)
+from . import views
 
-app_name = "users"
-urlpatterns = [
-    path("~redirect/", view=user_redirect_view, name="redirect"),
-    path("~update/", view=user_update_view, name="update"),
-    path("<str:username>/", view=user_detail_view, name="detail"),
-]
+# User management
+if settings.USE_AUTH_SERVICE:
+
+    urlpatterns = [
+        path("", include("social_django.urls")),
+        path("logout/", views.logout, name="logout"),
+        path("log_in/", views.Login.as_view(), name="login"),
+        path("login-error/", views.LoginError.as_view(), name="login-error"),
+    ]
+else:
+    urlpatterns = [path("", include("django.contrib.auth.urls"))]

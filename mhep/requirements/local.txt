@@ -20,9 +20,8 @@ coreapi==2.3.3
 coreschema==0.0.4         # via coreapi
 coverage==4.5.4
 decorator==4.4.1          # via ipython, traitlets
-defusedxml==0.6.0         # via odfpy, python3-openid
+defusedxml==0.6.0         # via odfpy, python3-openid, social-auth-core
 diff-match-patch==20181111  # via django-import-export
-django-allauth==0.39.1
 django-cors-headers==3.1.0
 django-coverage-plugin==1.6.0
 django-crispy-forms==1.7.2
@@ -34,6 +33,7 @@ django-model-utils==3.2.0
 django==2.2.4
 djangorestframework==3.10.2
 docutils==0.15.2          # via sphinx
+ecdsa==0.14.1             # via python-jose
 entrypoints==0.3          # via flake8
 et-xmlfile==1.0.1         # via openpyxl
 factory-boy==2.12.0
@@ -58,7 +58,7 @@ mccabe==0.6.1             # via flake8, pylint
 more-itertools==8.0.2     # via pytest, zipp
 mypy-extensions==0.4.3    # via mypy
 mypy==0.750
-oauthlib==3.1.0           # via requests-oauthlib
+oauthlib==3.1.0           # via requests-oauthlib, social-auth-core
 odfpy==1.4.0              # via tablib
 openpyxl==3.0.2           # via tablib
 packaging==19.2           # via pytest, sphinx
@@ -72,10 +72,12 @@ prompt-toolkit==3.0.2     # via ipython
 psycopg2-binary==2.8.4
 ptyprocess==0.6.0         # via pexpect
 py==1.8.0                 # via pytest
+pyasn1==0.4.8             # via python-jose, rsa
 pycodestyle==2.5.0        # via flake8
 pycparser==2.19           # via cffi
 pyflakes==2.1.1           # via flake8
 pygments==2.5.2           # via ipython, sphinx
+pyjwt==1.7.1              # via social-auth-core
 pylint-django==2.0.13
 pylint-plugin-utils==0.6  # via pylint-django
 pylint==2.4.4             # via pylint-django, pylint-plugin-utils
@@ -84,14 +86,18 @@ pytest-cov==2.8.1
 pytest-django==3.7.0
 pytest==5.3.1
 python-dateutil==2.8.1    # via faker, freezegun
-python3-openid==3.1.0     # via django-allauth
+python-jose==3.1.0
+python3-openid==3.1.0     # via social-auth-core
 pytz==2019.3
 pyyaml==5.2               # via tablib
-requests-oauthlib==1.3.0  # via django-allauth
+requests-oauthlib==1.3.0  # via social-auth-core
 requests==2.22.0
+rsa==4.0                  # via python-jose
 sentry-sdk==0.10.2
-six==1.13.0               # via argon2-cffi, astroid, django-coverage-plugin, django-extensions, faker, freezegun, packaging, pip-tools, python-dateutil, traitlets
+six==1.13.0               # via argon2-cffi, astroid, django-coverage-plugin, django-extensions, ecdsa, faker, freezegun, packaging, pip-tools, python-dateutil, python-jose, social-auth-app-django, social-auth-core, traitlets
 snowballstemmer==2.0.0    # via sphinx
+social-auth-app-django==3.1.0
+social-auth-core==3.2.0   # via social-auth-app-django
 sphinx==2.2.2
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx

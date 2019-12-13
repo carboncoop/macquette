@@ -68,7 +68,7 @@
 			CARBON COOP (DJANGO)
 		  </div>
       {% if user.is_authenticated %}
-          <a style="display: inline" class="menu-assessment pull-right" href="{% url 'account_logout' %}" >Log out</a>
+          <a style="display: inline" class="menu-assessment pull-right" href="{% url 'logout' %}" >Log out</a>
           <a style="display: inline" class="menu-assessment pull-right" href="{% url VERSION|add:':index' %}" >Assessments</a>
       {% endif %}
 		</div>
