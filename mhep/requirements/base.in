@@ -18,3 +18,8 @@ coreapi               # https://github.com/core-api/python-client
 
 whitenoise[brotli]
 sentry-sdk            # https://github.com/getsentry/sentry-python
+
+# Auth0 integration
+# ------------------------------------------------------------------------------
+python-jose
+social-auth-app-django
