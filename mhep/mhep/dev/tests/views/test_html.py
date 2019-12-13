@@ -1,5 +1,7 @@
+from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
+from django import http
 
 from rest_framework import status
 
@@ -19,10 +21,13 @@ class TestListAssessmentsHTMLView(TestCase):
         cls.my_assessment = AssessmentFactory.create(owner=cls.me)
 
     def test_logged_out_users_get_redirected_to_log_in(self):
-        login_url = reverse("login")
+        login_url = settings.LOGIN_URL
         my_assessments_url = reverse(f"{VERSION}:list-assessments")
+
         response = self.client.get(my_assessments_url)
-        self.assertRedirects(response, f"{login_url}?next={my_assessments_url}")
+
+        assert type(response) == http.response.HttpResponseRedirect
+        assert response.url == f"{login_url}?next={my_assessments_url}"
 
     def test_returns_200_for_logged_in_user_viewing_own_assessment(self):
         self.client.login(username=self.me.username, password="foo")
@@ -41,10 +46,13 @@ class TestAssessmentHTMLView(TestCase):
         cls.my_assessment = AssessmentFactory.create(owner=cls.me)
 
     def test_logged_out_users_get_redirected_to_log_in(self):
-        login_url = reverse("login")  # '/accounts/login/'
+        login_url = settings.LOGIN_URL
         my_assessment_url = f"/{VERSION}/assessments/{self.my_assessment.pk}/"
+
         response = self.client.get(my_assessment_url)
-        self.assertRedirects(response, f"{login_url}?next={my_assessment_url}")
+
+        assert type(response) == http.response.HttpResponseRedirect
+        assert response.url == f"{login_url}?next={my_assessment_url}"
 
     def test_returns_200_for_logged_in_user_viewing_own_assessment(self):
         self.client.login(username=self.me.username, password="foo")
