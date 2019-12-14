@@ -147,6 +147,12 @@ var mhep_helper = {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // This means we can't do this because we're not an admin in any
+                    // groups.  Just resolve to the empty list.
+                    if (jqXHR.status == 403) {
+                        return resolve([]);
+                    }
+
                     handleServerError("listing users")(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
