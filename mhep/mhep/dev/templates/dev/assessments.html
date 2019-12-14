@@ -1,24 +1,9 @@
 {% extends VERSION|add:"/mhep_base.html" %}
-{% load static i18n %}
-
+{% load static %}
 
 {% block extra_head %}
-<link href='https://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>
-
 <style>
-    .cc {
-        font-weight: bold;
-        padding-right:20px;
-    }
-
-    .title {
-        padding: 10px 30px;
-        color:#888;
-        float:left;
-    }
-
-    .modal-backdrop
-    {
+    .modal-backdrop {
         opacity:0.3 !important;
     }
 
@@ -29,10 +14,13 @@
         margin-left: -280px;
     }
 
-    section {
+    .container_if_u_want_it {
         max-width: 1100px;
         margin: 0 auto;
-        background: white;
+    }
+
+    section {
+        padding: 30px;
     }
 
     section h2 {
@@ -45,57 +33,76 @@
         margin-bottom: 0;
     }
 
-    html, body { background-color: white; }
+    html, body { background-color: var(--brown-3); }
     .table td { vertical-align: middle; }
     a.underline, a:hover.underline { text-decoration: underline; }
+    thead {
+        background-color: var(--brown-2);
+    }
 </style>
 
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
 
 {% endblock %}
 
 {% block content %}
 
-<section class="mt-30 pa-15">
+<section class="px-0">
     <h1 class="ma-0" id="organisation-name">Welcome</h1>
+    <div id="org-buttons" class="mt-15" style="display: none">
+        <button id="close-organisation" class="btn">
+            <i class="icon-arrow-left"></i>
+            Back to all organisations
+        </button>
+
+        <button id="show-members" class="btn">
+            <i class="icon-user"></i>
+            Show members
+        </button>
+    </div>
 </section>
 
-<section class="mb-30 pa-15" id="organisation-list">
-    <h2 class="mt-0 mb-15">Your Organisations</h2>
+<section class="mb-30 bg-white" style="min-width: 450px; width: min-content;" id="organisation-list">
+    <div class="d-flex justify-content-between align-items-center mb-15">
+        <h2 class="mt-0 mb-0">Your Organisations</h2>
+        <div>
+            {% if request.user.is_staff %}
+            <a class="btn mb-0" href="{% url "admin:"|add:VERSION|add:"_organisation_add" %}">
+                <i class="icon-plus"></i> New Organisation
+            </a>
+            {% endif %}
+        </div>
+    </div>
 
     <div id="myorganisations"></div>
-
-    {% if request.user.is_staff %}
-    <p>
-        <a class="btn" href="{% url "admin:"|add:VERSION|add:"_organisation_add" %}">
-            <i class="icon-plus"></i> Create new
-        </a>
-    </p>
-    {% endif %}
 </section>
 
-<section id="organisation" class="mb-30 pa-15" style="display:none;">
-    <button id="back-myview" class="btn">Back to all organisations</button>
+<section id="org-members" class="mb-30 bg-white" style="display:none; min-width: 50rem; width: min-content;">
+    <h2 class="mt-0 mb-15">Members</h2>
 
-    <h2 class="mt-30 mb-15">Members</h2>
+    <table id="organisation-members" class="table" style="display: none; max-width: 50rem">
+        <thead>
+            <th>Username</th>
+            <th>Last active</th>
+            <th colspan="3">Roles</th>
+        </thead>
 
-    <table id="organisation-members" class="table" style="display: none">
-        <tr id="organisation-member-template" class="organisation-member" style="display: none;">
-            <td style="width: 50%;">
-                <span class="member-name"></span>
-                <span class="member-last-active">Last active: </span>
-                <button class="remove-user demote-role" style="display: none;" data-user-id="" data-org-id="">Remove</button>
-            </td>
-            <td style="width: 25%;">
+        <tr id="organisation-member-template" style="display: none;">
+            <td class="member-name text-bold"></td>
+            <td class="member-last-active"></td>
+            <td style="width: 10rem">
                 <span class="member-is-librarian" style="display: none;" data-user-id="" data-org-id="">
                     <b>Librarian</b>
                     <button class="demote-librarian demote-role" style="display: none;" data-user-id="" data-org-id="">Demote</button>
                 </span>
             </td>
-            <td style="width: 25%;">
+            <td style="width: 3rem">
                 <span class="member-is-admin" style="display: none;" data-user-id="" data-org-id="">
                     <b>Admin</b>
                 </span>
+            </td>
+            <td style="width: 10rem">
+                <button class="remove-user demote-role" style="display: none;" data-user-id="" data-org-id="">Remove member</button>
             </td>
         </tr>
     </table>
@@ -135,7 +142,7 @@
     {% endif %}
 </section>
 
-<section class="assessments mt-30 mb-45 pa-15">
+<section class="assessments mb-45 bg-white">
     <div class="d-flex justify-content-between align-items-center mb-15">
         <h2 class="mt-0 mb-0" id="assessments-title">Your Assessments</h2>
         <div>
@@ -144,7 +151,7 @@
     </div>
 
     <table class="table">
-        <thead style="background-color: var(--brown-2)">
+        <thead>
             <tr>
                 <th>Name</th>
                 <th>Description</th>
@@ -278,7 +285,7 @@
                 if (status_options[s] == projects[z].status) {
                     out += "<tr>";
                     out += "<td>" + projects[z].name + "</td>";
-                    out += "<td style='font-style:italic; color:#888'>" + projects[z].description + "</td>";
+                    out += "<td style='color:#888'>" + projects[z].description + "</td>";
                     out += "<td>" + projects[z].author + "</td>";
 
                     var t = new Date();
@@ -380,7 +387,7 @@
             orgid = $(this).attr("data-id");
             draw_organisation(orgid);
             $("#organisation-add-member").attr("href", urlHelper.admin.organisation(orgid));
-            $("#organisation").show();
+            $("#show-members").show();
             viewmode = "organisation";
             $.ajax({
             url: urlHelper.api.organisationAssessments(orgid),
@@ -426,6 +433,7 @@
 
     function draw_organisation(orgid) {
         $("#organisation-list").hide();
+        $("#org-buttons").show();
 
         var tableTemplate = $("#organisation-members");
 
@@ -447,7 +455,7 @@
 
             row.find('.member-name').html(members[z].name);
             row.find('.member-last-active').html(
-                "Last active: " + new Date(members[z].last_login).toLocaleString()
+                new Date(members[z].last_login).toLocaleString()
             );
 
             if (members[z].is_admin) row.find('.member-is-admin').show();
@@ -587,12 +595,13 @@
         };
     };
 
-    $("#back-myview").click(function () {
+    $("#close-organisation").click(function () {
         var viewmode = "personal";
         var orgid = 0;
         $("#organisation-name").html("Welcome");
+        $("#org-buttons").hide();
         $("#organisation-list").show();
-        $("#organisation").hide();
+        $("#org-members").hide();
 
         projects = mhep_helper.getlist();
         draw_projects("#projects", projects);
@@ -600,6 +609,10 @@
         $("#myview").show();
     });
 
+    $("#show-members").click(function() {
+        $("#org-members").show();
+        $("#show-members").hide();
+    })
 
 // -------------------------------------------------------
 // Other
