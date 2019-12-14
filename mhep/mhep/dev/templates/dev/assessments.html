@@ -421,11 +421,16 @@
     function fetchOrganisations() {
         return new Promise((resolve, reject) => {
             mhep_helper.list_organisations().then(result => {
-                for (let i = 0; i < result.length; i++) {
-                    const org = result[i];
+                if (result.length === 0) {
+                    no_organisations();
+                    return;
+                }
+
+                for (let org of result) {
                     org.orgid = org.id;
                     myorganisations[org.id] = org;
                 }
+
                 fetchAllUsers().then(result => {
                     draw_organisation_list();
                     resolve();
@@ -467,6 +472,10 @@
             });
         });
     });
+
+    function no_organisations() {
+        $("#myorganisations").html("<p class='pa-15'>You are in no organisations.</p>");
+    }
 
     function draw_organisation_list() {
         var out = "";
