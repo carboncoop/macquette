@@ -2,6 +2,7 @@
     --app-color: #ff2712;;
 
     --brown-1: #897A67;
+    --brown-2: rgba(215, 210, 201, 0.9);
     --brown-3: #EEECE5;
     --brown-4: rgb(242, 242, 242);
 }
@@ -80,15 +81,6 @@ a:hover {
 .side-block {
     background-color: white;
     border-bottom: 1px solid #edeae6;
-}
-
-.main-block {
-    width:100%;
-    height: auto;
-    text-align: left;
-    background-color:#fff;
-
-    margin-top:10px;
 }
 
 .scenario-nav {
