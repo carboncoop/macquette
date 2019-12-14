@@ -321,9 +321,6 @@
     var max_wrapper_width = 1150;
     var sidebar_enabled = true;
     var sidebar_visible = true;
-    $("#assessment_menu").parent().attr("href", "#");
-    $("#assessment_menu").find("i").removeClass("icon-home");
-    $("#assessment_menu").find("i").addClass("icon-list");
     sidebar_resize();
 
     //*********************
@@ -534,16 +531,6 @@
     $(window).resize(function () {
         draw_openbem_graphics('#topgraphic');
         sidebar_resize();
-    });
-    $("#assessment_menu").parent().click(function () {
-        if (sidebar_visible) {
-            sidebar_enabled = false;
-            hide_sidebar();
-        }
-        else {
-            sidebar_enabled = true;
-            show_sidebar();
-        }
     });
 
 
