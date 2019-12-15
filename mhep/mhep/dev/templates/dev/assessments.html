@@ -162,10 +162,10 @@
             </tr>
         </thead>
 
-        <tbody id="projects"></tbody>
+        <tbody id="assessments"></tbody>
     </table>
 
-    <div id="noprojects" class="alert alert-warning" style="display:none">
+    <div id="noassessments" class="alert alert-warning" style="display:none">
         You don't have any assessments yet.  Click "New" to get started.
     </div>
 </section>
@@ -178,11 +178,11 @@
     <div class="modal-body">
         <p>
             <span class="muted">Name</span>
-            <br><input id="project-name-input" type="text" style="width:82%" />
+            <br><input id="assessment-name-input" type="text" style="width:82%" />
         </p>
         <p>
             <span class="muted">Description</span>
-            <br><input id="project-description-input" type="text" style="width:82%" />
+            <br><input id="assessment-description-input" type="text" style="width:82%" />
         </p>
     </div>
     <div class="modal-footer">
@@ -200,11 +200,11 @@
     var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var now = (new Date()).getTime() * 0.001;
 // -----------------------------------------------------------------------------------
-// 1) Load project lists
+// 1) Load assessment lists
 // -----------------------------------------------------------------------------------
 
-    var projects = mhep_helper.getlist();
-    draw_projects("#projects", projects);
+    var assessments = mhep_helper.getlist();
+    draw_assessments("#assessments", assessments);
 
     $("#assessments-title").html("Your Assessments");
 
@@ -219,15 +219,15 @@
     });
     $("#assessment-create").click(function () {
 
-        var name = $("#project-name-input").val();
-        var description = $("#project-description-input").val();
+        var name = $("#assessment-name-input").val();
+        var description = $("#assessment-description-input").val();
         if (name == "") {
-            alert("Please enter a project name");
+            alert("Please enter a assessment name");
         } else {
-          var callback = function (project) {
-            projects.push(project);
-            draw_projects("#projects", projects);
-            $("#noprojects").hide();
+          var callback = function (assessment) {
+            assessments.push(assessment);
+            draw_assessments("#assessments", assessments);
+            $("#noassessments").hide();
           };
           if (viewmode == "organisation" && orgid != 0) {
             mhep_helper.create(name, description, orgid, callback);
@@ -235,8 +235,8 @@
           else {
             mhep_helper.create(name, description, null, callback);
           }
-          $("#project-name-input").val("");
-          $("#project-description-input").val("");
+          $("#assessment-name-input").val("");
+          $("#assessment-description-input").val("");
           $("#modal-assessment-create").modal("hide");
         }
     });
@@ -244,17 +244,17 @@
 // Delete assessment
 // -----------------------------------------------------------------------------------
 
-    $(".assessments").on('click', '.delete-project', function () {
-        if (!window.confirm("Do you really want to delete this project?  This cannot be undone.")) {
+    $(".assessments").on('click', '.delete-assessment', function () {
+        if (!window.confirm("Do you really want to delete this assessment?  This cannot be undone.")) {
             return;
         }
 
-        const id = $(this).attr('projectid');
+        const id = $(this).attr('assessmentid');
         const z = $(this).attr('z');
 
         if (mhep_helper.delete(id)) {
-            projects.splice(z, 1);
-            draw_projects("#projects", projects);
+            assessments.splice(z, 1);
+            draw_assessments("#assessments", assessments);
         }
     });
 
@@ -262,34 +262,34 @@
 // Change assessment status
 // -----------------------------------------------------------------------------------
 
-    $(".assessments").on('change', '.project-status', function () {
-        var projectid = $(this).attr('projectid');
+    $(".assessments").on('change', '.assessment-status', function () {
+        var assessmentid = $(this).attr('assessmentid');
         var z = $(this).attr('z');
         var status = $(this).val();
-        mhep_helper.set_status(projectid, status);
-        projects[z].status = status;
-        draw_projects("#projects", projects);
+        mhep_helper.set_status(assessmentid, status);
+        assessments[z].status = status;
+        draw_assessments("#assessments", assessments);
     });
 // -----------------------------------------------------------------------------------
 // Draw assessment list
 // -----------------------------------------------------------------------------------
 
-    function draw_projects(element, projects)
+    function draw_assessments(element, assessments)
     {
         var status_options = ["Complete", "In progress", "Test"];
         var out = "";
         for (s in status_options) {
             // out += "<tr><th>"+status_options[s]+"</th><th></th><th></th><th></th><th></th><th></th><th></th></tr>";
-            for (z in projects)
+            for (z in assessments)
             {
-                if (status_options[s] == projects[z].status) {
+                if (status_options[s] == assessments[z].status) {
                     out += "<tr>";
-                    out += "<td>" + projects[z].name + "</td>";
-                    out += "<td style='color:#888'>" + projects[z].description + "</td>";
-                    out += "<td>" + projects[z].author + "</td>";
+                    out += "<td>" + assessments[z].name + "</td>";
+                    out += "<td style='color:#888'>" + assessments[z].description + "</td>";
+                    out += "<td>" + assessments[z].author + "</td>";
 
                     var t = new Date();
-                    var d = new Date(projects[z].mdate * 1000);
+                    var d = new Date(assessments[z].mdate * 1000);
                     if (t.getYear() == d.getYear()) {
                         var mins = d.getMinutes();
                         if (mins < 10)
@@ -300,30 +300,30 @@
                     }
 
                     var color = "";
-                    if (projects[z].status == "Complete")
+                    if (assessments[z].status == "Complete")
                         color = " alert-success";
-                    if (projects[z].status == "In progress")
+                    if (assessments[z].status == "In progress")
                         color = " alert-info";
-                    if (projects[z].status == "Test")
+                    if (assessments[z].status == "Test")
                         color = " alert-error";
-                    out += "<td><select class='project-status" + color + "' z=" + z + " projectid=" + projects[z].id + ">";
+                    out += "<td><select class='assessment-status" + color + "' z=" + z + " assessmentid=" + assessments[z].id + ">";
                     for (o in status_options) {
                         var selected = "";
-                        if (projects[z].status == status_options[o])
+                        if (assessments[z].status == status_options[o])
                             selected = " selected"
                         out += "<option " + selected + ">" + status_options[o] + "</option>";
                     }
                     out += "</select></td>";
 
 
-                    const assessmentURL = urlHelper.html.assessment(projects[z].id);
+                    const assessmentURL = urlHelper.html.assessment(assessments[z].id);
                     out += `
                     <td>
                         <a class="btn" href="${assessmentURL}" target="_blank">
                             <i class="icon-folder-open"></i> Open
                         </a>
 
-                        <button class="btn delete-project" projectid="${projects[z].id}" z="${z}">
+                        <button class="btn delete-assessment" assessmentid="${assessments[z].id}" z="${z}">
                             <i class="icon-trash"></i> Delete
                         </button>
                     </td>`;
@@ -333,10 +333,10 @@
         }
 
         $(element).html(out);
-        if (projects.length == 0)
-            $("#noprojects").show();
+        if (assessments.length == 0)
+            $("#noassessments").show();
         else
-            $("#noprojects").hide();
+            $("#noassessments").hide();
     }
 
 
@@ -393,8 +393,8 @@
             url: urlHelper.api.organisationAssessments(orgid),
             error: handleServerError('listing assessments for organisation'),
             success: function (result) {
-                projects = result;
-                draw_projects("#projects", projects);
+                assessments = result;
+                draw_assessments("#assessments", assessments);
                 $("#assessments-title").html(myorganisations[orgid].name + " Assessments");
                 $("#myview").hide();
             },
@@ -603,8 +603,8 @@
         $("#organisation-list").show();
         $("#org-members").hide();
 
-        projects = mhep_helper.getlist();
-        draw_projects("#projects", projects);
+        assessments = mhep_helper.getlist();
+        draw_assessments("#assessments", assessments);
         $("#assessments-title").html("Your Assessments");
         $("#myview").show();
     });
