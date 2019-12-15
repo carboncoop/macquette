@@ -514,6 +514,8 @@
             promoteLibrarianForm.show();
 
             $("#promote-librarian-form-container").html(promoteLibrarianForm);
+        } else {
+            $("#promote-librarian-form-container").html("");
         }
 
         if (permissions.can_add_remove_members) {
@@ -533,6 +535,8 @@
             addMemberForm.show();
 
             $("#add-member-form-container").html(addMemberForm);
+        } else {
+            $("#add-member-form-container").html("");
         }
     }
 
