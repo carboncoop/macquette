@@ -361,65 +361,65 @@
             $("#noassessments").hide();
     }
 
-
-
 // ----------------------------------------------------------------------------
 // ORGANISATIONS
 // ----------------------------------------------------------------------------
+
+    // These are in practice sparse arrays, index by element IDs
     var myorganisations = {};
     var allusers = {};
 
     function fetchOrganisations() {
-        return new Promise((resolve, reject) => {
-            mhep_helper.list_organisations().then(result => {
-                if (result.length === 0) {
-                    no_organisations();
-                    return;
-                }
-
-                for (let org of result) {
-                    org.orgid = org.id;
-                    myorganisations[org.id] = org;
-                }
-
-                fetchAllUsers().then(result => {
-                    draw_organisation_list();
-                    resolve();
-                });
-            })
-        });
-    };
+        return mhep_helper.list_organisations().then(result => {
+            for (let org of result) {
+                myorganisations[org.id] = org;
+            }
+            return myorganisations;
+        })
+    }
 
     function fetchAllUsers() {
-        return new Promise((resolve, reject) => {
-            mhep_helper.list_users().then(result => {
-                for (let i = 0; i < result.length; i++) {
-                    var user = result[i];
-                    user.userid = user.id;
-                    allusers[user.id] = user;
-                }
-                draw_organisation_list();
-                resolve();
-            })
-        });
+        return mhep_helper.list_users().then(result => {
+            for (let user of result) {
+                allusers[user.id] = user;
+            }
+            return allusers;
+        })
     };
 
-    fetchOrganisations().then(result => {
-        $("body").on("click", ".view-organisation", function () {
-            orgid = $(this).attr("data-id");
+    function fetchAndDrawOrganisationList() {
+        let waitFor = [ fetchOrganisations(), fetchAllUsers() ]
+
+        Promise.all(waitFor).then(_ => {
+            if (myorganisations.length === 0) {
+                no_organisations();
+            } else {
+                draw_organisation_list();
+            }
+        })
+    };
+
+    function fetchAndDrawOrganisation(orgid) {
+        fetchOrganisations().then(result => {
             draw_organisation(orgid);
-            $("#organisation-add-member").attr("href", urlHelper.admin.organisation(orgid));
-            $("#show-members").show();
-            $.ajax({
+        });
+    }
+
+    fetchAndDrawOrganisationList()
+
+    $("body").on("click", ".view-organisation", function () {
+        orgid = $(this).attr("data-id");
+        draw_organisation(orgid);
+        $("#organisation-add-member").attr("href", urlHelper.admin.organisation(orgid));
+        $("#show-members-button").show();
+        $.ajax({
             url: urlHelper.api.organisationAssessments(orgid),
             error: handleServerError('listing assessments for organisation'),
             success: function (result) {
                 assessments = result;
                 draw_assessments("#assessments", assessments);
                 $("#assessments-title").html(myorganisations[orgid].name + " Assessments");
-                $("#myview").hide();
-            },
-            });
+            }
         });
     });
 
@@ -435,7 +435,7 @@
 
             out += `
             <div class="d-flex justify-content-between align-items-center mb-15" style="width: 30rem">
-                <a class='view-organisation font-bold clickable underline' data-id='${org.orgid}'>
+                <a class='view-organisation font-bold clickable underline' data-id='${org.id}'>
                     ${org.name}
                 </a>
                 <span>
@@ -444,12 +444,6 @@
             </div>`;
         }
         $("#myorganisations").html(out);
-    }
-
-    function fetchAndRedrawOrganisation(orgid) {
-        fetchOrganisations().then(result => {
-            draw_organisation(orgid);
-        });
     }
 
     function draw_organisation(orgid) {
@@ -471,7 +465,7 @@
             var row = rowTemplate.clone()
             row.removeAttr('id');
 
-            row.find('[data-user-id=""]').attr('data-user-id', members[z].userid);
+            row.find('[data-user-id=""]').attr('data-user-id', members[z].id);
             row.find('[data-org-id=""]').attr('data-org-id', orgid);
 
             row.find('.member-name').html(members[z].name);
@@ -481,7 +475,6 @@
 
             if (members[z].is_admin) row.find('.member-is-admin').show();
             if (members[z].is_librarian) row.find('.member-is-librarian').show();
-
 
             if (permissions.can_promote_demote_librarians) {
                 var demoteLibrarianButton = row.find('.demote-librarian')
@@ -551,7 +544,7 @@
         var orgid = $(this).attr('data-org-id');
         var userid = $(this).attr('data-user-id');
         mhep_helper.demote_user_as_librarian(orgid, userid).then(result => {
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -564,7 +557,7 @@
         mhep_helper.promote_user_as_librarian(orgid, userid).then(result => {
             submitButton.attr("disabled", false);
             submitButton.val("Add");
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -575,7 +568,7 @@
         var orgid = $(this).attr('data-org-id');
         var userid = $(this).attr('data-user-id');
         mhep_helper.remove_member(orgid, userid).then(result => {
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -588,7 +581,7 @@
         mhep_helper.add_member(orgid, userid).then(result => {
             submitButton.attr("disabled", false);
             submitButton.val("Add");
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -600,7 +593,7 @@
             if (!member.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = member.name;
-                option.value = member.userid;
+                option.value = member.id;
                 select.append(option);
             }
         };
@@ -614,7 +607,7 @@
             if (!user.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = user.name;
-                option.value = user.userid;
+                option.value = user.id;
                 select.append(option);
             }
         };

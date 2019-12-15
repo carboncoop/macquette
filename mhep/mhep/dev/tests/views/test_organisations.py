@@ -49,14 +49,14 @@ class TestListOrganisations(APITestCase):
                         "members",
                         [
                             {
-                                "userid": f"{me.id}",
+                                "id": f"{me.id}",
                                 "name": me.username,
                                 "is_admin": False,
                                 "is_librarian": True,
                                 "last_login": me.last_login.isoformat(),
                             },
                             {
-                                "userid": f"{org_admin.id}",
+                                "id": f"{org_admin.id}",
                                 "name": org_admin.username,
                                 "is_admin": True,
                                 "is_librarian": False,
@@ -131,14 +131,14 @@ class TestListOrganisationsPermissions(APITestCase):
     def _assert_permissions(self, response, expected_permissions):
         expected_members = [
             {
-                "userid": f"{self.member_1.id}",
+                "id": f"{self.member_1.id}",
                 "name": self.member_1.username,
                 "is_admin": False,
                 "is_librarian": False,
                 "last_login": self.member_1.last_login.isoformat(),
             },
             {
-                "userid": f"{self.org_admin.id}",
+                "id": f"{self.org_admin.id}",
                 "name": self.org_admin.username,
                 "is_admin": True,
                 "is_librarian": False,
