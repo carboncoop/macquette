@@ -195,9 +195,7 @@
     var viewmode = "personal";
     var orgid = 0;
     var myusername = '{{ user.username|default:"anonymous" }}';
-    $(".username").html(myusername);
     var path = '{{ request.build_absolute_uri }}';
-    var now = (new Date()).getTime() * 0.001;
 
 // -----------------------------------------------------------------------------------
 // 1) Load assessment lists
