@@ -192,8 +192,8 @@
 </div>
 
 <script>
-    var viewmode = "personal";
-    var orgid = 0;
+    // if null, show personal assessments; otherwise show assessments with in given org
+    var orgid = null;
     var myusername = '{{ user.username|default:"anonymous" }}';
     var path = '{{ request.build_absolute_uri }}';
 
@@ -226,13 +226,7 @@
             assessments.push(assessment);
             draw_assessments("#assessments", assessments);
             $("#noassessments").hide();
-          };
-          if (viewmode == "organisation" && orgid != 0) {
             mhep_helper.create(name, description, orgid, callback);
-          }
-          else {
-            mhep_helper.create(name, description, null, callback);
-          }
           $("#assessment-name-input").val("");
           $("#assessment-description-input").val("");
           $("#modal-assessment-create").modal("hide");
@@ -403,7 +397,6 @@
             draw_organisation(orgid);
             $("#organisation-add-member").attr("href", urlHelper.admin.organisation(orgid));
             $("#show-members").show();
-            viewmode = "organisation";
             $.ajax({
             url: urlHelper.api.organisationAssessments(orgid),
             error: handleServerError('listing assessments for organisation'),
@@ -615,8 +608,8 @@
     };
 
     $("#close-organisation").click(function () {
-        var viewmode = "personal";
-        var orgid = 0;
+        orgid = null;
+
         $("#organisation-name").html("Welcome");
         $("#org-buttons").hide();
         $("#organisation-list").show();
