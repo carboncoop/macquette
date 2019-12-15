@@ -196,17 +196,16 @@
     var orgid = null;
     var myusername = '{{ user.username|default:"anonymous" }}';
     var path = '{{ request.build_absolute_uri }}';
+    var assessments = [];
 
 // -----------------------------------------------------------------------------------
 // 1) Load assessment lists
 // -----------------------------------------------------------------------------------
 
-    var assessments = mhep_helper.getlist();
-    draw_assessments("#assessments", assessments);
-
-    $("#assessments-title").html("Your Assessments");
-
-    var libraries = {};
+    mhep_helper.list_assessments().then(result => {
+        assessments = result;
+        draw_assessments("#assessments", assessments);
+    });
 
 // -----------------------------------------------------------------------------------
 // Create new assessment
@@ -215,23 +214,27 @@
     $("#new-assessment").click(function () {
         $("#modal-assessment-create").modal("show");
     });
-    $("#assessment-create").click(function () {
 
+    $("#assessment-create").click(function () {
         var name = $("#assessment-name-input").val();
         var description = $("#assessment-description-input").val();
+
         if (name == "") {
-            alert("Please enter a assessment name");
-        } else {
-          var callback = function (assessment) {
+            alert("Please enter an assessment name");
+            return;
+        }
+
+        mhep_helper.create(name, description, orgid, assessment => {
             assessments.push(assessment);
             draw_assessments("#assessments", assessments);
             $("#noassessments").hide();
-            mhep_helper.create(name, description, orgid, callback);
-          $("#assessment-name-input").val("");
-          $("#assessment-description-input").val("");
-          $("#modal-assessment-create").modal("hide");
-        }
+        });
+
+        $("#modal-assessment-create").modal("hide");
+        $("#assessment-name-input").val("");
+        $("#assessment-description-input").val("");
     });
+
 // -----------------------------------------------------------------------------------
 // Delete assessment
 // -----------------------------------------------------------------------------------
@@ -243,11 +246,11 @@
 
         const id = $(this).attr('data-assessment-id');
 
-        if (mhep_helper.delete(id)) {
+        mhep_helper.delete_assessment(id).then(() => {
             let idx = assessments.findIndex(e => e.id == id)
             assessments.splice(idx, 1);
             draw_assessments("#assessments", assessments);
-        }
+        });
     });
 
 // -----------------------------------------------------------------------------------
@@ -257,10 +260,12 @@
     $(".assessments").on('change', '.assessment-status', function () {
         var assessmentid = $(this).attr('data-assessment-id');
         var status = $(this).val();
-        mhep_helper.set_status(assessmentid, status);
-        assessments.find(a => a.id == assessmentid).status = status;
-        draw_assessments("#assessments", assessments);
+        mhep_helper.set_status(assessmentid, status).then(() => {
+            assessments.find(a => a.id == assessmentid).status = status;
+            draw_assessments("#assessments", assessments);
+        });
     });
+
 // -----------------------------------------------------------------------------------
 // Draw assessment list
 // -----------------------------------------------------------------------------------
@@ -615,10 +620,11 @@
         $("#organisation-list").show();
         $("#org-members").hide();
 
-        assessments = mhep_helper.getlist();
-        draw_assessments("#assessments", assessments);
-        $("#assessments-title").html("Your Assessments");
-        $("#myview").show();
+        mhep_helper.list_assessments().then(result => {
+            assessments = result;
+            $("#assessments-title").html("Your Assessments");
+            draw_assessments("#assessments", assessments);
+        });
     });
 
     $("#show-members").click(function() {
