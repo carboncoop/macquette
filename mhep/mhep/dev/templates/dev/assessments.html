@@ -55,7 +55,7 @@
             Back to all organisations
         </button>
 
-        <button id="show-members" class="btn">
+        <button id="show-members-button" class="btn">
             <i class="icon-user"></i>
             Show members
         </button>
@@ -213,6 +213,13 @@
 
     $("#new-assessment").click(function () {
         $("#modal-assessment-create").modal("show");
+        $("#assessment-name-input").focus();
+    });
+
+    $('#modal-assessment-create').on('keypress', function (e) {
+        if (e.key == "Enter") {
+            $('#assessment-create').click();
+        }
     });
 
     $("#assessment-create").click(function () {
@@ -240,7 +247,8 @@
 // -----------------------------------------------------------------------------------
 
     $(".assessments").on('click', '.delete-assessment', function () {
-        if (!window.confirm("Do you really want to delete this assessment?  This cannot be undone.")) {
+        if (!window.confirm(
+            "Do you really want to delete this assessment?  This cannot be undone.")) {
             return;
         }
 
@@ -627,19 +635,10 @@
         });
     });
 
-    $("#show-members").click(function() {
+    $("#show-members-button").click(function() {
         $("#org-members").show();
-        $("#show-members").hide();
+        $("#show-members-button").hide();
     })
-
-// -------------------------------------------------------
-// Other
-// -------------------------------------------------------
-  $('#modal-assessment-create').on('keypress', function (e) {
-        if (e.which == 13) {
-            $('#assessment-create').click();
-        }
-    });
 
 </script>
 {% endblock %}
