@@ -197,8 +197,8 @@
     var myusername = '{{ user.username|default:"anonymous" }}';
     $(".username").html(myusername);
     var path = '{{ request.build_absolute_uri }}';
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     var now = (new Date()).getTime() * 0.001;
+
 // -----------------------------------------------------------------------------------
 // 1) Load assessment lists
 // -----------------------------------------------------------------------------------
@@ -249,11 +249,11 @@
             return;
         }
 
-        const id = $(this).attr('assessmentid');
-        const z = $(this).attr('z');
+        const id = $(this).attr('data-assessment-id');
 
         if (mhep_helper.delete(id)) {
-            assessments.splice(z, 1);
+            let idx = assessments.findIndex(e => e.id == id)
+            assessments.splice(idx, 1);
             draw_assessments("#assessments", assessments);
         }
     });
@@ -263,11 +263,10 @@
 // -----------------------------------------------------------------------------------
 
     $(".assessments").on('change', '.assessment-status', function () {
-        var assessmentid = $(this).attr('assessmentid');
-        var z = $(this).attr('z');
+        var assessmentid = $(this).attr('data-assessment-id');
         var status = $(this).val();
         mhep_helper.set_status(assessmentid, status);
-        assessments[z].status = status;
+        assessments.find(a => a.id == assessmentid).status = status;
         draw_assessments("#assessments", assessments);
     });
 // -----------------------------------------------------------------------------------
@@ -276,60 +275,78 @@
 
     function draw_assessments(element, assessments)
     {
-        var status_options = ["Complete", "In progress", "Test"];
-        var out = "";
-        for (s in status_options) {
-            // out += "<tr><th>"+status_options[s]+"</th><th></th><th></th><th></th><th></th><th></th><th></th></tr>";
-            for (z in assessments)
-            {
-                if (status_options[s] == assessments[z].status) {
-                    out += "<tr>";
-                    out += "<td>" + assessments[z].name + "</td>";
-                    out += "<td style='color:#888'>" + assessments[z].description + "</td>";
-                    out += "<td>" + assessments[z].author + "</td>";
+        const status_options = ["In progress", "Complete", "Test"];
+        const status_colours = {
+            "In progress": "alert-info",
+            "Complete": "alert-success",
+            "Test": "alert-error"
+        }
+        const months = [
+            'Jan', 'Feb', 'Mar', 'Apr',
+            'May', 'Jun', 'Jul', 'Aug',
+            'Sep', 'Oct', 'Nov', 'Dec'
+        ];
 
-                    var t = new Date();
-                    var d = new Date(assessments[z].mdate * 1000);
-                    if (t.getYear() == d.getYear()) {
-                        var mins = d.getMinutes();
-                        if (mins < 10)
-                            mins = "0" + mins;
-                        out += "<td>" + d.getHours() + ":" + mins + " " + d.getDate() + " " + months[d.getMonth()] + "</td>";
-                    } else {
-                        out += "<td>" + d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + "</td>";
-                    }
+        const sortedAssessments = [...assessments].sort((a, b) => {
+            // Primarily sort by status (lowest first), then by ID (highest first)
+            if (a.status != b.status) {
+                let a_status_nr = status_options.indexOf(a.status)
+                let b_status_nr = status_options.indexOf(b.status)
 
-                    var color = "";
-                    if (assessments[z].status == "Complete")
-                        color = " alert-success";
-                    if (assessments[z].status == "In progress")
-                        color = " alert-info";
-                    if (assessments[z].status == "Test")
-                        color = " alert-error";
-                    out += "<td><select class='assessment-status" + color + "' z=" + z + " assessmentid=" + assessments[z].id + ">";
-                    for (o in status_options) {
-                        var selected = "";
-                        if (assessments[z].status == status_options[o])
-                            selected = " selected"
-                        out += "<option " + selected + ">" + status_options[o] + "</option>";
-                    }
-                    out += "</select></td>";
+                return a_status_nr - b_status_nr;
+            } else {
+                return b.id - a.id;
+            }
+        })
 
+        const getDate = date => {
+            var t = new Date();
+            var d = new Date(date);
+            if (t.getYear() == d.getYear()) {
+                var mins = d.getMinutes();
+                if (mins < 10)
+                    mins = "0" + mins;
+                return `${d.getHours()}:${mins} ${d.getDate()} ${months[d.getMonth()]}`;
+            } else {
+                return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
+            }
+        }
 
-                    const assessmentURL = urlHelper.html.assessment(assessments[z].id);
-                    out += `
+        const getOptions = selectedStatus => {
+            return status_options.map(status => {
+                let selected = status === selectedStatus ? "selected" : ""
+                return `<option ${selected}>${status}</option>`
+            }).join("")
+        }
+
+        let out = "";
+        for (let assessment of sortedAssessments) {
+            let statusColour = status_colours[assessment.status]
+            let assessmentURL = urlHelper.html.assessment(assessment.id);
+
+            out +=
+                `<tr>
+                    <td>${assessment.name}</td>
+                    <td style='color:#888'>${assessment.description}</td>
+                    <td>${assessment.author}</td>
+                    <td>${getDate(assessment.mdate * 1000)}</td>
+                    <td>
+                        <select class='assessment-status ${statusColour}'
+                                data-assessment-id="${assessment.id}">
+                            ${getOptions(assessment.status)}
+                        </select>
+                    </td>
                     <td>
                         <a class="btn" href="${assessmentURL}" target="_blank">
                             <i class="icon-folder-open"></i> Open
                         </a>
 
-                        <button class="btn delete-assessment" assessmentid="${assessments[z].id}" z="${z}">
+                        <button class="btn delete-assessment"
+                                data-assessment-id="${assessment.id}">
                             <i class="icon-trash"></i> Delete
                         </button>
-                    </td>`;
-                    out += "</tr>";
-                }
-            }
+                    </td>
+                </tr>`;
         }
 
         $(element).html(out);
