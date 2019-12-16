@@ -11,15 +11,18 @@ admin.site.site_header = "My Home Energy Planner administration"
 admin.site.site_title = "Django admin"
 admin.site.index_title = "My Home Energy Planner administration"
 
+if settings.ENV != "production":
+    DEFAULT_ROUTE = "v1:list-assessments"
+else:
+    DEFAULT_ROUTE = "dev:list-assessments"
+
 urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Login stuff
     path("", include("mhep.users.urls")),
     # Your stuff: custom urls includes go here
-    path(
-        "", RedirectView.as_view(url=reverse_lazy("v1:list-assessments")), name="index"
-    ),
+    path("", RedirectView.as_view(url=reverse_lazy(DEFAULT_ROUTE)), name="index"),
     # Add app versions after this line
     path("dev/", include("mhep.dev.urls", namespace="dev")),
     path("v1/", include("mhep.v1.urls", namespace="v1")),
