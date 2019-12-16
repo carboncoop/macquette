@@ -74,7 +74,7 @@
         </div>
     </div>
 
-    <div id="myorganisations"></div>
+    <div id="organisations"></div>
 </section>
 
 <section id="org-members" class="mb-30 bg-white" style="display:none; min-width: 50rem; width: min-content;">
@@ -194,15 +194,15 @@
 <script>
     // if null, show personal assessments; otherwise show assessments with in given org
     var orgid = null;
-    var myusername = '{{ user.username|default:"anonymous" }}';
+    var current_user = '{{ user.username|default:"anonymous" }}';
     var path = '{{ request.build_absolute_uri }}';
 
     var assessments = [];
-    var allusers = [];
-    var myorganisations = [];
+    var users = [];
+    var organisations = [];
 
     function getOrganisationById(id) {
-        return myorganisations.find(e => e.id == id)
+        return organisations.find(e => e.id == id)
     }
 
     function getAssessmentById(id) {
@@ -379,15 +379,15 @@
 
     function fetchOrganisations() {
         return mhep_helper.list_organisations().then(result => {
-            myorganisations = result;
-            return myorganisations;
+            organisations = result;
+            return organisations;
         })
     }
 
     function fetchAllUsers() {
         return mhep_helper.list_users().then(result => {
-            allusers = result;
-            return allusers;
+            users = result;
+            return users;
         })
     };
 
@@ -395,7 +395,7 @@
         let waitFor = [ fetchOrganisations(), fetchAllUsers() ]
 
         Promise.all(waitFor).then(_ => {
-            if (myorganisations.length === 0) {
+            if (organisations.length === 0) {
                 no_organisations();
             } else {
                 draw_organisation_list();
@@ -429,12 +429,12 @@
     });
 
     function no_organisations() {
-        $("#myorganisations").html("<p>You are in no organisations.</p>");
+        $("#organisations").html("<p>You are in no organisations.</p>");
     }
 
     function draw_organisation_list() {
         var out = "";
-        for (let org of myorganisations) {
+        for (let org of organisations) {
             let s = org.assessments === 1 ? "" : "s"
 
             out += `
@@ -447,7 +447,7 @@
                 </span>
             </div>`;
         }
-        $("#myorganisations").html(out);
+        $("#organisations").html(out);
     }
 
     function draw_organisation(orgid) {
@@ -487,7 +487,7 @@
                 demoteLibrarianButton.click(handleClickDemoteLibrarian);
             }
 
-            if (permissions.can_add_remove_members && member.name != myusername) {
+            if (permissions.can_add_remove_members && member.name != current_user) {
                 var removeMemberButton = row.find('.remove-user')
                 removeMemberButton.show();
                 removeMemberButton.click(handleClickRemoveUser);
@@ -607,7 +607,7 @@
     function populateAddMemberSelect(addMemberForm) {
         var select = addMemberForm.find("select");
 
-        for (let user of allusers) {
+        for (let user of users) {
             if (!user.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = user.name;
