@@ -1,10 +1,12 @@
 import pytest
+from django.urls import resolve
+from django.urls import reverse
+
+from .. import VERSION
+from ..models import Assessment
+from ..models import Library
 
 # from django.conf import settings
-from django.urls import reverse, resolve
-
-from ..models import Assessment, Library
-from .. import VERSION
 
 pytestmark = pytest.mark.django_db
 
@@ -116,7 +118,7 @@ def test_create_delete_organisation_librarians():
     assert (
         reverse(
             f"{VERSION}:create-delete-organisation-librarians",
-            kwargs={"pk": 1, "userid": 5,},
+            kwargs={"pk": 1, "userid": 5},
         )
         == f"/{VERSION}/api/organisations/1/librarians/5/"
     )
@@ -130,7 +132,7 @@ def test_create_delete_organisation_members():
     assert (
         reverse(
             f"{VERSION}:create-delete-organisation-members",
-            kwargs={"pk": 1, "userid": 5,},
+            kwargs={"pk": 1, "userid": 5},
         )
         == f"/{VERSION}/api/organisations/1/members/5/"
     )
@@ -144,7 +146,7 @@ def test_share_unshare_organisation_library():
     assert (
         reverse(
             f"{VERSION}:share-unshare-organisation-libraries",
-            kwargs={"pk": 1, "libraryid": 2, "otherorgid": 3,},
+            kwargs={"pk": 1, "libraryid": 2, "otherorgid": 3},
         )
         == f"/{VERSION}/api/organisations/1/libraries/2/shares/3/"
     )
@@ -158,7 +160,7 @@ def test_list_organisation_library_shares():
     assert (
         reverse(
             f"{VERSION}:list-organisation-library-shares",
-            kwargs={"pk": 1, "libraryid": 5,},
+            kwargs={"pk": 1, "libraryid": 5},
         )
         == f"/{VERSION}/api/organisations/1/libraries/5/shares/"
     )

@@ -1,6 +1,7 @@
-from django.db import models
 from django.conf import settings
 from django.contrib.postgres.fields import JSONField
+from django.db import models
+
 from ..validators import validate_dict
 
 STATUS_CHOICES = [
@@ -9,10 +10,7 @@ STATUS_CHOICES = [
     ("Test", "Test"),
 ]
 
-OPENBEM_VERSION_CHOICES = [
-    ("10.1.0", "v10.1.0"),
-    ("10.1.1", "v10.1.1"),
-]
+OPENBEM_VERSION_CHOICES = [("10.1.0", "v10.1.0"), ("10.1.1", "v10.1.1")]
 
 
 class Assessment(models.Model):
@@ -36,10 +34,10 @@ class Assessment(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
 
-    openbem_version = models.CharField(max_length=20, choices=OPENBEM_VERSION_CHOICES,)
+    openbem_version = models.CharField(max_length=20, choices=OPENBEM_VERSION_CHOICES)
 
     status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="In progress",
+        max_length=20, choices=STATUS_CHOICES, default="In progress"
     )
 
     data = JSONField(default=dict, validators=[validate_dict])

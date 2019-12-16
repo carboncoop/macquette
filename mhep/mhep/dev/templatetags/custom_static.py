@@ -1,6 +1,5 @@
-from django.templatetags.static import StaticNode
-
 from django import template
+from django.templatetags.static import StaticNode
 
 register = template.Library()
 

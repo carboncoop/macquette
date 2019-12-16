@@ -1,10 +1,9 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
-
-from mhep.users.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
 from ... import VERSION
 from ..factories import LibraryFactory
+from mhep.users.tests.factories import UserFactory
 
 
 class CommonMixin:
@@ -16,7 +15,7 @@ class CommonMixin:
     def setUpClass(cls):
         super().setUpClass()
         cls.library = LibraryFactory.create(
-            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"},}
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"}}
         )
 
 
@@ -40,12 +39,10 @@ class TestCreateLibraryItemPermissions(CommonMixin, APITestCase):
         self.client.force_authenticate(non_owner)
 
         response = self._call_endpoint(self.library)
-        self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, "Not found.",
-        )
+        self._assert_error(response, status.HTTP_404_NOT_FOUND, "Not found.")
 
     def _call_endpoint(self, library):
-        item_data = {"tag": "new_tag", "item": {"name": "bar",}}
+        item_data = {"tag": "new_tag", "item": {"name": "bar"}}
 
         return self.client.post(
             f"/{VERSION}/api/libraries/{self.library.id}/items/",
@@ -74,15 +71,10 @@ class TestUpdateLibraryItemPermissions(CommonMixin, APITestCase):
         self.client.force_authenticate(non_owner)
 
         response = self._call_endpoint(self.library)
-        self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, "Not found.",
-        )
+        self._assert_error(response, status.HTTP_404_NOT_FOUND, "Not found.")
 
     def _call_endpoint(self, library):
-        replacement_data = {
-            "name": "bar",
-            "other": "data",
-        }
+        replacement_data = {"name": "bar", "other": "data"}
 
         return self.client.put(
             f"/{VERSION}/api/libraries/{self.library.id}/items/tag1/",
@@ -111,9 +103,7 @@ class TestDeleteLibraryItemPermissions(CommonMixin, APITestCase):
         self.client.force_authenticate(non_owner)
 
         response = self._call_endpoint(self.library)
-        self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, "Not found.",
-        )
+        self._assert_error(response, status.HTTP_404_NOT_FOUND, "Not found.")
 
     def _call_endpoint(self, library):
         return self.client.delete(

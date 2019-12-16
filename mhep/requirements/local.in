@@ -18,6 +18,7 @@ pytest-cov              # https://pypi.org/project/pytest-cov/
 flake8                  # https://github.com/PyCQA/flake8
 coverage                # https://github.com/nedbat/coveragepy
 pylint-django           # https://github.com/PyCQA/pylint-django
+pre-commit              # https://github.com/pre-commit/pre-commit
 
 # Django
 # ------------------------------------------------------------------------------

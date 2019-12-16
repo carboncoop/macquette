@@ -1,65 +1,77 @@
-console.log("debug heating.js");
-if (typeof library_helper != "undefined")
+console.log('debug heating.js');
+if (typeof library_helper != 'undefined') {
     library_helper.type = 'water_usage';
-else
-    var library_helper = new libraryHelper('heating_systems', $("#openbem"));
-function heating_UpdateUI()
-{
+} else {
+    var library_helper = new libraryHelper('heating_systems', $('#openbem'));
+}
+function heating_UpdateUI() {
     add_water_usage();
     add_heating_systems();
     add_storage();
-    if (data.water_heating.override_annual_energy_content)
+    if (data.water_heating.override_annual_energy_content) {
         $('#annual_energy_content').html('<input type="text"  dp=0 style="width:35px; margin-right:10px" key="data.water_heating.annual_energy_content" /> kWh/year');
-    else
+    } else {
         $('#annual_energy_content').html('<span key="data.water_heating.annual_energy_content" dp=0></span>  kWh/year');
+    }
     //Add "Hot water storage control type" and "Pipework insulation" if any of the systems requires it
     data.heating_systems.forEach(function (system) {
         var show = false;
-        if (system.primary_circuit_loss == 'Yes')
+        if (system.primary_circuit_loss == 'Yes') {
             show = true;
-        if (show == true)
+        }
+        if (show == true) {
             $('.if-primary-circuit-loss').show();
+        }
     });
     show_hide_if_master();
 
     // Measures applied
     if (data.measures.water_heating != undefined) {
         if (data.measures.water_heating.water_usage != undefined) {
-            for (var id in data.measures.water_heating.water_usage)
+            for (var id in data.measures.water_heating.water_usage) {
                 $('.WU-measure-applied[item-id=' + id + ']').show();
+            }
         }
-        if (data.measures.water_heating.pipework_insulation != undefined)
+        if (data.measures.water_heating.pipework_insulation != undefined) {
             $('#pipework_insulation-measure-applied').show();
-        if (data.measures.water_heating.storage_type_measures != undefined)
+        }
+        if (data.measures.water_heating.storage_type_measures != undefined) {
             $('#storage-type-measure-applied').show();
-        if (data.measures.water_heating.hot_water_control_type != undefined)
+        }
+        if (data.measures.water_heating.hot_water_control_type != undefined) {
             $('#hot_water_control_type-measure-applied').show();
+        }
     }
     if (data.measures.space_heating_control_type != undefined) {
-        for (var id in data.measures.space_heating_control_type)
+        for (var id in data.measures.space_heating_control_type) {
             $('.space_heating_control_type-measure-applied[item-id=' + id + ']').show();
+        }
 
     }
     if (data.measures.heating_systems != undefined) {
-        for (var id in data.measures.heating_systems)
+        for (var id in data.measures.heating_systems) {
             $('.heating_systems-measure-applied[item-id=' + id + ']').show();
+        }
 
     }
 }
 
 function heating_initUI() {
 // Measures
-    if (data.measures == undefined)
+    if (data.measures == undefined) {
         data.measures = {};
-    if (data.measures.water_heating == undefined)
+    }
+    if (data.measures.water_heating == undefined) {
         data.measures.water_heating = {};
+    }
     // Water heating
     $('#solarhotwater-link').prop('href', 'view?id=' + p.id + '#' + scenario + '/solarhotwater');
     // Space heating
     for (var day_type in data.temperature.hours_off) {
         var total_hours = 0;
-        for (i in data.temperature.hours_off[day_type])
+        for (i in data.temperature.hours_off[day_type]) {
             total_hours += data.temperature.hours_off[day_type][i];
+        }
         $('#hours-off-' + day_type).html(total_hours);
     }
     heating_UpdateUI();
@@ -101,21 +113,23 @@ $('#openbem').on('click', '.apply-water-heating-measure', function () {
 //1. Set variables in library_helper
     library_helper.init();
     library_helper.type_of_measure = $(this).attr('type');
-    if (library_helper.type_of_measure == 'add_heating_systems_measure')
+    if (library_helper.type_of_measure == 'add_heating_systems_measure') {
         library_helper.type = 'heating_systems_measures';
-    else
+    } else {
         library_helper.type = library_helper.type_of_measure;
+    }
     // 2. Prepare modal
     $('#apply-measure-water-heating-finish').hide();
     $('#apply-measure-water-heating-modal .modal-body > div').hide();
     // Populate selects in modal to choose library and measure
     var out = library_helper.get_list_of_libraries_for_select(library_helper.type);
-    $("#apply-measure-water-heating-library-select").html(out);
+    $('#apply-measure-water-heating-library-select').html(out);
     var library_id = $('#apply-measure-water-heating-library-select').val();
-    if (library_helper.type == 'heating_systems_measures' || library_helper.type == 'storage_type_measures')
+    if (library_helper.type == 'heating_systems_measures' || library_helper.type == 'storage_type_measures') {
         out = library_helper.get_list_of_items_for_select_by_category(library_id);
-    else
+    } else {
         out = library_helper.get_list_of_items_for_select(library_id);
+    }
     $('#apply-measure-water-heating-items-select').html(out);
     // Populate body of modal
     var tag = $('#apply-measure-water-heating-items-select').val();
@@ -157,7 +171,7 @@ $('#openbem').on('click', '.apply-water-heating-measure', function () {
     $('#apply-measure-water-heating-modal').modal('show');
 });
 $('#openbem').on('change', '#apply-measure-water-heating-library-select', function () {
-    var library_id = $("#apply-measure-water-heating-library-select").val();
+    var library_id = $('#apply-measure-water-heating-library-select').val();
     out = library_helper.get_list_of_items_for_select(library_id);
     $('#apply-measure-water-heating-items-select').html(out);
     var tag = $('#apply-measure-water-heating-items-select').val();
@@ -167,7 +181,7 @@ $('#openbem').on('change', '#apply-measure-water-heating-library-select', functi
     $('#apply-measure-water-heating-modal .modal-body').html(out);
 });
 $('#openbem').on('change', '#apply-measure-water-heating-items-select', function () {
-    var library_id = $("#apply-measure-water-heating-library-select").val();
+    var library_id = $('#apply-measure-water-heating-library-select').val();
     var tag = $('#apply-measure-water-heating-items-select').val();
     var function_name = library_helper.type + '_item_to_html';
     var item = library_helper.get_library_by_id(library_id).data[tag];
@@ -180,20 +194,19 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
         if (data.measures.space_heating_control_type == undefined) {
             data.measures.space_heating_control_type = {};
         }
-    }
-    else if (library_helper.type === 'heating_systems_measures') {
+    } else if (library_helper.type === 'heating_systems_measures') {
         if (data.measures.heating_systems == undefined) {
             data.measures.heating_systems = {};
         }
-    }
-    else if (data.measures.water_heating[library_helper.type] == undefined) { // If it is the first time we apply a measure to this element iin this scenario
+    } else if (data.measures.water_heating[library_helper.type] == undefined) { // If it is the first time we apply a measure to this element iin this scenario
         data.measures.water_heating[library_helper.type] = {};
     }
     switch (library_helper.type_of_measure) {
         case 'water_usage':
             var measure = library_helper.water_usage_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             measure[tag].id = get_WU_max_id(data.water_heating.water_usage) + 1;
             add_quantity_and_cost_to_measure(measure[tag]);
@@ -204,11 +217,14 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
             data.water_heating.water_usage.push(measure[tag]);
             break;
         case 'storage_type_measures':
-            if (data.measures.water_heating[library_helper.type].original == undefined) // first time
+            // first time
+            if (data.measures.water_heating[library_helper.type].original == undefined) {
                 data.measures.water_heating[library_helper.type].original = data.water_heating.storage_type;
+            }
             var measure = library_helper.storage_type_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             add_quantity_and_cost_to_measure(measure[tag]);
             // Update data object and add measure
@@ -216,13 +232,17 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
             data.water_heating.storage_type = measure[tag];
             break;
         case 'pipework_insulation':
-            if (data.measures.water_heating['pipework_insulation'] == undefined)
+            if (data.measures.water_heating['pipework_insulation'] == undefined) {
                 data.measures.water_heating['pipework_insulation'] = {};
-            if (data.measures.water_heating['pipework_insulation'].original == undefined) // first time
+            }
+            // first time
+            if (data.measures.water_heating['pipework_insulation'].original == undefined) {
                 data.measures.water_heating['pipework_insulation'].original = data.water_heating.pipework_insulation;
+            }
             var measure = library_helper.pipework_insulation_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             add_quantity_and_cost_to_measure(measure[tag]);
             // Update data object and add measure
@@ -230,13 +250,17 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
             data.water_heating.pipework_insulation = measure[tag].pipework_insulation;
             break;
         case 'hot_water_control_type':
-            if (data.measures.water_heating['hot_water_control_type'] == undefined)
+            if (data.measures.water_heating['hot_water_control_type'] == undefined) {
                 data.measures.water_heating['hot_water_control_type'] = {};
-            if (data.measures.water_heating['hot_water_control_type'].original == undefined) // first time
+            }
+            // first time
+            if (data.measures.water_heating['hot_water_control_type'].original == undefined) {
                 data.measures.water_heating['hot_water_control_type'].original = data.water_heating.hot_water_control_type;
+            }
             var measure = library_helper.hot_water_control_type_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             add_quantity_and_cost_to_measure(measure[tag]);
             // Update data object and add measure
@@ -246,11 +270,14 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
         case 'space_heating_control_type':
             var item_index = $(this).attr('item-index');
             var item = data.heating_systems[item_index];
-            if (data.measures.space_heating_control_type[item.id] == undefined) //if first time we apply a measure to this system
+            //if first time we apply a measure to this system
+            if (data.measures.space_heating_control_type[item.id] == undefined) {
                 data.measures.space_heating_control_type[item.id] = {original: item.heating_controls, measure: {}};
+            }
             var measure = library_helper.space_heating_control_type_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             add_quantity_and_cost_to_measure(measure[tag]);
             // Update data object and add measure
@@ -260,37 +287,46 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
         case 'heating_systems_measures':
             var item_index = $(this).attr('item-index');
             var item = data.heating_systems[item_index];
-            if (data.measures.heating_systems[item.id] == undefined) //if first time we apply a measure to this system
+            //if first time we apply a measure to this system
+            if (data.measures.heating_systems[item.id] == undefined) {
                 data.measures.heating_systems[item.id] = {original: item, measure: {}};
+            }
             var measure = library_helper.heating_systems_measures_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
-            if (measure[tag].category == 'Warm air systems')
+            if (measure[tag].category == 'Warm air systems') {
                 measure[tag].fans_and_supply_pumps = 0.4 * measure[tag].sfp * data.volume;
+            }
             add_quantity_and_cost_to_measure(measure[tag]);
             // Add properties that were in the original item
             for (z in item) {
-                if (measure[tag][z] == undefined)
+                if (measure[tag][z] == undefined) {
                     measure[tag][z] = item[z];
+                }
             }
-// Update data object and add measure
+            // Update data object and add measure
             data.measures.heating_systems[item.id].measure = measure[tag];
             data.heating_systems[item_index] = measure[tag];
             break;
         case 'add_heating_systems_measure':
             var item_id = get_HS_max_id() + 1;
-            if (data.measures.heating_systems[item_id] == undefined) //if first time we apply a measure to this system
+            //if first time we apply a measure to this system
+            if (data.measures.heating_systems[item_id] == undefined) {
                 data.measures.heating_systems[item_id] = {original: 'empty', measure: {}};
+            }
             var measure = library_helper.heating_systems_measures_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             measure[tag].id = item_id;
-            if (measure[tag].category == 'Warm air systems')
+            if (measure[tag].category == 'Warm air systems') {
                 measure[tag].fans_and_supply_pumps = 0.4 * measure[tag].sfp * data.volume;
+            }
             add_quantity_and_cost_to_measure(measure[tag]);
-            // Add extra properties to measure 
+            // Add extra properties to measure
             measure[tag].fuel = 'Standard Tariff';
             measure[tag].fraction_space = 1;
             measure[tag].fraction_water_heating = 1;
@@ -320,11 +356,11 @@ $('#openbem').on('click', '.add-storage-type ', function () {
     item.tag = tag;
     data.water_heating.storage_type = item;
     update();
-    heating_initUI()
+    heating_initUI();
 });
 $('#openbem').on('click', '.delete-storage', function () {
     delete data.water_heating.storage_type;
-    console.log('hola')
+    console.log('hola');
     update();
 });
 $('#openbem').on('click', '.add-heating-system', function () {
@@ -332,8 +368,9 @@ $('#openbem').on('click', '.add-heating-system', function () {
     var library = library_helper.get_library_by_id($(this).attr('library')).data;
     var item = library[tag];
     item.tag = tag;
-    if (item.category = 'Warm air systems')
+    if (item.category = 'Warm air systems') {
         item.fans_and_supply_pumps = 0.4 * item.sfp * data.volume;
+    }
     item.id = get_HS_max_id() + 1;
     item.fuel = 'Standard Tariff';
     item.fraction_space = 1;
@@ -359,12 +396,14 @@ function get_WU_max_id() {
     var max_id = 0;
     // Find the max id
     for (z in data.water_heating.water_usage) {
-        if (data.water_heating.water_usage[z].id != undefined && data.water_heating.water_usage[z].id > max_id)
+        if (data.water_heating.water_usage[z].id != undefined && data.water_heating.water_usage[z].id > max_id) {
             max_id = data.water_heating.water_usage[z].id;
+        }
     }
     for (z in data.measures.water_heating.water_usage) {
-        if (z > max_id)
+        if (z > max_id) {
             max_id = z;
+        }
     }
     return 1.0 * max_id;
 }
@@ -372,20 +411,23 @@ function get_HS_max_id() {
     var max_id = 0;
     // Find the max id
     for (z in data.heating_systems) {
-        if (data.heating_systems[z].id != undefined && data.heating_systems[z].id > max_id)
+        if (data.heating_systems[z].id != undefined && data.heating_systems[z].id > max_id) {
             max_id = data.heating_systems[z].id;
+        }
     }
     for (z in data.measures.heating_systems) {
-        if (z > max_id)
+        if (z > max_id) {
             max_id = z;
+        }
     }
     return 1.0 * max_id;
 }
 function add_water_usage() {
-    if (data.water_heating.water_usage.length > 0)
+    if (data.water_heating.water_usage.length > 0) {
         $('#water-usage').show();
-    else
+    } else {
         $('#water-usage').hide();
+    }
     $('#water-usage').html('');
     for (z in data.water_heating.water_usage) {
         var item = data.water_heating.water_usage[z];
@@ -398,10 +440,11 @@ function add_water_usage() {
     }
 }
 function add_heating_systems() {
-    if (data.heating_systems.length > 0)
+    if (data.heating_systems.length > 0) {
         $('#heating-systems').show();
-    else
+    } else {
         $('#heating-systems').hide();
+    }
 
     $('#heating-systems').html('');
     var out = "<tr><th>Tag</th><th>Name</th><th>Provides</th><th>Space heating / Winter efficiency</th><th>Water heating / Summer efficiency</th>\n\
@@ -409,7 +452,7 @@ function add_heating_systems() {
 <th>Responsiveness <i class='icon-question-sign' title='Refer to Table 4d, p.209 SAP 9.92' /></th>\n\
 <th>Temperature adjustment <i class='icon-question-sign' title='SAP2012, table 4e, p.210'></i></th>\n\
 <th>Space heating controls <i class='icon-question-sign' title='Refer to Table 4e, p.210 SAP 9.92' /></th>\n\
-<th>Instantaneous water heating?</th><th>Central heating pump inside dwelling</th></tr>"
+<th>Instantaneous water heating?</th><th>Central heating pump inside dwelling</th></tr>";
     $('#heating-systems').append(out);
 
     // Generate html string
@@ -430,22 +473,21 @@ function add_heating_systems() {
         if (mainHSs.mainHS1 === false) {
             out += '<option value = "mainHS1" > Main heating system </option>';
             out += '<option value="mainHS2_whole_house" disabled>2<sup>nd</sup > Main heating system - whole house </option>';
-            out += '<option value="mainHS2_part_of_the_house" disabled>2<sup>nd</sup > Main heating system - different part of the house </option>'
-        }
-        else if (mainHSs.mainHS2 === false) {
+            out += '<option value="mainHS2_part_of_the_house" disabled>2<sup>nd</sup > Main heating system - different part of the house </option>';
+        } else if (mainHSs.mainHS2 === false) {
             out += '<option value = "mainHS1" disabled> Main heating system </option>';
             out += '<option value="mainHS2_whole_house">2<sup>nd</sup > Main heating system - whole house </option>';
             out += '<option value="mainHS2_part_of_the_house">2<sup>nd</sup > Main heating system - different part of the house </option>';
-        }
-        else {
+        } else {
             out += '<option value = "mainHS1" disabled> Main heating system </option>';
             out += '<option value="mainHS2_whole_house" disabled>2<sup>nd</sup > Main heating system - whole house </option>';
             out += '<option value="mainHS2_part_of_the_house" disabled>2<sup>nd</sup > Main heating system - different part of the house </option>';
         }
-        if (item.main_space_heating_system == 'mainHS1')
+        if (item.main_space_heating_system == 'mainHS1') {
             mainHSs.mainHS1 = true;
-        else if (item.main_space_heating_system == 'mainHS2_whole_house' || item.main_space_heating_system == 'mainHS2_part_of_the_house')
+        } else if (item.main_space_heating_system == 'mainHS2_whole_house' || item.main_space_heating_system == 'mainHS2_part_of_the_house') {
             mainHSs.mainHS2 = true;
+        }
         out += '<option value="secondaryHS">Secondary heating system</option > </select></td >';
         out += '<td class = "if-SH" > <input style = "width:55px" type = "number" key = "data.heating_systems.' + z + '.responsiveness" max = "1" step = "0.01" min = "0" /> </td>';
         out += '<td class = "if-SH" > <input style = "width:55px" type = "number" key = "data.heating_systems.' + z + '.temperature_adjustment" max = "1" step = "0.01" min = "0" /> </td>';
@@ -456,8 +498,9 @@ function add_heating_systems() {
         out += '</tr>';
 
         $('#heating-systems').append(out);
-        if (scenario != 'master')
-            $('.controls-input').attr("disabled", true);
+        if (scenario != 'master') {
+            $('.controls-input').attr('disabled', true);
+        }
         switch (data.heating_systems[z].provides) {
             case 'heating':
                 $('.if-WH').html('');
@@ -482,15 +525,13 @@ function add_storage() {
     var st = data.water_heating.storage_type;
     if (st == undefined) {
         $('#type_of_storage').append('<tr><th>Type of storage <span class="select-type-of-storage-from-lib if-master" style="cursor:pointer"><button class="btn" style="margin-left: 20px"> Add from library</button></span></th></tr>');
-    }
-    else {
+    } else {
         var specific_header = '';
         var specific_st_info = '';
         if (st.declared_loss_factor_known == true) {
             specific_header = '<th>Manufacturers loss factor</th><th>Temperature factor a</th>';
             specific_st_info = '<td>' + st.manufacturer_loss_factor + '</td><td>' + st.temperature_factor_a + '</td>';
-        }
-        else {
+        } else {
             specific_header = '<th>Loss factor b</th><th>Volume factor b</th><th>Temperature factor b</th>';
             specific_st_info = '<td>' + st.loss_factor_b + '</td><td>' + st.volume_factor_b + '</td><td>' + st.temperature_factor_b + '</td>';
         }
@@ -500,20 +541,22 @@ function add_storage() {
 
 }
 function edit_item(item, index, item_subsystem) {
-    for (z in item)
-        item = item[z]; // item comes in the format: system = {electric:{bla bla bla}} and we transform it to: system = {bla bla bla}
+    for (z in item) {
+        item = item[z];
+    } // item comes in the format: system = {electric:{bla bla bla}} and we transform it to: system = {bla bla bla}
     if (library_helper.type === 'water_usage') {
         var object = 'water_usage';
         for (z in data.water_heating[object][index]) { // We copy over all the properties that are not asked when editting an system, like id or tag
-            if (item[z] == undefined)
+            if (item[z] == undefined) {
                 item[z] = data.water_heating[object][index][z];
+            }
         }
         data.water_heating[object][index] = item;
-    }
-    else if (library_helper.type === 'heating_systems') {
+    } else if (library_helper.type === 'heating_systems') {
         for (z in data.heating_systems[index]) { // We copy over all the properties that are not asked when editting an system, like id or tag
-            if (item[z] == undefined)
+            if (item[z] == undefined) {
                 item[z] = data.heating_systems[index][z];
+            }
         }
         data.heating_systems[index] = item;
     }

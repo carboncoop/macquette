@@ -1,6 +1,3 @@
-from ..models import Assessment
-
-from .. import VERSION
 from . import helpers
 
 

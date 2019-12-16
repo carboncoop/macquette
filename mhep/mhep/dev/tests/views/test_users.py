@@ -1,11 +1,9 @@
 import pytest
-
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from ... import VERSION
 from ..factories import OrganisationFactory
-
 from mhep.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db  # enable DB and run each test in transaction
@@ -26,9 +24,9 @@ class TestListUsers(APITestCase):
         assert response.status_code == status.HTTP_200_OK
 
         expected = [
-            {"id": f"{me.id}", "name": me.username,},
-            {"id": f"{user_1.id}", "name": user_1.username,},
-            {"id": f"{user_2.id}", "name": user_2.username,},
+            {"id": f"{me.id}", "name": me.username},
+            {"id": f"{user_1.id}", "name": user_1.username},
+            {"id": f"{user_2.id}", "name": user_2.username},
         ]
 
         assert expected == response.json()

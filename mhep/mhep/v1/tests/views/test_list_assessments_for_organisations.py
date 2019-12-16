@@ -1,12 +1,11 @@
 from freezegun import freeze_time
-
-from rest_framework.test import APITestCase
 from rest_framework import status
-
-from mhep.users.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
 from ... import VERSION
-from ..factories import AssessmentFactory, OrganisationFactory
+from ..factories import AssessmentFactory
+from ..factories import OrganisationFactory
+from mhep.users.tests.factories import UserFactory
 
 
 class TestListAssessmentsForOrganisation(APITestCase):

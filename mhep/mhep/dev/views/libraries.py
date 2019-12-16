@@ -1,25 +1,20 @@
 import json
 import logging
 
-from rest_framework import generics, exceptions
+from rest_framework import exceptions
+from rest_framework import generics
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
 
 from .. import VERSION
-
 from ..models import Library
-from ..permissions import (
-    CanReadLibrary,
-    CanWriteLibrary,
-    IsReadRequest,
-    IsWriteRequest,
-)
-from ..serializers import (
-    LibraryItemSerializer,
-    LibrarySerializer,
-)
-
+from ..permissions import CanReadLibrary
+from ..permissions import CanWriteLibrary
+from ..permissions import IsReadRequest
+from ..permissions import IsWriteRequest
+from ..serializers import LibraryItemSerializer
+from ..serializers import LibrarySerializer
 from .exceptions import BadRequest
 from .helpers import build_static_dictionary
 
@@ -58,7 +53,7 @@ class ListCreateLibraries(MyLibrariesMixin, generics.ListCreateAPIView):
 
 
 class UpdateDestroyLibrary(
-    MyLibrariesMixin, generics.UpdateAPIView, generics.DestroyAPIView,
+    MyLibrariesMixin, generics.UpdateAPIView, generics.DestroyAPIView
 ):
     serializer_class = LibrarySerializer
     permission_classes = [
@@ -80,9 +75,7 @@ class UpdateDestroyLibrary(
             return response
 
 
-class CreateUpdateDeleteLibraryItem(
-    MyLibrariesMixin, generics.GenericAPIView,
-):
+class CreateUpdateDeleteLibraryItem(MyLibrariesMixin, generics.GenericAPIView):
     serializer_class = LibraryItemSerializer
     permission_classes = [
         IsAuthenticated,
@@ -110,7 +103,7 @@ class CreateUpdateDeleteLibraryItem(
 
         if tag in d:
             logging.warning(f"tag {tag} already exists in library {library.id}")
-            raise BadRequest(f"tag `{tag}` already exists in library {library.id}",)
+            raise BadRequest(f"tag `{tag}` already exists in library {library.id}")
 
         d[tag] = item
         library.data = d

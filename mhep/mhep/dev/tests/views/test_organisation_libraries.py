@@ -1,12 +1,11 @@
 from freezegun import freeze_time
-
+from rest_framework import exceptions
+from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework import exceptions, status
 
 from ... import VERSION
 from ...models import Library
 from ..factories import OrganisationFactory
-
 from mhep.users.tests.factories import UserFactory
 
 
@@ -43,7 +42,7 @@ class TestCreateOrganisationLibraries(APITestCase):
                 "updated_at": "2019-06-01T16:35:34Z",
                 "name": "test library 1",
                 "type": "test type 1",
-                "permissions": {"can_write": True, "can_share": False,},
+                "permissions": {"can_write": True, "can_share": False},
                 "data": {"foo": "bar"},
                 "owner": {
                     "id": f"{self.org.id}",

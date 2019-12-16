@@ -1,14 +1,13 @@
 import datetime
-import pytz
-
 from collections import OrderedDict
 
-from rest_framework.test import APITestCase
+import pytz
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from ... import VERSION
-from ..factories import AssessmentFactory, OrganisationFactory
-
+from ..factories import AssessmentFactory
+from ..factories import OrganisationFactory
 from mhep.users.tests.factories import UserFactory
 
 
@@ -45,7 +44,7 @@ class TestListOrganisations(APITestCase):
                         ],
                     ),
                 ]
-            ),
+            )
         ]
 
         assert expected == response.data

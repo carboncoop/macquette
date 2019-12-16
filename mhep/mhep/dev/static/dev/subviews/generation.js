@@ -1,17 +1,17 @@
 console.log('debug generation.js');
 
-if (typeof library_helper != "undefined")
+if (typeof library_helper != 'undefined') {
     library_helper.type = 'generation_measures';
-else
-    var library_helper = new libraryHelper('generation_measures', $("#openbem"));
+} else {
+    var library_helper = new libraryHelper('generation_measures', $('#openbem'));
+}
 
 function generation_initUI() {
     if (data.generation.use_PV_calculator == 1) {
         $('#PV_calculator').show();
         $('input[key="data.generation.solar_annual_kwh"').hide();
         $('span#solar_annual_kwh').html(data.generation.solar_annual_kwh.toFixed(0)).show();
-    }
-    else {
+    } else {
         $('#PV_calculator').hide();
         $('input[key="data.generation.solar_annual_kwh"').show();
         $('span#solar_annual_kwh').hide();
@@ -21,7 +21,7 @@ function generation_initUI() {
         $('[key="data.generation.use_PV_calculator"]').hide().append('See PV calculator');
         $('#solarpv_kwp_installed').html('<span key="data.generation.solarpv_kwp_installed" /> kWp');
         $('#PV_calculator_message').show();
-        $('#PV_generation-measure-applied').show()
+        $('#PV_generation-measure-applied').show();
     }
     
 }
@@ -35,8 +35,7 @@ $('#openbem').on('change', '[key="data.generation.use_PV_calculator"]', function
         $('#PV_calculator').show(800);
         $('input[key="data.generation.solar_annual_kwh"').hide();
         $('span#solar_annual_kwh').html(data.generation.solar_annual_kwh.toFixed(0)).show();
-    }
-    else{
+    } else{
         $('#PV_calculator').hide(800);
         $('input[key="data.generation.solar_annual_kwh"').show();
         $('span#solar_annual_kwh').html(data.generation.solar_annual_kwh.toFixed(0)).hide();
@@ -54,7 +53,7 @@ $('#openbem').on('click', '.apply-generation-measure-from-lib', function () {
     $('#apply-measure-generation-modal .modal-body > div').hide('slow');
     // Populate selects in modal to choose library and measure
     var out = library_helper.get_list_of_libraries_for_select(library_helper.type);
-    $("#apply-measure-generation-library-select").html(out);
+    $('#apply-measure-generation-library-select').html(out);
     var library_id = $('#apply-measure-generation-library-select').val();
     out = library_helper.get_list_of_items_for_select(library_id);
     $('#apply-measure-generation-items-select').html(out);
@@ -70,7 +69,7 @@ $('#openbem').on('click', '.apply-generation-measure-from-lib', function () {
 });
 
 $('#openbem').on('change', '#apply-measure-generation-library-select', function () {
-    var library_id = $("#apply-measure-generation-library-select").val();
+    var library_id = $('#apply-measure-generation-library-select').val();
     out = library_helper.get_list_of_items_for_select(library_id);
     $('#apply-measure-generation-items-select').html(out);
     var tag = $('#apply-measure-generation-items-select').val();
@@ -81,7 +80,7 @@ $('#openbem').on('change', '#apply-measure-generation-library-select', function 
 });
 
 $('#openbem').on('change', '#apply-measure-generation-items-select', function () {
-    var library_id = $("#apply-measure-generation-library-select").val();
+    var library_id = $('#apply-measure-generation-library-select').val();
     var tag = $('#apply-measure-generation-items-select').val();
     var function_name = library_helper.type + '_item_to_html';
     var item = library_helper.get_library_by_id(library_id).data[tag];
@@ -96,8 +95,9 @@ $('#openbem').on('click', '#apply-measure-generation-ok', function () {
     }
 
     var measure = library_helper.generation_measures_get_item_to_save();
-    for (var t in measure)
+    for (var t in measure) {
         var tag = t;
+    }
     measure[tag].tag = tag;
     data.measures.PV_generation.measure = measure[tag];
     data.measures.PV_generation.measure.quantity = measure[tag].kWp;

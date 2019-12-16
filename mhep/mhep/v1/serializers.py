@@ -2,8 +2,9 @@ import datetime
 
 from rest_framework import serializers
 
-from . import VERSION
-from .models import Assessment, Library, Organisation
+from .models import Assessment
+from .models import Library
+from .models import Organisation
 
 
 class AuthorUserIDMixin:
@@ -82,15 +83,7 @@ class LibrarySerializer(StringIDMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Library
-        fields = [
-            "id",
-            "name",
-            "type",
-            "data",
-            "created_at",
-            "updated_at",
-            "writeable",
-        ]
+        fields = ["id", "name", "type", "data", "created_at", "updated_at", "writeable"]
 
     def get_writeable(self, obj):
         return True
@@ -112,12 +105,7 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Organisation
-        fields = [
-            "id",
-            "name",
-            "assessments",
-            "members",
-        ]
+        fields = ["id", "name", "assessments", "members"]
 
     def get_assessments(self, obj):
         return obj.assessments.count()

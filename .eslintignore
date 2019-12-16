@@ -1,0 +1,5 @@
+**/*.min.js
+**/papaparse.js
+**/bootstrap.js
+
+**/v1/**/*.js

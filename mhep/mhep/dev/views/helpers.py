@@ -1,16 +1,16 @@
 import logging
 import os
+from os.path import abspath
+from os.path import dirname
+from os.path import join
 
-from os.path import abspath, dirname, join
-
-from django.urls import reverse
-from django.templatetags.static import static
 from django.contrib.auth import get_user_model
+from django.templatetags.static import static
+from rest_framework.exceptions import NotAuthenticated
+from rest_framework.exceptions import PermissionDenied
 
-from rest_framework.exceptions import PermissionDenied, NotAuthenticated
-
-from .. import VERSION
 from .. import models
+from .. import VERSION
 
 User = get_user_model()
 
@@ -47,7 +47,8 @@ def find_app_static_files():
     for root, dirs, files in os.walk(static_dir):
         for fn in files:
             full_filename = join(root, fn)
-            relative_filename = full_filename[len(static_dir) + 1 :]
+            start = len(static_dir) + 1
+            relative_filename = full_filename[start:]
             # print("relative: {}".format(relative_filename))
             yield relative_filename
 

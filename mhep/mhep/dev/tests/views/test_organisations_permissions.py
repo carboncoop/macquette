@@ -1,12 +1,11 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
-
-from mhep.users.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
 from ... import VERSION
-from ..factories import LibraryFactory, OrganisationFactory
-
+from ..factories import LibraryFactory
+from ..factories import OrganisationFactory
 from .mixins import AssertErrorMixin
+from mhep.users.tests.factories import UserFactory
 
 
 class TestPromoteAsLibrarianPermissions(AssertErrorMixin, APITestCase):

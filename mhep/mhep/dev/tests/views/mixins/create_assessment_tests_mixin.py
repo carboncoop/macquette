@@ -1,12 +1,10 @@
 from django.contrib.auth import get_user_model
-
 from freezegun import freeze_time
-
-from rest_framework import exceptions, status
-
-from mhep.users.tests.factories import UserFactory
+from rest_framework import exceptions
+from rest_framework import status
 
 from ....models import Assessment
+from mhep.users.tests.factories import UserFactory
 
 User = get_user_model()
 
@@ -83,10 +81,7 @@ class CreateAssessmentTestsMixin:
     def test_accepts_no_description(self):
         self.client.force_authenticate(self.user)
 
-        new_assessment = {
-            "name": "test assessment 1",
-            "data": {"foo": "baz"},
-        }
+        new_assessment = {"name": "test assessment 1", "data": {"foo": "baz"}}
 
         response = self.post_to_create_endpoint(new_assessment)
 
@@ -94,9 +89,7 @@ class CreateAssessmentTestsMixin:
         assert "" == response.data["description"]
 
     def test_returns_forbidden_if_not_logged_in(self):
-        new_assessment = {
-            "name": "test assessment 1",
-        }
+        new_assessment = {"name": "test assessment 1"}
 
         response = self.post_to_create_endpoint(new_assessment)
 
@@ -106,7 +99,7 @@ class CreateAssessmentTestsMixin:
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {"description": "test description 2",},
+            {"description": "test description 2"},
             status.HTTP_400_BAD_REQUEST,
             {
                 "name": [
@@ -126,7 +119,7 @@ class CreateAssessmentTestsMixin:
             {
                 "status": [
                     exceptions.ErrorDetail(
-                        string='"bar" is not a valid choice.', code="invalid_choice",
+                        string='"bar" is not a valid choice.', code="invalid_choice"
                     )
                 ]
             },

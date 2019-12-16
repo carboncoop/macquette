@@ -1,15 +1,14 @@
 import datetime
-import pytz
-import pytest
-
 from collections import OrderedDict
 
-from rest_framework.test import APITestCase
+import pytest
+import pytz
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from ... import VERSION
-from ..factories import AssessmentFactory, OrganisationFactory
-
+from ..factories import AssessmentFactory
+from ..factories import OrganisationFactory
 from mhep.users.tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db  # enable DB and run each test in transaction
@@ -73,7 +72,7 @@ class TestListOrganisations(APITestCase):
                     ),
                     ("report", {}),
                 ]
-            ),
+            )
         ]
 
         assert expected == response.data
@@ -117,7 +116,7 @@ class TestListOrganisationsPermissions(APITestCase):
 
         self._assert_permissions(
             self.client.get(f"/{VERSION}/api/organisations/"),
-            {"can_add_remove_members": False, "can_promote_demote_librarians": False,},
+            {"can_add_remove_members": False, "can_promote_demote_librarians": False},
         )
 
     def test_shows_permissions_for_logged_in_admin(self):
@@ -125,7 +124,7 @@ class TestListOrganisationsPermissions(APITestCase):
 
         self._assert_permissions(
             self.client.get(f"/{VERSION}/api/organisations/"),
-            {"can_add_remove_members": True, "can_promote_demote_librarians": True,},
+            {"can_add_remove_members": True, "can_promote_demote_librarians": True},
         )
 
     def _assert_permissions(self, response, expected_permissions):

@@ -5,12 +5,9 @@ from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
 
 from .. import VERSION
-
 from ..models import Assessment
-
-from .mixins import AssessmentQuerySetMixin
-
 from .helpers import build_static_dictionary
+from .mixins import AssessmentQuerySetMixin
 
 STATIC_URLS = build_static_dictionary()
 

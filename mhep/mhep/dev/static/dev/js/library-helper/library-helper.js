@@ -39,13 +39,13 @@ libraryHelper.prototype.init = function () {
         'storage_type': 'Type of storages',
         'storage_type_measures': 'Type of storage measure',
         'appliances_and_cooking': 'Appliances and Cooking',
-        'heating_control': "Heating controls",
-        'heating_systems': "Heating systems",
-        'heating_systems_measures': "Heating systems mesaures",
-        'pipework_insulation': "Pipework insulation measures",
-        'hot_water_control_type': "Storage control types",
+        'heating_control': 'Heating controls',
+        'heating_systems': 'Heating systems',
+        'heating_systems_measures': 'Heating systems mesaures',
+        'pipework_insulation': 'Pipework insulation measures',
+        'hot_water_control_type': 'Storage control types',
         space_heating_control_type: 'Space heating control types',
-        'clothes_drying_facilities': "Clothes drying facilities",
+        'clothes_drying_facilities': 'Clothes drying facilities',
         'generation_measures': 'Generation measures'
     };
 };
@@ -78,10 +78,10 @@ libraryHelper.prototype.add_events = function () {
         library_id = $(this).attr('data-library-id');
         myself.onCreateInLibraryOk(library_id);
     });
-    this.container.on('change', "[name=empty_or_copy_item]", function () {
+    this.container.on('change', '[name=empty_or_copy_item]', function () {
         myself.onChangeEmptyOrCopyItem();
     });
-    this.container.on('change', "#origin-library-select", function () {
+    this.container.on('change', '#origin-library-select', function () {
         myself.onChangeOriginLibrarySelect();
     });
     this.container.on('change', '#item-to-copy-select', function () {
@@ -92,8 +92,9 @@ libraryHelper.prototype.add_events = function () {
     });
     this.container.on('click', '.edit-library-item-ok', function () {
         var library_id = null;
-        if ($(this).attr('data-library-id') != '')
+        if ($(this).attr('data-library-id') != '') {
             library_id = $(this).attr('data-library-id');
+        }
         myself.onEditLibraryItemOk(library_id);
     });
     this.container.on('click', '.edit-item', function () {
@@ -154,11 +155,12 @@ libraryHelper.prototype.add_events = function () {
         var options = '';
         for (var item in library.data) {
             if (library.type == 'elements' || library.type == 'elements_measures') {
-                if (library.data[item].tags[0].toUpperCase() == item_type.toUpperCase())
+                if (library.data[item].tags[0].toUpperCase() == item_type.toUpperCase()) {
                     options += '<option value="' + item + '">' + item + ': ' + library.data[item].name + '</option>';
-            }
-            else
+                }
+            } else {
                 options += '<option value="' + item + '">' + item + ': ' + library.data[item].name + '</option>';
+            }
         }
         $('#replace-from-lib-items').html(options);
     });
@@ -185,7 +187,7 @@ libraryHelper.prototype.add_events = function () {
     this.container.on('click', '.delete-library-item', function () {
         $('#delete-library-item-ok').attr('data-library-id', $(this).attr('library'));
         $('#delete-library-item-ok').attr('tag', $(this).attr('tag'));
-        $('#confirm-delete-library-item-modal .message').html("");
+        $('#confirm-delete-library-item-modal .message').html('');
         myself.hide_modals_temporaly();
         $('#confirm-delete-library-item-modal').modal('show');
     });
@@ -197,28 +199,25 @@ libraryHelper.prototype.add_events = function () {
     });
     this.container.on('change', '.item-ventilation_type', function () {
         var newVS = $('.item-ventilation_type').val();
-        if (newVS == 'DEV' || newVS == 'MEV' || newVS == 'MV' || newVS == 'MVHR')
-        {
+        if (newVS == 'DEV' || newVS == 'MEV' || newVS == 'MV' || newVS == 'MVHR') {
             $('.item-air_change_rate').parent().parent().show('fast');
             $('.item-specific_fan_power').parent().parent().show('fast');
-        }
-        else {
+        } else {
             $('.item-air_change_rate').parent().parent().hide('fast');
             $('.item-air_change_rate').val(0);
             $('.item-specific_fan_power').parent().parent().hide('fast');
             $('.item-specific_fan_power').val(0);
         }
-        if (newVS == 'MVHR')
+        if (newVS == 'MVHR') {
             $('.item-heat_recovery_efficiency').parent().parent().show('fast');
-        else {
+        } else {
             $('.item-heat_recovery_efficiency').parent().parent().hide('fast');
             $('.item-heat_recovery_efficiency').val(0);
         }
         if (newVS == 'NV' || newVS == 'IE' || newVS == 'PS') {
             $('.item-intermitent_fans').parent().parent().show('fast');
             $('.item-passive_vents').parent().parent().show('fast');
-        }
-        else {
+        } else {
             $('.item-intermitent_fans').parent().parent().hide('fast');
             $('.item-passive_vents').parent().parent().hide('fast');
             $('.item-intermitent_fans').val(0);
@@ -226,12 +225,11 @@ libraryHelper.prototype.add_events = function () {
         }
     });
     this.container.on('change', '.item-declared_loss_factor_known', function () {
-        var a = $(this).prop("checked");
+        var a = $(this).prop('checked');
         if ($(this).prop('checked') === true) {
             $('.if-declared-loss-factor').show('slow');
             $('.if-not-declared-loss-factor').hide('slow');
-        }
-        else {
+        } else {
             $('.if-declared-loss-factor').hide('slow');
             $('.if-not-declared-loss-factor').show('slow');
         }
@@ -240,8 +238,7 @@ libraryHelper.prototype.add_events = function () {
         if ($('.item-category').val() != 'Warm air systems') {
             $('.item-fans_and_supply_pumps').parent().parent().show();
             $('.item-sfp').parent().parent().hide();
-        }
-        else {
+        } else {
             $('.item-fans_and_supply_pumps').parent().parent().hide();
             $('.item-sfp').parent().parent().show();
         }
@@ -256,16 +253,16 @@ libraryHelper.prototype.append_modals = function () {
     var myself = this;
     $.ajax({
         url: urlHelper.static('js/library-helper/library-helper.html'),
-        datatype: "json",
+        datatype: 'json',
         error: handleServerError('loading library helper HTML'),
         success: function (result) {
             html = result;
             myself.container.append(html);
             // Make modals draggable
-            $("#openbem .modal").css("position", "fixed");
-            $("#openbem .modal-header").css("cursor", "move");
-            $("#openbem .modal").draggable({
-                handle: ".modal-header"
+            $('#openbem .modal').css('position', 'fixed');
+            $('#openbem .modal-header').css('cursor', 'move');
+            $('#openbem .modal').draggable({
+                handle: '.modal-header'
             });
         }});
 };
@@ -274,39 +271,39 @@ libraryHelper.prototype.append_modals = function () {
  *************************************/
 libraryHelper.prototype.onAddItemFromLib = function (origin) {
     this.populate_library_modal(origin);
-    $("#show-library-modal").modal('show');
+    $('#show-library-modal').modal('show');
 };
 libraryHelper.prototype.onOpenShareLib = function (libraryID, ownerID) {
     var myself = this;
-    $("#modal-share-library #share-library").attr("data-library-id", libraryID);
-    $(".modal").modal("hide");
+    $('#modal-share-library #share-library').attr('data-library-id', libraryID);
+    $('.modal').modal('hide');
 
     // Clone the 'share library with org form
-    var shareLibWithOrgForm = $("#share-lib-with-org-form-template").clone();
-    shareLibWithOrgForm.removeAttr("id");
+    var shareLibWithOrgForm = $('#share-lib-with-org-form-template').clone();
+    shareLibWithOrgForm.removeAttr('id');
 
-    shareLibWithOrgForm.find("#share-lib-with-org-select-template").removeAttr("id").attr(
-        "id", "share-lib-with-org-select-" + libraryID
+    shareLibWithOrgForm.find('#share-lib-with-org-select-template').removeAttr('id').attr(
+        'id', 'share-lib-with-org-select-' + libraryID
     );
-    shareLibWithOrgForm.find("#share-lib-with-org-label-template").removeAttr("id").attr(
-        "for", "share-lib-with-org-select-" + libraryID
+    shareLibWithOrgForm.find('#share-lib-with-org-label-template').removeAttr('id').attr(
+        'for', 'share-lib-with-org-select-' + libraryID
     );
-    shareLibWithOrgForm.on("submit", function (e) {
+    shareLibWithOrgForm.on('submit', function (e) {
         myself.onShareLib(e, ownerID, libraryID);
     });
 
     this.populateShareLibWithOrgSelect(shareLibWithOrgForm, ownerID);
     shareLibWithOrgForm.show();
 
-    var container = $("#share-lib-with-org-form-container");
+    var container = $('#share-lib-with-org-form-container');
     container.html(shareLibWithOrgForm);
 
     // Clone the table of who the library is shared with
-    var tableTemplate = $("#organisations-library-is-shared-with");
+    var tableTemplate = $('#organisations-library-is-shared-with');
     var table = tableTemplate.clone();
     table.show();
 
-    table.find("#organisation-library_shared_with-header-template").show();
+    table.find('#organisation-library_shared_with-header-template').show();
 
     var rowTemplate = $('#organisation-library_shared_with-row-template');
 
@@ -315,62 +312,62 @@ libraryHelper.prototype.onOpenShareLib = function (libraryID, ownerID) {
             org = organisations[i];
 
             row = rowTemplate.clone();
-            row.removeAttr("id");
+            row.removeAttr('id');
 
-            row.find(".organisation-name").html(org.name);
+            row.find('.organisation-name').html(org.name);
 
             row.find('[data-owner-org-id=""]').attr('data-owner-org-id', ownerID);
             row.find('[data-library-id=""]').attr('data-library-id', libraryID);
             row.find('[data-shared-org-id=""]').attr('data-shared-org-id', org.id);
 
-            var stopSharingButton = row.find('.stop-sharing')
-            stopSharingButton.on("click", myself.onStopSharingLib);
+            var stopSharingButton = row.find('.stop-sharing');
+            stopSharingButton.on('click', myself.onStopSharingLib);
 
             row.show();
             table.append(row);
         }
     });
 
-    $("#organisations-library-is-shared-with-container").html(table);
+    $('#organisations-library-is-shared-with-container').html(table);
 
 
-    $("#modal-share-library").modal("show");
+    $('#modal-share-library').modal('show');
 };
 libraryHelper.prototype.onShareLib = function (e, ownerID, libraryID) {
     e.preventDefault();
-    $("#return-message").html("");
+    $('#return-message').html('');
 
     if (libraryID == -1) {
-        $("#return-message").html("You must select an organisation");
+        $('#return-message').html('You must select an organisation');
         return;
     }
 
-    $("#return-message").html("");
-    var submitButton = $(this).find(":submit");
-    submitButton.attr("disabled", true);
-    submitButton.val("Sharing...");
-    var toOrgID = $("#share-lib-with-org-select-" + libraryID).val();
+    $('#return-message').html('');
+    var submitButton = $(this).find(':submit');
+    submitButton.attr('disabled', true);
+    submitButton.val('Sharing...');
+    var toOrgID = $('#share-lib-with-org-select-' + libraryID).val();
 
     mhep_helper.share_library_with_organisation(ownerID, libraryID, toOrgID).then(result => {
-        submitButton.attr("disabled", false);
-        $("#return-message").html("Successfully shared library");
+        submitButton.attr('disabled', false);
+        $('#return-message').html('Successfully shared library');
         libraryHelper.prototype.onOpenShareLib(libraryID, ownerID);
     });
 };
 libraryHelper.prototype.onStopSharingLib = function (e) {
     e.preventDefault();
-    $("#return-message").html("");
+    $('#return-message').html('');
 
     var myself = this;
 
-    $(this).attr("disabled", true);
-    $(this).text("Stopping...");
+    $(this).attr('disabled', true);
+    $(this).text('Stopping...');
 
     var ownerOrgID = $(this).attr('data-owner-org-id');
     var libraryID = $(this).attr('data-library-id');
     var sharedOrgID = $(this).attr('data-shared-org-id');
     mhep_helper.stop_sharing_library_with_organisation(ownerOrgID, libraryID, sharedOrgID).then(result => {
-        $("#return-message").html("Stopped sharing library");
+        $('#return-message').html('Stopped sharing library');
         libraryHelper.prototype.onOpenShareLib(libraryID, ownerOrgID);
     });
 };
@@ -392,7 +389,7 @@ libraryHelper.prototype.onRemoveUserFromSharedLib = function (user_to_remove, se
     //var selected_library = $('#library-select').val();
     var myself = this;
     $.ajax({
-        url: path + "assessment/removeuserfromsharedlibrary.json",
+        url: path + 'assessment/removeuserfromsharedlibrary.json',
         data: 'library_id=' + selected_library + '&user_to_remove=' + user_to_remove,
         error: handleServerError('removing user from shared library'),
         success: function (result) {
@@ -405,7 +402,7 @@ libraryHelper.prototype.onSelectingLibraryToShow = function (origin) {
     $('#library_table').html('');
     var function_name = this.type + '_library_to_html';
     out = this[function_name](origin, id);
-    $("#library_table").html(out);
+    $('#library_table').html(out);
     $('#create-in-library').attr('data-library-id', id);
 };
 libraryHelper.prototype.onNewLibraryOption = function () {
@@ -414,43 +411,44 @@ libraryHelper.prototype.onNewLibraryOption = function () {
 
     var libraryOptionsHTML = '';
     this.library_list[this.type].forEach(function (library) {
-        libraryOptionsHTML += "<option value=" + library.id + ">" + library.name + "</option>";
+        libraryOptionsHTML += '<option value=' + library.id + '>' + library.name + '</option>';
     });
-    $("#library-to-copy-select").html(libraryOptionsHTML);
+    $('#library-to-copy-select').html(libraryOptionsHTML);
 
     mhep_helper.list_organisations().then(organisations => {
         var orgInputsHTML = '';
         organisations.forEach(function (org) {
-          orgInputsHTML += '<p><input type="radio" name="organisation_id" value="' + org.id + '" />' + org.name + '</p>';
+            orgInputsHTML += '<p><input type="radio" name="organisation_id" value="' + org.id + '" />' + org.name + '</p>';
         });
         $('#organisations-to-add-library-to').html(orgInputsHTML);
     });
 
     $('#new-library-name').val('New name');
-    $(".modal").modal('hide');
+    $('.modal').modal('hide');
     $('#new-library-modal .btn').show('fast');
     $('#new-library-modal #finishcreatelibrary').hide('fast');
-    $("#new-library-modal").modal('show');
+    $('#new-library-modal').modal('show');
 };
 libraryHelper.prototype.onChangeEmptyOrCopyLibrary = function () {
-    if ($("input[name=empty_or_copy_library]:checked").val() == 'empty')
+    if ($('input[name=empty_or_copy_library]:checked').val() == 'empty') {
         $('#library-to-copy').hide('fast');
-    else
+    } else {
         $('#library-to-copy').show('fast');
+    }
 };
 libraryHelper.prototype.onCreateNewLibrary = function () {
-    $("#create-library-message").html('');
+    $('#create-library-message').html('');
     var myself = this;
-    var name = $("#new-library-name").val();
+    var name = $('#new-library-name').val();
     if (name === '') {
-        $("#create-library-message").html('Library name cannot be empty');
+        $('#create-library-message').html('Library name cannot be empty');
         return;
     }
     const new_library_body = {
         'name': name,
         'type': this.type,
     };
-    if ($("input[name=empty_or_copy_library]:checked").val() == 'copy') {
+    if ($('input[name=empty_or_copy_library]:checked').val() == 'copy') {
         const id = $('#library-to-copy-select').val();
         const library = myself.get_library_by_id(id);
         new_library_body['data'] = library['data'];
@@ -464,7 +462,7 @@ libraryHelper.prototype.onCreateNewLibrary = function () {
 
     mhep_helper.create_library(new_library_body, organisationID).then(result => {
         myself.load_user_libraries();
-        $("#create-library-message").html('Library created');
+        $('#create-library-message').html('Library created');
         $('#cancelnewlibrary').hide('fast');
         $('#newlibrary').hide('fast');
         $('#finishcreatelibrary').show('fast');
@@ -479,24 +477,24 @@ libraryHelper.prototype.onCreateInLibrary = function (library_id) {
     // Populate the select to choose library to copy from
     var out = '';
     this.library_list[this.type].forEach(function (library) {
-        out += "<option value=" + library.id + ">" + library.name + "</option>";
+        out += '<option value=' + library.id + '>' + library.name + '</option>';
     });
-    $("#origin-library-select").html(out);
+    $('#origin-library-select').html(out);
     // Populate the select to choose item to copy from
     out = '';
     var selected_library = this.get_library_by_id($('#origin-library-select').val());
     for (item in selected_library.data) {
-        out += "<option value=" + item + ">" + item + "</option>";
+        out += '<option value=' + item + '>' + item + '</option>';
     }
-    $("#item-to-copy-select").html(out);
+    $('#item-to-copy-select').html(out);
     // Item fields
     // Call to specific function for the type
     var function_name = this.type + '_item_to_html';
     out = this[function_name]();
     $('.new-item-in-library').html(out);
     // Ensure the tag input is editable
-    $('.item-tag').removeAttr("disabled");
-    $('.editable-field').removeAttr("disabled");
+    $('.item-tag').removeAttr('disabled');
+    $('.editable-field').removeAttr('disabled');
     this.hide_modals_temporaly();
     $('.modal').modal('hide');
     if (library_id != undefined) {
@@ -508,7 +506,7 @@ libraryHelper.prototype.onCreateInLibrary = function (library_id) {
     $('#modal-create-in-library').modal('show');
 };
 libraryHelper.prototype.onCreateInLibraryOk = function (library_id) {
-    $("#create-in-library-message").html('');
+    $('#create-in-library-message').html('');
     //if ($('#library-select').val() != undefined)
     //library_id = $('#library-select').val();
     var selected_library = this.get_library_by_id(library_id);
@@ -518,23 +516,23 @@ libraryHelper.prototype.onCreateInLibraryOk = function (library_id) {
     item = this[function_name]();
     // Add item to library and save it
     for (tag in item) {
-        if (tag === '')
-            $("#create-in-library-message").html("Tag cannot be empty");
-        else if (selected_library.data[tag] != undefined)
-            $("#create-in-library-message").html("Tag already exist, choose another one");
-        else {
+        if (tag === '') {
+            $('#create-in-library-message').html('Tag cannot be empty');
+        } else if (selected_library.data[tag] != undefined) {
+            $('#create-in-library-message').html('Tag already exist, choose another one');
+        } else {
             $.ajax({
-                type: "POST",
+                type: 'POST',
                 url: urlHelper.api.libraryItems(selected_library.id),
                 data: JSON.stringify({
                     'tag': tag,
                     'item': item[tag],
                 }),
-                dataType: "json",
-                contentType: "application/json;charset=utf-8",
+                dataType: 'json',
+                contentType: 'application/json;charset=utf-8',
                 error: handleServerError('adding item to library'),
                 success: function (result) {
-                    $("#create-in-library-message").html("Item added to the library");
+                    $('#create-in-library-message').html('Item added to the library');
                     $('#modal-create-in-library button').hide('fast');
                     $('#create-in-library-finish').show('fast');
                 },
@@ -549,8 +547,7 @@ libraryHelper.prototype.onChangeEmptyOrCopyItem = function () {
         out = this[function_name]();
         $('.new-item-in-library').html(out);
         $('#copy-item-from').hide('fast');
-    }
-    else {
+    } else {
         $('#copy-item-from').show('fast');
         // Display the item
         var selected_library = this.get_library_by_id($('#origin-library-select').val());
@@ -558,7 +555,7 @@ libraryHelper.prototype.onChangeEmptyOrCopyItem = function () {
         var function_name = this.type + '_item_to_html';
         out = this[function_name](selected_item);
         $('.new-item-in-library').html(out);
-        $('#modal-create-in-library .item-tag').val('New tag')
+        $('#modal-create-in-library .item-tag').val('New tag');
 
     }
 };
@@ -567,9 +564,9 @@ libraryHelper.prototype.onChangeOriginLibrarySelect = function () {
     var out = '';
     var selected_library = this.get_library_by_id($('#origin-library-select').val());
     for (item in selected_library.data) {
-        out += "<option value=" + item + ">" + item + "</option>";
+        out += '<option value=' + item + '>' + item + '</option>';
     }
-    $("#item-to-copy-select").html(out);
+    $('#item-to-copy-select').html(out);
     // Display the item
     var selected_item = selected_library.data[$('#item-to-copy-select').val()];
     var function_name = this.type + '_item_to_html';
@@ -582,11 +579,11 @@ libraryHelper.prototype.onChangeItemToCopySelect = function () {
     var selected_library = this.get_library_by_id($('#origin-library-select').val());
     var selected_item = selected_library.data[$('#item-to-copy-select').val()];
     var function_name = this.type + '_item_to_html';
-    out = this[function_name](selected_item, "");
+    out = this[function_name](selected_item, '');
     $('.new-item-in-library').html(out);
     //$('#create-element-type').val(selected_item.tags[0]);
 
-}
+};
 
 libraryHelper.prototype.onEditLibraryItem = function (origin) {
 //var selected_library = this.get_library_by_id($('#library-select').val());
@@ -600,18 +597,18 @@ libraryHelper.prototype.onEditLibraryItem = function (origin) {
     var out = this[function_name](item, tag);
     $('#library-to-edit-item').parent().show('fast');
     $('.edit-item-in-library').html(out);
-    $('#edit-item-ok').attr('class', "btn edit-library-item-ok");
+    $('#edit-item-ok').attr('class', 'btn edit-library-item-ok');
     $('#edit-item-ok').attr('data-library-id', selected_library.id);
     $('.item-tag').attr('disabled', 'true');
-    $('.editable-field').removeAttr("disabled");
-    $("#edit-item-message").html('');
+    $('.editable-field').removeAttr('disabled');
+    $('#edit-item-message').html('');
     $('#modal-edit-item button').show('fast');
     $('#edit-item-finish').hide('fast');
     $('.modal').modal('hide');
     $('#modal-edit-item').modal('show');
 };
 libraryHelper.prototype.onEditLibraryItemOk = function (library_id) {
-    $("#edit-item-message").html('');
+    $('#edit-item-message').html('');
     //if ($('#library-select').val() != undefined)
     //library_id = $('#library-select').val();
     var selected_library = this.get_library_by_id(library_id);
@@ -623,13 +620,13 @@ libraryHelper.prototype.onEditLibraryItemOk = function (library_id) {
         var item_string = JSON.stringify(item[tag]).replace('+', '/plus'); // For a reason i have not been able to find why the character + becomes a carrier return when it is accesed in $_POST in the controller, because of this we escape + with \plus
         item_string = item_string.replace(/&/g, 'and');
         //item[tag].number_of_intermittentfans="\\+2";
-        $.ajax({type: "PUT",
+        $.ajax({type: 'PUT',
             url: urlHelper.api.libraryItem(selected_library.id, tag),
             data: item_string,
-            contentType: "application/json;charset=utf-8",
+            contentType: 'application/json;charset=utf-8',
             error: handleServerError('saving library'),
             success: function(xhr) {
-                $("#edit-item-message").html("Item edited and library saved");
+                $('#edit-item-message').html('Item edited and library saved');
                 $('#modal-edit-item button').hide('fast');
                 $('#edit-item-finish').show('fast');
             }
@@ -648,8 +645,8 @@ libraryHelper.prototype.onEditItem = function (origin) {
     $('#library-to-edit-item').parent().hide('fast');
     $('.item-tag').attr('disabled', 'true'); // comment to enable change of tag
     $('.editable-field').attr('disabled', 'true'); // comment to enable change of tag
-    $('#edit-item-ok').attr('class', "btn edit-item-ok");
-    $("#edit-item-message").html('');
+    $('#edit-item-ok').attr('class', 'btn edit-item-ok');
+    $('#edit-item-message').html('');
     $('#edit-item-ok').attr('row', origin.attr('row'));
     $('#edit-item-ok').attr('type-of-item', origin.attr('type-of-item'));
     $('#modal-edit-item button').show('fast');
@@ -658,7 +655,7 @@ libraryHelper.prototype.onEditItem = function (origin) {
     $('#modal-edit-item').modal('show');
 };
 libraryHelper.prototype.onEditItemOk = function () {
-    $("#edit-item-message").html('');
+    $('#edit-item-message').html('');
     // Call to specific function for the type
     var function_name = this.type + '_get_item_to_save';
     var item = this[function_name]();
@@ -695,8 +692,9 @@ libraryHelper.prototype.onApplyMeasure = function (origin) {
         // $(this).parent().show('fast');
     });
     //If we are in fabric Systems remove show the option to Apply Measure from Measures Library
-    if (this.type == 'systems')
+    if (this.type == 'systems') {
         $('.replace_from_measure_library').hide();
+    }
     $('#apply-measure-modal').modal('show');
 };
 libraryHelper.prototype.onApplyMeasureOk = function (origin) {
@@ -737,10 +735,11 @@ libraryHelper.prototype.onChangeApplyMeasureWhatToDo = function () {
             $('#apply-measure-item-fields').show('fast');
             break;
         case 'replace_from_measure_library':
-            if (this.type == 'elements')
+            if (this.type == 'elements') {
                 var type = 'elements_measures';
-            else
+            } else {
                 var type = this.type;
+            }
             this.populate_selects_in_apply_measure_modal(type);
             this.onChangeApplyMeasureReplaceFromLib(type);
             this.onChangeApplyMeasureReplaceFromLibItem(type);
@@ -751,63 +750,67 @@ libraryHelper.prototype.onChangeApplyMeasureWhatToDo = function () {
             var original_item = JSON.parse($('#apply-measure-ok').attr('item'));
             var tag = $('#apply-measure-ok').attr('tag');
             $('#apply-measure-item-fields').html('');
-            var function_name = this.type + "_item_to_html";
+            var function_name = this.type + '_item_to_html';
             var out = this[function_name](original_item, tag);
             $('#apply-measure-item-fields').html(out);
-            $("#apply-measure-item-fields .create-element-type").prop('disabled', true);
+            $('#apply-measure-item-fields .create-element-type').prop('disabled', true);
             $('#apply-measure-replace').hide('fast');
             $('#apply-measure-item-fields').show('fast');
             break;
     }
 };
 libraryHelper.prototype.onChangeApplyMeasureReplaceFromLib = function (type_of_library) {
-    var out = "";
+    var out = '';
     var original_item = JSON.parse($('#apply-measure-ok').attr('item'));
     var library = this.get_library_by_id($('#replace-from-lib').val()).data;
     for (item in library) {
         if (type_of_library == 'elements' || type_of_library == 'elements_measures') {
-            if (library[item].tags[0].toUpperCase() == original_item.type.toUpperCase())
+            if (library[item].tags[0].toUpperCase() == original_item.type.toUpperCase()) {
                 out += '<option value="' + item + '">' + item + ': ' + library[item].name + '</option>';
-        }
-        else
+            }
+        } else {
             out += '<option value="' + item + '">' + item + ': ' + library[item].name + '</option>';
+        }
     }
 
     $('#replace-from-lib-items').html(out);
-    $("#replace-from-lib-items").attr('library_type', type_of_library);
+    $('#replace-from-lib-items').attr('library_type', type_of_library);
     this.populate_measure_new_item(type_of_library);
 };
 libraryHelper.prototype.onChangeApplyMeasureReplaceFromLibItem = function (type_of_library) {
     this.populate_measure_new_item(type_of_library);
     //disable the possibility to change the type of the element
-    var item = JSON.parse($("#apply-measure-ok").attr('item'));
-    if (item.type != 'Loft' && item.type != 'Roof')
-        $("#apply-measure-item-fields .create-element-type").prop('disabled', true);
+    var item = JSON.parse($('#apply-measure-ok').attr('item'));
+    if (item.type != 'Loft' && item.type != 'Roof') {
+        $('#apply-measure-item-fields .create-element-type').prop('disabled', true);
+    }
 };
 libraryHelper.prototype.onChangeTypeOnCreateElementLibItem = function () {
     var type = $('#modal-create-in-library .create-element-type').val();
     // Show window specific fields for a given type
-    if (type == 'Window' || type == 'Door' || type == 'Roof_light')
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
         $('.window-element').show('fast');
-    else
+    } else {
         $('.window-element').hide('fast');
-    if (type == "Wall" && this.type == 'elements_measures')
+    }
+    if (type == 'Wall' && this.type == 'elements_measures') {
         $('#modal-create-in-library .EWI-row').show('fast');
-    else
+    } else {
         $('#modal-create-in-library .EWI-row').hide('fast');
+    }
     // Populate elements dropdown
     $('#modal-create-in-library #item-to-copy-select').html('');
     var library = this.get_library_by_id($('#modal-create-in-library #origin-library-select').val());
     var out = '';
     for (i in library.data) {
-        if (type.toUpperCase() == library.data[i].tags[0].toUpperCase())
+        if (type.toUpperCase() == library.data[i].tags[0].toUpperCase()) {
             out += '<option value="' + i + '">' + i + '</option>';
+        }
     }
     $('#modal-create-in-library #item-to-copy-select').html(out);
     if ($('#modal-create-in-library [name="empty_or_copy_item"]:checked').val() == 'empty') {
         out = this.elements_item_to_html();
-    }
-    else { // Copy from existing one
+    } else { // Copy from existing one
         // Replace item with the first one in the list
         $('#modal-create-in-library #new-item-in-library').html('');
         var tag = $('#modal-create-in-library #item-to-copy-select').val();
@@ -820,27 +823,29 @@ libraryHelper.prototype.onShowLibraryItems = function (library_id) {
     var library = this.get_library_by_id(library_id);
     this.type = library.type;
     //Header
-    $("#show-library-items-header").html(this.library_names[this.type]);
+    $('#show-library-items-header').html(this.library_names[this.type]);
     $('#show-library-items-library-name').html(library.name);
     // Items
     var function_name = library.type + '_library_to_html';
     var out = this[function_name](null, library_id);
-    $("#show-library-items-modal #show-library-items-table").html(out);
+    $('#show-library-items-modal #show-library-items-table').html(out);
     // Add Library id to edit buttons
 
     // Hide the Use buttons
-    $("#show-library-items-modal .use-from-lib").hide('fast');
+    $('#show-library-items-modal .use-from-lib').hide('fast');
     // Hide Write options if no write access
-    if (!library.permissions.can_write)
-        $("#show-library-items-modal .if-write").hide('fast');
+    if (!library.permissions.can_write) {
+        $('#show-library-items-modal .if-write').hide('fast');
+    }
     // Show the select to choose the type of fabric elements when library is "elements"
-    if (this.type == 'elements' || this.type == 'elements_measures')
+    if (this.type == 'elements' || this.type == 'elements_measures') {
         $('#show-library-items-modal .element-type').show('fast');
+    }
     // Add library id to Create new item and Save
     $('#show-library-items-modal #create-in-library').attr('data-library-id', library_id);
     $('#show-library-items-modal #save').attr('data-library-id', library_id);
     // Show modal
-    $("#show-library-items-modal").modal('show');
+    $('#show-library-items-modal').modal('show');
 };
 libraryHelper.prototype.onChangeTypeOfElementsToShow = function (origin) {
     origin.attr('tags', [origin.val()]); //this is the type of elements to display
@@ -849,25 +854,26 @@ libraryHelper.prototype.onChangeTypeOfElementsToShow = function (origin) {
     var function_name = this.type + '_library_to_html';
     var out = this[function_name](origin, library_id);
     // Items
-    $("#show-library-items-modal #show-library-items-table").html(out);
+    $('#show-library-items-modal #show-library-items-table').html(out);
     // Add Library id to edit buttons
 
     // Hide the Use buttons
-    $("#show-library-items-modal .use-from-lib").hide('fast');
+    $('#show-library-items-modal .use-from-lib').hide('fast');
     // Hide Write options if no write access
-    const library = this.get_library_by_id(library_id)
-    if (!library.permissions.can_write)
-        $("#show-library-items-modal .if-write").hide('fast');
+    const library = this.get_library_by_id(library_id);
+    if (!library.permissions.can_write) {
+        $('#show-library-items-modal .if-write').hide('fast');
+    }
     // Show the select to choose the type of fabric elements when library is "elements"
     $('#show-library-items-modal .element-type').show('fast');
 };
 libraryHelper.prototype.onManageUsers = function (library_id) {
 
-}
+};
 libraryHelper.prototype.onDeleteLibrary = function (library_id) {
     $('#confirm-delete-library-modal #delete-library-ok').attr('data-library-id', library_id);
     $('#confirm-delete-library-modal').modal('show');
-}
+};
 libraryHelper.prototype.onDeleteLibraryOk = function (library_id) {
     var myself = this;
     $.ajax({
@@ -881,21 +887,22 @@ libraryHelper.prototype.onDeleteLibraryOk = function (library_id) {
             UpdateUI();
         },
     });
-}
+};
 libraryHelper.prototype.onShowLibraryItemsEditMode = function (library_id) {
     var library = this.get_library_by_id(library_id);
     this.type = library.type;
 
     //Header
-    $("#show-library-modal-edit-mode #show-library-header").html(this.library_names[this.type]);
+    $('#show-library-modal-edit-mode #show-library-header').html(this.library_names[this.type]);
     $('#show-library-modal-edit-mode #show-library-name').html(library.name);
     // Items
     var function_name = library.type + '_library_to_html_edit_mode';
     var out = this[function_name](null, library_id);
-    $("#show-library-modal-edit-mode .modal-body").html(out);
+    $('#show-library-modal-edit-mode .modal-body').html(out);
     // Hide Write options if no write access
-    if (!library.permissions.can_write)
-        $("#show-library-modal-edit-mode .if-write").hide('fast');
+    if (!library.permissions.can_write) {
+        $('#show-library-modal-edit-mode .if-write').hide('fast');
+    }
     // Add library id to "Create new item" and "Save" buttons
     $('#show-library-modal-edit-mode #create-in-library').attr('data-library-id', library_id);
     $('#show-library-modal-edit-mode #save').attr('data-library-id', library_id);
@@ -933,15 +940,15 @@ libraryHelper.prototype.onShowLibraryItemsEditMode = function (library_id) {
             break;
     }
     var a = width + 'px';
-    $("#show-library-modal-edit-mode").css({'width': width + 'px', 'margin-left': -width / 2 + 'px'});
+    $('#show-library-modal-edit-mode').css({'width': width + 'px', 'margin-left': -width / 2 + 'px'});
     // Show modal
-    $("#show-library-modal-edit-mode").modal('show');
-    $("#show-library-modal-edit-mode").resizable({});
+    $('#show-library-modal-edit-mode').modal('show');
+    $('#show-library-modal-edit-mode').resizable({});
     $('#show-library-modal-edit-mode').draggable();
-    $("#show-library-modal-edit-mode").resize(function () {
-        var new_height = $("#show-library-modal-edit-mode").height() - 150;
+    $('#show-library-modal-edit-mode').resize(function () {
+        var new_height = $('#show-library-modal-edit-mode').height() - 150;
         $('#show-library-modal-edit-mode .modal-body').height(new_height);
-    })
+    });
     // Add events
     $('#show-library-modal-edit-mode input, \n\
         #show-library-modal-edit-mode select,\n\
@@ -960,25 +967,24 @@ libraryHelper.prototype.onSaveLibraryEditMode = function (selector, library_id) 
             var key = $(this).attr('index');
             if (key != undefined) {
                 if ($(this).children('input')[0] != undefined) {
-                    if ($(this).children('input')[0].type == 'text' || $(this).children('input')[0].type == 'number')
+                    if ($(this).children('input')[0].type == 'text' || $(this).children('input')[0].type == 'number') {
                         data[tag][key] = $(this).children('input')[0].value;
-                    else if ($(this).children('input')[0].type == 'checkbox') {
-                        if ($(this).children('input').is(":checked"))
+                    } else if ($(this).children('input')[0].type == 'checkbox') {
+                        if ($(this).children('input').is(':checked')) {
                             data[tag][key] = true;
-                        else
+                        } else {
                             data[tag][key] = false;
+                        }
+                    } else {
+                        console.error('Type of input not recognized: ' + $(this).children('input')[0].type);
                     }
-                    else
-                        console.error("Type of input not recognized: " + $(this).children('input')[0].type);
-                }
-                else if ($(this).children('select')[0] != undefined) {
+                } else if ($(this).children('select')[0] != undefined) {
                     data[tag][key] = $(this).children('select')[0].value;
-                }
-                else if ($(this).children('textarea')[0] != undefined) {
+                } else if ($(this).children('textarea')[0] != undefined) {
                     data[tag][key] = $(this).children('textarea')[0].value;
+                } else {
+                    console.error('Type of input not recognized: ');
                 }
-                else
-                    console.error("Type of input not recognized: ");
                 /*if(element.type)
                  data[tag][key] = $(this).find('input')[0].value;
                  */
@@ -990,8 +996,8 @@ libraryHelper.prototype.onSaveLibraryEditMode = function (selector, library_id) 
         type: 'PATCH',
         url: urlHelper.api.library(library_id),
         data: JSON.stringify({'data': data}),
-        datatype: "json",
-        contentType: "application/json;charset=utf-8",
+        datatype: 'json',
+        contentType: 'application/json;charset=utf-8',
         error: handleServerError('saving library'),
         success: function (result) {
             $('#show-library-modal-edit-mode #save').attr('disabled', 'disabled');
@@ -999,82 +1005,84 @@ libraryHelper.prototype.onSaveLibraryEditMode = function (selector, library_id) 
         },
     });
 
-}
+};
 
 /**********************************************
  * Libraries to html
  **********************************************/
 
 libraryHelper.prototype.default_library_to_html = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     for (z in selected_library.data) {
-        out += "<tr><td>" + z + ': ' + selected_library.data[z].name + "</td>";
+        out += '<tr><td>' + z + ': ' + selected_library.data[z].name + '</td>';
         out += "<td style='text-align:right;width:250px'>";
         out += "<button tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn add-system use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-        out += "</td>";
-        out += "</tr>";
+        out += '</td>';
+        out += '</tr>';
     }
     return out;
 };
 libraryHelper.prototype.default_library_by_category_to_html = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     // order by category
     var ordered_by_categories = {};
     for (z in selected_library.data) {
         var category = selected_library.data[z].category;
-        if (ordered_by_categories[category] == undefined)
+        if (ordered_by_categories[category] == undefined) {
             ordered_by_categories[category] = {};
+        }
         ordered_by_categories[category][z] = selected_library.data[z];
     }
 
     // Prepare the output string
     for (category in ordered_by_categories) {
-        out += "<tr><th colspan='2'>" + category + "</th></tr>";
+        out += "<tr><th colspan='2'>" + category + '</th></tr>';
         for (z in ordered_by_categories[category]) {
-            out += "<tr><td style='padding-left:50px'>" + z + ': ' + selected_library.data[z].name + "</td>";
+            out += "<tr><td style='padding-left:50px'>" + z + ': ' + selected_library.data[z].name + '</td>';
             out += "<td style='text-align:right;width:250px'>";
             out += "<button tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
             out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
             out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn add-system use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-            out += "</td>";
-            out += "</tr>";
+            out += '</td>';
+            out += '</tr>';
         }
     }
     return out;
 };
 libraryHelper.prototype.systems_library_to_html = function (origin, library_id) {
     var eid = '';
-    if (origin != undefined)
+    if (origin != undefined) {
         eid = $(origin).attr('eid');
-    else
+    } else {
         eid = '';
+    }
     //if ($('#library-select').val() != undefined)
     //library_id = $('#library-select').val();
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     $('#library-select').attr('eid', eid);
-    var out = "";
+    var out = '';
     for (z in selected_library.data) {
-        out += "<tr><td>" + z + ': ' + selected_library.data[z].name + "<br>";
+        out += '<tr><td>' + z + ': ' + selected_library.data[z].name + '<br>';
         out += "<span style='font-size:80%'>";
-        out += "<b>Efficiency:</b> " + Math.round(selected_library.data[z].efficiency * 100) + "%, ";
-        out += "<b>Winter:</b> " + Math.round(selected_library.data[z].winter * 100) + "%, ";
-        out += "<b>Summer:</b> " + Math.round(selected_library.data[z].summer * 100) + "%, ";
-        out += "<b>Fuel:</b> " + selected_library.data[z].fuel;
-        out += "</span></td>";
-        out += "<td></td>";
+        out += '<b>Efficiency:</b> ' + Math.round(selected_library.data[z].efficiency * 100) + '%, ';
+        out += '<b>Winter:</b> ' + Math.round(selected_library.data[z].winter * 100) + '%, ';
+        out += '<b>Summer:</b> ' + Math.round(selected_library.data[z].summer * 100) + '%, ';
+        out += '<b>Fuel:</b> ' + selected_library.data[z].fuel;
+        out += '</span></td>';
+        out += '<td></td>';
         out += "<td style='text-align:right;width:250px'>";
         out += "<button eid='" + eid + "' system='" + z + "' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
         out += "<button style='margin-left:10px' eid='" + eid + "' system='" + z + "' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
         out += "<button style='margin-left:10px' eid='" + eid + "' system='" + z + "' library='" + selected_library.id + "' class='btn add-system use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-        out += "</td>";
-        out += "</tr>";
+        out += '</td>';
+        out += '</tr>';
     }
     return out;
 };
@@ -1086,13 +1094,14 @@ libraryHelper.prototype.elements_library_to_html = function (origin, library_id)
     if (origin != undefined) {
         tag = $(origin).attr('tags').split(',');
         element_row = $(origin).attr('row');
-        if (element_row != undefined)
+        if (element_row != undefined) {
             selected_lib = data.fabric.elements[element_row].lib;
+        }
 
-        if (selected_lib == undefined)
+        if (selected_lib == undefined) {
             selected_lib = false;
-    }
-    else {
+        }
+    } else {
         tag = ['Wall'];
     }
 
@@ -1101,14 +1110,15 @@ libraryHelper.prototype.elements_library_to_html = function (origin, library_id)
     var element_library = this.get_library_by_id(library_id).data;
     this.orderObjectsByKeys(element_library);
     $('#library-select').attr('tags', tag);
-    var out = "";
+    var out = '';
     //Select to choose the type of element to display, not always used and is hidden by default
     out = '<div class="input-prepend element-type" style="display:none" ><span class="add-on">Type</span><select library_id="' + library_id + '" >';
     out += tag[0] == 'Wall' ? '<option value="Wall" selected>Wall</option>' : '<option value = "Wall" > Wall </option>';
-    if (tag[0] == 'party_wall' || tag[0] == 'Party_wall')
+    if (tag[0] == 'party_wall' || tag[0] == 'Party_wall') {
         out += '<option value="Party_wall" selected>Party wall</option>';
-    else
+    } else {
         out += '<option value="Party_wall">Party wall</option>';
+    }
     out += tag[0] == 'Roof' ? '<option value="Roof" selected>Roof</option>' : '<option value="Roof">Roof</option>';
     out += tag[0] == 'Loft' ? '<option value="Loft" selected>Loft</option>' : '<option value="Loft">Loft</option>';
     out += tag[0] == 'Floor' ? '<option value="Floor" selected>Floor</option>' : '<option value="Floor">Floor</option>';
@@ -1121,41 +1131,42 @@ libraryHelper.prototype.elements_library_to_html = function (origin, library_id)
     out += '<table>';
     for (z in element_library) {
         if (tag.indexOf(element_library[z].tags[0]) != -1) {
-            var selected_class = "";
-            if (z == selected_lib)
-                selected_class = "selected_lib";
+            var selected_class = '';
+            if (z == selected_lib) {
+                selected_class = 'selected_lib';
+            }
             out += "<tr class='librow " + selected_class + "' lib='" + z + "' type='" + tag + "'>";
-            out += "<td>" + z + "</td>";
-            out += "<td>" + element_library[z].name;
-            out += "<br><span style='font-size:13px'><b>Source:</b> " + element_library[z].source + "</span>";
+            out += '<td>' + z + '</td>';
+            out += '<td>' + element_library[z].name;
+            out += "<br><span style='font-size:13px'><b>Source:</b> " + element_library[z].source + '</span>';
             /*if (element_library[z].criteria.length)
              out += "<br><span style='font-size:13px'><b>Measure criteria:</b> " + element_library[z].criteria.join(", ") + "</span>";
              */
-            out += "</td>";
+            out += '</td>';
             out += "<td style='font-size:13px'>";
-            out += "<b>U-value:</b> " + element_library[z].uvalue + " W/m<sup>2</sup>.K";
-            out += "<br><b>k-value:</b> " + element_library[z].kvalue + " kJ/m<sup>2</sup>.K";
-            if (element_library[z].tags[0] == "Window" || element_library[z].tags[0] == "Door" || element_library[z].tags[0] == "Roof_light") {
-                out += "<br><b>g:</b> " + element_library[z].g + ", ";
-                out += "<b>gL:</b> " + element_library[z].gL + ", ";
-                out += "<b>ff:</b> " + element_library[z].ff;
+            out += '<b>U-value:</b> ' + element_library[z].uvalue + ' W/m<sup>2</sup>.K';
+            out += '<br><b>k-value:</b> ' + element_library[z].kvalue + ' kJ/m<sup>2</sup>.K';
+            if (element_library[z].tags[0] == 'Window' || element_library[z].tags[0] == 'Door' || element_library[z].tags[0] == 'Roof_light') {
+                out += '<br><b>g:</b> ' + element_library[z].g + ', ';
+                out += '<b>gL:</b> ' + element_library[z].gL + ', ';
+                out += '<b>ff:</b> ' + element_library[z].ff;
             }
-            out += "</td>";
-            out += "<td >";
+            out += '</td>';
+            out += '<td >';
             out += "<i style='cursor:pointer' class='icon-pencil if-write edit-library-item' library='" + library_id + "' lib='" + z + "' type='" + element_library[z].tags[0] + "' tag='" + z + "'></i>";
             out += "<i style='cursor:pointer;margin-left:20px' class='icon-trash if-write delete-library-item' library='" + library_id + "' lib='" + z + "' type='" + element_library[z].tags[0] + "' tag='" + z + "'></i>";
             // out += "<i class='icon-trash' style='margin-left:20px'></i>";
 
             // add-element & change-element handled in elements.js
-            var action = "add-element";
-            var row_attr = "";
+            var action = 'add-element';
+            var row_attr = '';
             if (selected_lib) {
-                action = "change-element";
-                row_attr = "row=" + element_row;
+                action = 'change-element';
+                row_attr = 'row=' + element_row;
             }
             out += "<button class='" + action + " use-from-lib btn' style='margin-left:20px' " + row_attr + " library='" + library_id + "' lib='" + z + "' type='" + element_library[z].tags[0] + "'>use</button</i>";
-            out += "</td>";
-            out += "</tr>";
+            out += '</td>';
+            out += '</tr>';
         }
     }
     out += '</table>';
@@ -1166,18 +1177,18 @@ libraryHelper.prototype.elements_measures_library_to_html = function (origin, li
     return out;
 };
 libraryHelper.prototype.draught_proofing_measures_library_to_html = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     for (z in selected_library.data) {
-        out += "<tr><td>" + z + ': ' + selected_library.data[z].name + "</td>";
-        out += "<td><b>q50:</b> " + selected_library.data[z].q50 + " m<sup>3</sup>/hm<sup>2</sup></td>";
+        out += '<tr><td>' + z + ': ' + selected_library.data[z].name + '</td>';
+        out += '<td><b>q50:</b> ' + selected_library.data[z].q50 + ' m<sup>3</sup>/hm<sup>2</sup></td>';
         out += "<td style='text-align:right;width:250px'>";
         out += "<button tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn add-system use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-        out += "</td>";
-        out += "</tr>";
+        out += '</td>';
+        out += '</tr>';
     }
     return out;
 };
@@ -1195,34 +1206,34 @@ libraryHelper.prototype.extract_ventilation_points_library_to_html = function (o
     return out;
 };
 libraryHelper.prototype.intentional_vents_and_flues_library_to_html = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     for (z in selected_library.data) {
-        out += "<tr><td>" + z + ': ' + selected_library.data[z].name + "</td>";
-        out += "<td><b>Ventilation rate:</b> " + selected_library.data[z].ventilation_rate + " m<sup>3</sup>/hm<sup>2</sup></td>";
+        out += '<tr><td>' + z + ': ' + selected_library.data[z].name + '</td>';
+        out += '<td><b>Ventilation rate:</b> ' + selected_library.data[z].ventilation_rate + ' m<sup>3</sup>/hm<sup>2</sup></td>';
         out += "<td style='text-align:right;width:150px'>";
         out += "<button tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn add-IVF use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-        out += "</td>";
-        out += "</tr>";
+        out += '</td>';
+        out += '</tr>';
     }
     return out;
 };
 libraryHelper.prototype.intentional_vents_and_flues_measures_library_to_html = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     for (z in selected_library.data) {
-        out += "<tr><td>" + z + ': ' + selected_library.data[z].name + "</td>";
-        out += "<td><b>Ventilation rate:</b> " + selected_library.data[z].ventilation_rate + " m<sup>3</sup>/hm<sup>2</sup></td>";
+        out += '<tr><td>' + z + ': ' + selected_library.data[z].name + '</td>';
+        out += '<td><b>Ventilation rate:</b> ' + selected_library.data[z].ventilation_rate + ' m<sup>3</sup>/hm<sup>2</sup></td>';
         out += "<td style='text-align:right;width:150px'>";
         out += "<button tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
         out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn add-IVF-measure use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-        out += "</td>";
-        out += "</tr>";
+        out += '</td>';
+        out += '</tr>';
     }
     return out;
 };
@@ -1242,29 +1253,30 @@ libraryHelper.prototype.storage_type_measures_library_to_html = function (origin
     return out;
 };
 libraryHelper.prototype.appliances_and_cooking_library_to_html = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     this.orderObjectsByKeys(selected_library.data);
     // order by category
     var ordered_by_categories = {};
     for (z in selected_library.data) {
         var category = selected_library.data[z].category;
-        if (ordered_by_categories[category] == undefined)
+        if (ordered_by_categories[category] == undefined) {
             ordered_by_categories[category] = {};
+        }
         ordered_by_categories[category][z] = selected_library.data[z];
     }
 
     // Prepare the output string
     for (category in ordered_by_categories) {
-        out += "<tr><th colspan='2'>" + category + "</th></tr>";
+        out += "<tr><th colspan='2'>" + category + '</th></tr>';
         for (z in ordered_by_categories[category]) {
-            out += "<tr><td style='padding-left:50px'>" + z + ': ' + selected_library.data[z].name + "</td>";
+            out += "<tr><td style='padding-left:50px'>" + z + ': ' + selected_library.data[z].name + '</td>';
             out += "<td style='text-align:right;width:250px'>";
             out += "<button tag='" + z + "' library='" + selected_library.id + "' class='btn if-write edit-library-item'>Edit</button>";
             out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn if-write delete-library-item'>Delete</button>";
             out += "<button style='margin-left:10px' tag='" + z + "' library='" + selected_library.id + "' class='btn add-item-CarbonCoop use-from-lib'>Use</button>"; //the functionnality to add the system to the data obkect is not part of the library, it must be defined in system.js or somewhere else: $("#openbem").on("click", '.add-system', function () {.......
-            out += "</td>";
-            out += "</tr>";
+            out += '</td>';
+            out += '</tr>';
         }
     }
     return out;
@@ -1328,15 +1340,16 @@ libraryHelper.prototype.measure_fields_for_library_to_html_edit_mode = function 
 };
 libraryHelper.prototype.elements_library_to_html_edit_mode = function (origin, library_id) {
     var tag = [];
-    if (origin != undefined)
+    if (origin != undefined) {
         tag = $(origin).attr('tags').split(',');
-    else
+    } else {
         tag = ['Wall'];
+    }
     //if ($('#library-select').val() != undefined)
     //library_id = $('#library-select').val();
     var element_library = this.get_library_by_id(library_id).data;
     this.orderObjectsByKeys(element_library);
-    var out = "";
+    var out = '';
     // Elements
     out += html('Walls', 'Wall');
     out += html('Party walls', 'Party_wall');
@@ -1350,12 +1363,13 @@ libraryHelper.prototype.elements_library_to_html_edit_mode = function (origin, l
     return out;
     function html(heading, tag) {
         var out = '<div id="' + tag + '"><h4 style="margin-top:25px">' + heading + '</h4><table>';
-        if (Object.keys(element_library).length == 0)
+        if (Object.keys(element_library).length == 0) {
             out += '';
-        else {
+        } else {
             out += '<tr><th>Tag</th><th>Name</th><th>Source</th><th>U-value</th><th>k-value</th>';
-            if (tag == 'Window' || tag == 'Door' || tag == 'Roof_light' || tag == 'Hatch')
+            if (tag == 'Window' || tag == 'Door' || tag == 'Roof_light' || tag == 'Hatch') {
                 out += '<th>g</th><th>gL</th><th>ff</th>';
+            }
             out += '<th>Description</th>';
             out += '<th></th></tr>';
             for (z in element_library) {
@@ -1384,15 +1398,16 @@ libraryHelper.prototype.elements_library_to_html_edit_mode = function (origin, l
 libraryHelper.prototype.elements_measures_library_to_html_edit_mode = function (origin, library_id) {
     var myself = this;
     var tag = [];
-    if (origin != undefined)
+    if (origin != undefined) {
         tag = $(origin).attr('tags').split(',');
-    else
+    } else {
         tag = ['Wall'];
+    }
     //if ($('#library-select').val() != undefined)
     //library_id = $('#library-select').val();
     var element_library = this.get_library_by_id(library_id).data;
     this.orderObjectsByKeys(element_library);
-    var out = "";
+    var out = '';
     // Elements
     out += html('Walls', 'Wall');
     out += html('Party walls', 'Party_wall');
@@ -1407,13 +1422,15 @@ libraryHelper.prototype.elements_measures_library_to_html_edit_mode = function (
     function html(heading, tag) {
         var out = '<div id="' + tag + '"><h4 style="margin-top:25px">' + heading + '</h4><table><tr><th>Tag</th><th>Name</th><th>Source</th><th>U-value</th><th>k-value</th>';
 
-        if (Object.keys(element_library).length == 0)
+        if (Object.keys(element_library).length == 0) {
             out += '';
-        else {
-            if (tag == 'Window' || tag == 'Door' || tag == 'Roof_light' || tag == 'Hatch')
+        } else {
+            if (tag == 'Window' || tag == 'Door' || tag == 'Roof_light' || tag == 'Hatch') {
                 out += '<th>g</th><th>gL</th><th>ff</th>';
-            if (tag == 'Wall')
+            }
+            if (tag == 'Wall') {
                 out += '<th>EWI<i class="icon-question" title="Ticking this box will increase the area of the wall by 1.15" /></th>';
+            }
             out += '<th>Minimum cost <icon class="icon-question-sign" title="Total cost of measure = minimum cost + (area x unit cost)" /></th><th>Description</th>';
             out += '<th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th>';
             out += '<th></th></tr>';
@@ -1430,8 +1447,9 @@ libraryHelper.prototype.elements_measures_library_to_html_edit_mode = function (
                         out += '<td index="gL"><input class="w50" type="number" min="0" step="0.01" value="' + item.gL + '" /></td>';
                         out += '<td index="ff"><input class="w50" type="number" min="0" step="0.01" value="' + item.ff + '" /></td>';
                     }
-                    if (tag == 'Wall')
+                    if (tag == 'Wall') {
                         out += '<td index="EWI"><input type="checkbox"' + (item.EWI === true ? 'checked' : '') + ' /></td>';
+                    }
                     out += '<td index="min_cost"><input class="w100" type="number" min="0" step="1" value="' + item.min_cost + '" /></td>';
                     out += myself.measure_fields_for_library_to_html_edit_mode(item);
                     out += '<td><i class="icon-trash if-write delete-library-item" tag="' + z + '" library="' + library_id + '" style="cursor:pointer;margin-left:10px;margin-right:20px"></i></td>';
@@ -1444,21 +1462,21 @@ libraryHelper.prototype.elements_measures_library_to_html_edit_mode = function (
     }
 };
 libraryHelper.prototype.ventilation_systems_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Ventilation type</th><th>Air change rate - ach</th><th>Specific Fan Power - W/(litre.sec)</th><th>Balanced heat recovery efficiency (%)</th><th>Source</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="ventilation_type"><select class="w200" value="' + item.ventilation_type + '">'
+            out += '<td index="ventilation_type"><select class="w200" value="' + item.ventilation_type + '">';
             out += item.ventilation_type == 'NV' ? '<option value="NV" selected>Natural ventilation only (NV)</option>' : '<option value="NV">Natural ventilation only (NV)</option>';
             out += item.ventilation_type == 'IE' ? '<option value="IE" selected>Intermittent extract ventilation (IE)</option>' : '<option value="IE">Intermittent extract ventilation (IE)</option>';
             out += item.ventilation_type == 'DEV' ? '<option value="DEV" selected>Continuous decentralised mechanical extract ventilation (DEV)</option>' : '<option value="DEV">Continuous decentralised mechanical extract ventilation (DEV)</option>';
@@ -1479,21 +1497,21 @@ libraryHelper.prototype.ventilation_systems_library_to_html_edit_mode = function
     return out;
 };
 libraryHelper.prototype.ventilation_systems_measures_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Ventilation type</th><th>Air change rate - ach</th><th>Specific Fan Power - W/(litre.sec)</th><th>Balanced heat recovery efficiency (%)</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="ventilation_type"><select class="w200" value="' + item.ventilation_type + '">'
+            out += '<td index="ventilation_type"><select class="w200" value="' + item.ventilation_type + '">';
             out += item.ventilation_type == 'NV' ? '<option value="NV" selected>Natural ventilation only (NV)</option>' : '<option value="NV">Natural ventilation only (NV)</option>';
             out += item.ventilation_type == 'IE' ? '<option value="IE" selected>Intermittent extract ventilation (IE)</option>' : '<option value="IE">Intermittent extract ventilation (IE)</option>';
             out += item.ventilation_type == 'DEV' ? '<option value="DEV" selected>Continuous decentralised mechanical extract ventilation (DEV)</option>' : '<option value="DEV">Continuous decentralised mechanical extract ventilation (DEV)</option>';
@@ -1515,16 +1533,16 @@ libraryHelper.prototype.ventilation_systems_measures_library_to_html_edit_mode =
     return out;
 };
 libraryHelper.prototype.draught_proofing_measures_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>q50 (m<sup>3</sup>/hm<sup>2</sup>)</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
@@ -1540,22 +1558,22 @@ libraryHelper.prototype.draught_proofing_measures_library_to_html_edit_mode = fu
     return out;
 };
 libraryHelper.prototype.extract_ventilation_points_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Ventilation rate</th><th>Type</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
             out += '<td index="ventilation_rate"><input class="w100" type="number" min="0" step="1" value="' + item.ventilation_rate + '" /></td>';
-            out += '<td index="type"><select class="w200" value="' + item.type + '">'
+            out += '<td index="type"><select class="w200" value="' + item.type + '">';
             out += item.type === 'Intermittent fan' ? '<option value="Intermittent fan" selected>Intermittent fan</option>' : '<option value="Intermittent fan">Intermittent fan</option>';
             out += item.type === 'Passive vent' ? '<option value="Passive vent" selected>Passive vent</option>' : '<option value="Passive vent">Passive vent</option>';
             out += '</select></td>';
@@ -1569,16 +1587,16 @@ libraryHelper.prototype.extract_ventilation_points_library_to_html_edit_mode = f
     return out;
 };
 libraryHelper.prototype.generation_measures_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>kWp</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
@@ -1593,26 +1611,27 @@ libraryHelper.prototype.generation_measures_library_to_html_edit_mode = function
     return out;
 };
 libraryHelper.prototype.heating_systems_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Category</th><th>Winter efficiency (space heating)</th><th>Summer efficiency (water heating)</th><th>Central heating pump (kWh/year)</th><th>Fans and supply pumps (kWh/year)<i class="icon-question-sign" title="Taken into account for Warm air systems" /></th><th>Responsiveness</th><th>Combi loss</th><th>Primary circuit loss<i class="icon-question-sign" title="No primary loss for the following:\n\   - Electric inmersion heater.\n\   - Combi boiler\n\   - CPSU(including electric CPSU)\n\   - Boiler and thermal store within a single casing\n\   - Separate boiler and thermal store connected by no more than 1.5m of insulated pipework\n\ \n\For other cases (indirect cylinders and thermal stores connected by unsinsulated pipework or more than 1.5m of insulated pipework) the loss is calculated according to the amount of insulated pipework and the type of storage heating controls (in the Hot Water System section) - SAP2012 table 3, p. 199" /></th><th>Description</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="category"><select class="w200" value="' + item.category + '">'
+            out += '<td index="category"><select class="w200" value="' + item.category + '">';
             var categories = ['Combi boilers', 'System boilers', 'Heat pumps', 'Room heaters', 'Warm air systems', 'Hot water only'];
             for (index in categories) {
-                if (item.category == categories[index])
+                if (item.category == categories[index]) {
                     out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="winter_efficiency"><input class="w150" type="number" min="0" max="100" step="1" value="' + item.winter_efficiency + '" /></td>';
@@ -1620,22 +1639,24 @@ libraryHelper.prototype.heating_systems_library_to_html_edit_mode = function (or
             out += '<td index="central_heating_pump"><input class="w150" type="number" min="0" step="1" value="' + item.central_heating_pump + '" /></td>';
             out += '<td index="fans_and_supply_pumps"><input class="w150" type="number" min="0" step="1" value="' + item.fans_and_supply_pumps + '" /></td>';
             out += '<td index="responsiveness"><input class="w100" type="number" min="0" step="0.1" value="' + item.responsiveness + '" /></td>';
-            out += '<td index="combi_loss"><select class="w200" value="' + item.combi_loss + '">'
+            out += '<td index="combi_loss"><select class="w200" value="' + item.combi_loss + '">';
             var options = ['0', 'Instantaneous, without keep hot-facility', 'Instantaneous, with keep-hot facility controlled by time clock', 'Instantaneous, with keep-hot facility not controlled by time clock', 'Storage combi boiler >= 55 litres', 'Storage combi boiler < 55 litres'];
             for (index in options) {
-                if (item.instantaneous_water_heating == options[index])
+                if (item.instantaneous_water_heating == options[index]) {
                     out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+                }
             }
             out += '</select></td>';
-            out += '<td index="primary_circuit_loss"><select class="w150" value="' + item.primary_circuit_loss + '">'
+            out += '<td index="primary_circuit_loss"><select class="w150" value="' + item.primary_circuit_loss + '">';
             var options = ['Yes', 'No'];
             for (index in options) {
-                if (item.primary_circuit_loss == options[index])
+                if (item.primary_circuit_loss == options[index]) {
                     out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="source" title="' + item.name + '"><input class="w300" type="text" value="' + item.source + '" /></td>';
@@ -1726,29 +1747,30 @@ libraryHelper.prototype.heating_systems_library_to_html_edit_mode = function (or
  return out;
  };*/
 libraryHelper.prototype.heating_systems_measures_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
     var out = '<div><table class="test2"><tr><th>Tag</th><th>Name</th><th>Category</th><th>Winter efficiency (space heating)</th><th>Summer efficiency (water heating)</th><th>Central heating pump (kWh/year)</th><th>Fans and supply pumps (kWh/year)<i class="icon-question-sign" title="Taken into account for Warm air systems" /></th><th>Responsiveness</th><th>Combi loss</th><th>Primary circuit loss<i class="icon-question-sign" title="No primary loss for the following:\n\   - Electric inmersion heater.\n\   - Combi boiler\n\   - CPSU(including electric CPSU)\n\   - Boiler and thermal store within a single casing\n\   - Separate boiler and thermal store connected by no more than 1.5m of insulated pipework\n\ \n\For other cases (indirect cylinders and thermal stores connected by unsinsulated pipework or more than 1.5m of insulated pipework) the loss is calculated according to the amount of insulated pipework and the type of storage heating controls (in the Hot Water System section) - SAP2012 table 3, p. 199" /></th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
             //out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
             // Carlos remember to remove the test2 class in the table tag
-            out += "<style>table.test2 td{  vertical-align:top;  padding-right:10px}</style>";
+            out += '<style>table.test2 td{  vertical-align:top;  padding-right:10px}</style>';
             out += '<td index="name" title="' + item.name + '"><textarea rows=2" columns=25>' + item.name + '"</textarea></td>';
-            out += '<td index="category"><select class="w200" value="' + item.category + '">'
+            out += '<td index="category"><select class="w200" value="' + item.category + '">';
             var categories = ['Combi boilers', 'System boilers', 'Heat pumps', 'Room heaters', 'Warm air systems', 'Hot water only'];
             for (index in categories) {
-                if (item.category == categories[index])
+                if (item.category == categories[index]) {
                     out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="winter_efficiency"><input class="w150" type="number" min="0" max="100" step="1" value="' + item.winter_efficiency + '" /></td>';
@@ -1756,22 +1778,24 @@ libraryHelper.prototype.heating_systems_measures_library_to_html_edit_mode = fun
             out += '<td index="central_heating_pump"><input class="w150" type="number" min="0" step="1" value="' + item.central_heating_pump + '" /></td>';
             out += '<td index="fans_and_supply_pumps"><input class="w150" type="number" min="0" step="1" value="' + item.fans_and_supply_pumps + '" /></td>';
             out += '<td index="responsiveness"><input class="w100" type="number" min="0" step="0.1" value="' + item.responsiveness + '" /></td>';
-            out += '<td index="combi_loss"><select class="w200" value="' + item.combi_loss + '">'
+            out += '<td index="combi_loss"><select class="w200" value="' + item.combi_loss + '">';
             var options = ['0', 'Instantaneous, without keep hot-facility', 'Instantaneous, with keep-hot facility controlled by time clock', 'Instantaneous, with keep-hot facility not controlled by time clock', 'Storage combi boiler >= 55 litres', 'Storage combi boiler < 55 litres'];
             for (index in options) {
-                if (item.instantaneous_water_heating == options[index])
+                if (item.instantaneous_water_heating == options[index]) {
                     out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+                }
             }
             out += '</select></td>';
-            out += '<td index="primary_circuit_loss"><select class="w150" value="' + item.primary_circuit_loss + '">'
+            out += '<td index="primary_circuit_loss"><select class="w150" value="' + item.primary_circuit_loss + '">';
             var options = ['Yes', 'No'];
             for (index in options) {
-                if (item.primary_circuit_loss == options[index])
+                if (item.primary_circuit_loss == options[index]) {
                     out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="source" title="' + item.name + '"><input class="w300" type="text" value="' + item.source + '" /></td>';
@@ -1784,27 +1808,28 @@ libraryHelper.prototype.heating_systems_measures_library_to_html_edit_mode = fun
     return out;
 };
 libraryHelper.prototype.appliances_and_cooking_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Category</th><th>Norm demand</th><th>Units</th><th>Utilisation factor</th><th>Frequency</th><th>Reference quantity</th><th>Type of fuel</th><th>Efficiency</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w200" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="category"><select class="w150" value="' + item.category + '">'
+            out += '<td index="category"><select class="w150" value="' + item.category + '">';
             var categories = ['Computing', 'Cooking', 'Food storage', 'Other kitchen / cleaning', 'Laundry', 'Miscelanea', 'TV'];
             for (index in categories) {
-                if (item.category == categories[index])
+                if (item.category == categories[index]) {
                     out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="norm_demand"><input class="w100" type="number" min="0" step="1" value="' + item.norm_demand + '" /></td>';
@@ -1812,13 +1837,14 @@ libraryHelper.prototype.appliances_and_cooking_library_to_html_edit_mode = funct
             out += '<td index="utilisation_factor"><input class="w100" type="number" min="0" step="1" value="' + item.utilisation_factor + '" /></td>';
             out += '<td index="frequency"><input class="w100" type="number" min="0" step="1" value="' + item.frequency + '" /></td>';
             out += '<td index="reference_quantity"><input class="w100" type="number" min="0" step="1" value="' + item.reference_quantity + '" /></td>';
-            out += '<td index="type_of_fuel"><select class="w100" value="' + item.type_of_fuel + '">'
+            out += '<td index="type_of_fuel"><select class="w100" value="' + item.type_of_fuel + '">';
             var types_of_fuel = ['Gas', 'Oil', 'Solid fuel', 'Electricity'];
             for (index in types_of_fuel) {
-                if (item['type_of_fuel'] == types_of_fuel[index])
+                if (item['type_of_fuel'] == types_of_fuel[index]) {
                     out += '<option value="' + types_of_fuel[index] + '" selected>' + types_of_fuel[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + types_of_fuel[index] + '">' + types_of_fuel[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="efficiency"><input class="w50" type="number" min="0" max="1" step="0.01" value="' + item.efficiency + '" /></td>';
@@ -1830,16 +1856,16 @@ libraryHelper.prototype.appliances_and_cooking_library_to_html_edit_mode = funct
     return out;
 };
 libraryHelper.prototype.clothes_drying_facilities_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
@@ -1854,16 +1880,16 @@ libraryHelper.prototype.clothes_drying_facilities_library_to_html_edit_mode = fu
     return out;
 };
 libraryHelper.prototype.space_heating_control_type_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Control type</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
@@ -1880,21 +1906,21 @@ libraryHelper.prototype.space_heating_control_type_library_to_html_edit_mode = f
     return out;
 };
 libraryHelper.prototype.hot_water_control_type_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Hot water storage control type</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="control_type"><select class="w200" value="' + item.control_type + '">'
+            out += '<td index="control_type"><select class="w200" value="' + item.control_type + '">';
             out += item.control_type == 'Cylinder thermostat, water heating not separately timed' ? '<option value="Cylinder thermostat, water heating not separately timed" selected>Cylinder thermostat, water heating not separately timed</option>' : '<option value="Cylinder thermostat, water heating not separately timed">Cylinder thermostat, water heating not separately timed</option>';
             out += item.control_type == 'Cylinder thermostat, water heating separately timed' ? '<option value="Cylinder thermostat, water heating separately timed" selected>Cylinder thermostat, water heating separately timed</option>' : '<option value="Cylinder thermostat, water heating separately timed">Cylinder thermostat, water heating separately timed</option>';
             out += '</select></td>';
@@ -1908,22 +1934,22 @@ libraryHelper.prototype.hot_water_control_type_library_to_html_edit_mode = funct
     return out;
 };
 libraryHelper.prototype.intentional_vents_and_flues_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Source</th><th>Type</th><th>Ventilation rate (m<sup>3</sup>/h)</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
             out += '<td index="source" title="' + item.source + '"><input class="w200" type="text" value="' + item.source + '" /></td>';
-            out += '<td index="type"><select class="w200" value="' + item.type + '">'
+            out += '<td index="type"><select class="w200" value="' + item.type + '">';
             out += item.type === 'Chimney' ? '<option value="Chimney" selected>Chimney</option>' : '<option value="Chimney">Chimney</option>';
             out += item.type === 'Open Flue' ? '<option value="Open flue" selected>Open Flue</option>' : '<option value="Open Flue">Open Flue</option>';
             out += item.type === 'Flueless gas fire' ? '<option value="Flueless gas fire" selected>Flueless gas fire</option>' : '<option value="Flueless gas fire">Flueless gas fire</option>';
@@ -1938,22 +1964,22 @@ libraryHelper.prototype.intentional_vents_and_flues_library_to_html_edit_mode = 
     return out;
 };
 libraryHelper.prototype.intentional_vents_and_flues_measures_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Source</th><th>Type</th><th>Ventilation rate (m<sup>3</sup>/h)</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
             out += '<td index="source" title="' + item.source + '"><input class="w200" type="text" value="' + item.source + '" /></td>';
-            out += '<td index="type"><select class="w200" value="' + item.type + '">'
+            out += '<td index="type"><select class="w200" value="' + item.type + '">';
             out += item.type === 'Chimney' ? '<option value="Chimney" selected>Chimney</option>' : '<option value="Chimney">Chimney</option>';
             out += item.type === 'Open Flue' ? '<option value="Open flue" selected>Open Flue</option>' : '<option value="Open Flue">Open Flue</option>';
             out += item.type === 'Flueless gas fire' ? '<option value="Flueless gas fire" selected>Flueless gas fire</option>' : '<option value="Flueless gas fire">Flueless gas fire</option>';
@@ -1969,21 +1995,21 @@ libraryHelper.prototype.intentional_vents_and_flues_measures_library_to_html_edi
     return out;
 };
 libraryHelper.prototype.pipework_insulation_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Amount of pipework insulation</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="SELECT"><select class="w200" value="' + item.SELECT + '">'
+            out += '<td index="SELECT"><select class="w200" value="' + item.SELECT + '">';
             out += item.pipework_insulation == 'First 1m from cylinder insulated' ? '<option value="First 1m from cylinder insulated" selected>First 1m from cylinder insulated</option>' : '<option value="First 1m from cylinder insulated">First 1m from cylinder insulated</option>';
             out += item.pipework_insulation == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible piperwok insulated</option>' : '<option value="All accesible piperwok insulated">All accesible piperwok insulated</option>';
             out += item.pipework_insulation == 'Fully insulated primary pipework' ? '<option value="Fully insulated primary pipework" selected>Fully insulated primary pipework</option>' : '<option value="Fully insulated primary pipework">Fully insulated primary pipework</option>';
@@ -1998,27 +2024,28 @@ libraryHelper.prototype.pipework_insulation_library_to_html_edit_mode = function
     return out;
 };
 libraryHelper.prototype.storage_type_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Category</th><th>Storage volume</th><th>Manufacturer\' declared loss factor known</th><th>Hot water storage loss factor (kWh/litre/day)</th><th>Volume factor</th><th>Temperature factor</th><th>Source</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="category"><select class="w200" value="' + item.category + '">'
+            out += '<td index="category"><select class="w200" value="' + item.category + '">';
             var categories = ['Cylinders with inmersion', 'Indirectly heated cylinders'];
             for (index in categories) {
-                if (item.category == categories[index])
+                if (item.category == categories[index]) {
                     out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="storage_volume"><input class="w100" type="number" min="0" step="0.1" value="' + item.storage_volume + '" /></td>';
@@ -2035,27 +2062,28 @@ libraryHelper.prototype.storage_type_library_to_html_edit_mode = function (origi
     return out;
 };
 libraryHelper.prototype.storage_type_measures_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Category</th><th>Storage volume</th><th>Manufacturer\' declared loss factor known</th><th>Hot water storage loss factor (kWh/litre/day)</th><th>Volume factor</th><th>Temperature factor</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
-            out += '<td index="category"><select class="w200" value="' + item.category + '">'
+            out += '<td index="category"><select class="w200" value="' + item.category + '">';
             var categories = ['Cylinders with inmersion', 'Indirectly heated cylinders'];
             for (index in categories) {
-                if (item.category == categories[index])
+                if (item.category == categories[index]) {
                     out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-                else
+                } else {
                     out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+                }
             }
             out += '</select></td>';
             out += '<td index="storage_volume"><input class="w100" type="number" min="0" step="0.1" value="' + item.storage_volume + '" /></td>';
@@ -2073,16 +2101,16 @@ libraryHelper.prototype.storage_type_measures_library_to_html_edit_mode = functi
     return out;
 };
 libraryHelper.prototype.water_usage_library_to_html_edit_mode = function (origin, library_id) {
-    var out = "";
+    var out = '';
     var selected_library = this.get_library_by_id(library_id);
     var library = selected_library.data;
     var library_id = selected_library.id;
     this.orderObjectsByKeys(library);
 
     var out = '<div><table><tr><th>Tag</th><th>Name</th><th>Source</th><th>Description</th><th>Performance</th><th>Benefits</th><th>Cost</th><th>Cost units</th><th>Who by</th><th>Disruption</th><th>Associated work</th><th>Key risks</th><th>Notes</th><th>Maintenance</th><th></th></tr>';
-    if (Object.keys(library).length == 0)
+    if (Object.keys(library).length == 0) {
         out += '';
-    else {
+    } else {
         for (z in library) {
             var item = library[z];
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="w100" type="text" value="' + z + '" /></td>';
@@ -2101,10 +2129,11 @@ libraryHelper.prototype.water_usage_library_to_html_edit_mode = function (origin
  * Items to html
  **********************************************/
 libraryHelper.prototype.systems_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', efficiency: 1.0, winter: 1.0, summer: 1.0, fuel: 'electric', fans_and_pumps: 0, combi_keep_hot: 0, description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>System tag</td><td><input type="text" class="edit-system-tag item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="edit-system-name" value="' + item.name + '" /></td></tr>';
@@ -2115,10 +2144,11 @@ libraryHelper.prototype.systems_item_to_html = function (item, tag) {
     out += '<tr><td>Keep hot facility, combi boilers only (kWh/year)</td><td><input type="text" class="editable-field edit-system-combi_keep_hot" value="' + item.combi_keep_hot + '" /></td></tr>';
     out += '<tr><td>Fuel</td><td><select class="edit-system-fuel editable-field" default="' + item.fuel + '">';
     for (fuel in datasets.fuels) {
-        if (fuel == item.fuel)
+        if (fuel == item.fuel) {
             out += '<option value="' + fuel + '" selected>' + fuel + '</option>';
-        else
+        } else {
             out += '<option value="' + fuel + '">' + fuel + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td colspan="2">Fields to be taken into account when using the element as a Measure</td></tr>';
@@ -2136,21 +2166,21 @@ libraryHelper.prototype.systems_item_to_html = function (item, tag) {
     return out;
 };
 libraryHelper.prototype.elements_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'New name', EWI: false, uvalue: 1.0, kvalue: 1.0, tags: ['Wall'], location: '',
-            source: "", description: "", performance: "", benefits: "", cost: "",
-            who_by: "", disruption: "", associated_work: "", key_risks: "", notes: "",
-            maintenance: "", };
-    else if (tag != undefined)
+            source: '', description: '', performance: '', benefits: '', cost: '',
+            who_by: '', disruption: '', associated_work: '', key_risks: '', notes: '',
+            maintenance: '', };
+    } else if (tag != undefined) {
         item.tag = tag;
-    var type = "";
-    if (item.tags != undefined)
+    }
+    var type = '';
+    if (item.tags != undefined) {
         type = item.tags[0];
-    else if (item.type != undefined) {
+    } else if (item.type != undefined) {
         type = item.type.charAt(0).toUpperCase() + item.type.slice(1); // Ensure first letter is capital
         item.tags = [type];
-    }
-    else {
+    } else {
         item.tags = ['Wall'];
         type = 'Wall';
     }
@@ -2163,10 +2193,11 @@ libraryHelper.prototype.elements_item_to_html = function (item, tag) {
 
     var out = '<div class="input-prepend"><span class="add-on">Type</span><select class="create-element-type editable-field">';
     out += type == 'Wall' ? '<option value="Wall" selected>Wall</option>' : '<option value = "Wall" > Wall </option>';
-    if (type == 'party_wall' || type == 'Party_wall')
+    if (type == 'party_wall' || type == 'Party_wall') {
         out += '<option value="Party_wall" selected>Party wall</option>';
-    else
+    } else {
         out += '<option value="Party_wall">Party wall</option>';
+    }
     out += type == 'Roof' ? '<option value="Roof" selected>Roof</option>' : '<option value="Roof">Roof</option>';
     out += type == 'Loft' ? '<option value="Loft" selected>Loft</option>' : '<option value="Loft">Loft</option>';
     out += type == 'Floor' ? '<option value="Floor" selected>Floor</option>' : '<option value="Floor">Floor</option>';
@@ -2187,8 +2218,7 @@ libraryHelper.prototype.elements_item_to_html = function (item, tag) {
         out += '<tr><td>g</td><td><input type="text" class="create-element-g window-element editable-field" value="' + item.g + '" /></td></tr>';
         out += '<tr><td>gL</td><td><input type="text" class="create-element-gL window-element editable-field" value="' + item.gL + '" /></td></tr>';
         out += '<tr><td>Frame factor (ff)</td><td><input type="text" class="create-element-ff editable-field window-element" value="' + item.ff + '" /></td></tr>';
-    }
-    else {
+    } else {
         out += '<tr class="window-element" style="display:none"><td>g</td><td><input type="text" class="create-element-g window-element editable-field" value="1" /></td></tr>';
         out += '<tr class="window-element" style="display:none"><td>gL</td><td><input type="text" class="create-element-gL window-element editable-field" value="1" /></td></tr>';
         out += '<tr class="window-element" style="display:none" ><td>Frame factor (ff)</td><td><input type="text" class="create-element-ff editable-field window-element" value="1" /></td></tr>';
@@ -2197,21 +2227,21 @@ libraryHelper.prototype.elements_item_to_html = function (item, tag) {
     return out;
 };
 libraryHelper.prototype.elements_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'New name', EWI: false, uvalue: 1.0, kvalue: 1.0, tags: ['Wall'], location: '',
-            source: "", description: "", performance: "", benefits: "", cost: "",
-            who_by: "", disruption: "", associated_work: "", key_risks: "", notes: "",
-            maintenance: "", };
-    else if (tag != undefined)
+            source: '', description: '', performance: '', benefits: '', cost: '',
+            who_by: '', disruption: '', associated_work: '', key_risks: '', notes: '',
+            maintenance: '', };
+    } else if (tag != undefined) {
         item.tag = tag;
-    var type = "";
-    if (item.tags != undefined)
+    }
+    var type = '';
+    if (item.tags != undefined) {
         type = item.tags[0];
-    else if (item.type != undefined) {
+    } else if (item.type != undefined) {
         type = item.type.charAt(0).toUpperCase() + item.type.slice(1); // Ensure first letter is capital
         item.tags = [type];
-    }
-    else {
+    } else {
         item.tags = ['Wall'];
         type = 'Wall';
     }
@@ -2220,10 +2250,11 @@ libraryHelper.prototype.elements_measures_item_to_html = function (item, tag) {
     out += '<table><tr><td colspan="2">Fields to be taken into account when using the element as a Measure</td></tr>';
     out += '<tr><td>Description</td><td><textarea rows="4" cols="50" class="create-element-description" >' + item.description + '</textarea></td></tr>';
     if (item.tags[0] == 'Wall' || item.tags[0] == 'wall') {
-        if (item.EWI === true)
+        if (item.EWI === true) {
             out += '<tr class="EWI-row"><td>EWI <i class="icon-question" title="Ticking this box will increase the area of the wall by 1.15" /></td><td><input style="margin-bottom:10px" type="checkbox" class="create-element-ewi" checked /></td></tr>';
-        else
+        } else {
             out += '<tr class="EWI-row"><td>EWI <i class="icon-question" title="Ticking this box will increase the area of the wall by 1.15" /></td><td><input style="margin-bottom:10px" type="checkbox" class="create-element-ewi"  /></td></tr>';
+        }
     }
     out += '<tr><td>Performance</td><td><input type="text" class="create-element-performance" value="' + item.performance + '" /></td></tr>';
     out += '<tr><td>Benefits</td><td><input type="text" class="create-element-benefits" value="' + item.benefits + '" /></td></tr>';
@@ -2240,10 +2271,11 @@ libraryHelper.prototype.elements_measures_item_to_html = function (item, tag) {
     return out;
 };
 libraryHelper.prototype.draught_proofing_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', q50: 1.0, description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
@@ -2263,10 +2295,11 @@ libraryHelper.prototype.draught_proofing_measures_item_to_html = function (item,
     return out;
 };
 libraryHelper.prototype.ventilation_systems_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', ventilation_type: 'NV', system_air_change_rate: 0, heat_recovery_efficiency: 0, specific_fan_power: 3, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
@@ -2282,16 +2315,15 @@ libraryHelper.prototype.ventilation_systems_measures_item_to_html = function (it
     if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV') {
         out += '<tr><td>Air change rate - ach</td><td><input type="text" class="item-air_change_rate" value="' + item.system_air_change_rate + '" /></td></tr>';
         out += '<tr><td>Specific Fan Power - W/(litre.sec)</td><td><input type="text" class="item-specific_fan_power" value="' + item.specific_fan_power + '" /></td></tr>';
-    }
-    else
-    {
+    } else {
         out += '<tr style="display:none"><td>Air change rate - ach</td><td><input type="text" class="item-air_change_rate" value="' + item.system_air_change_rate + '" /></td></tr>';
         out += '<tr style="display:none"><td>Specific Fan Power - W/(litre.sec)</td><td><input type="text" class="item-specific_fan_power" value="' + item.specific_fan_power + '" /></td></tr>';
     }
-    if (item.ventilation_type == 'MVHR')
+    if (item.ventilation_type == 'MVHR') {
         out += '<tr><td>Balanced heat recovery efficiency (%)</td><td><input type="text" class="item-heat_recovery_efficiency" value="' + item.balanced_heat_recovery_efficiency + '" /></td></tr>';
-    else
+    } else {
         out += '<tr style="display:none"><td>Heat recovery efficiency</td><td><input type="text" class="item-heat_recovery_efficiency" value="' + item.balanced_heat_recovery_efficiency + '" /></td></tr>';
+    }
     out += '<tr><td>Source</td><td><input type="text" class="item-source" required value="' + item.source + '"/></td></tr>';
     out += '<tr><td colspan="2">Fields to be taken into account when using the element as a Measure</td></tr>';
     out += '<tr><td>Description</td><td><textarea rows="4" cols="50" class="item-description">' + item.description + '</textarea></td></tr>';
@@ -2307,28 +2339,27 @@ libraryHelper.prototype.ventilation_systems_measures_item_to_html = function (it
     out += '<tr><td>Maintenance</td><td><input type="text" class="item-maintenance" value="' + item.maintenance + '" /></td></tr>';
     out += '</tbody></table>';
     // Show hide "air change rate", "specific fan power" and "heat recovery efficiannecy" accordint to the ventilation system
-    if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV')
-    {
+    if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV') {
         $('.item-air_change_rate').parent().parent().show('fast');
         $('.item-specific_fan_power').parent().parent().show('fast');
-    }
-    else
-    {
+    } else {
         $('.item-air_change_rate').parent().parent().hide('fast');
         $('.item-specific_fan_power').parent().parent().hide('fast');
     }
-    if (item.ventilation_type == 'MVHR')
+    if (item.ventilation_type == 'MVHR') {
         $('.item-heat_recovery_efficiency').parent().parent().show('fast');
-    else
+    } else {
         $('.item-heat_recovery_efficiency').parent().parent().hide('fast');
+    }
     return out;
 };
 libraryHelper.prototype.ventilation_systems_item_to_html = function (item, tag) {
     console.log('asd');
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', ventilation_type: 'NV', system_air_change_rate: 0, heat_recovery_efficiency: 0, specific_fan_power: 3, source: '--', };
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
@@ -2341,44 +2372,41 @@ libraryHelper.prototype.ventilation_systems_item_to_html = function (item, tag) 
     out += item.ventilation_type == 'MVHR' ? '<option value="MVHR" selected>Balanced mechanical ventilation with heat recovery (MVHR)</option>' : '<option value="MVHR">Balanced mechanical ventilation with heat recovery (MVHR)</option>';
     out += item.ventilation_type == 'PS' ? '<option value="PS" selected>Whole House Passive Stack Ventilation System (PS)</option>' : '<option value="PS">Whole House Passive Stack Ventilation System (PS)</option>';
     out += '</select></td></tr>';
-    if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV')
-    {
+    if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV') {
         out += '<tr><td>Air change rate - ach</td><td><input type="text" class="item-air_change_rate" value="' + item.system_air_change_rate + '" /></td></tr>';
         out += '<tr><td>Specific Fan Power - W/(litre.sec)</td><td><input type="text" class="item-specific_fan_power" value="' + item.specific_fan_power + '" /></td></tr>';
-    }
-    else
-    {
+    } else {
         out += '<tr style="display:none"><td>Air change rate - ach</td><td><input type="text" class="item-air_change_rate" value="' + item.system_air_change_rate + '" /></td></tr>';
         out += '<tr style="display:none"><td>Specific Fan Power - W/(litre.sec)</td><td><input type="text" class="item-specific_fan_power" value="' + item.specific_fan_power + '" /></td></tr>';
     }
-    if (item.ventilation_type == 'MVHR')
+    if (item.ventilation_type == 'MVHR') {
         out += '<tr><td>Balanced heat recovery efficiency (%)</td><td><input type="text" class="item-heat_recovery_efficiency" value="' + item.balanced_heat_recovery_efficiency + '" /></td></tr>';
-    else
+    } else {
         out += '<tr style="display:none"><td>Heat recovery efficiency</td><td><input type="text" class="item-heat_recovery_efficiency" value="' + item.balanced_heat_recovery_efficiency + '" /></td></tr>';
+    }
     out += '<tr><td>Source</td><td><input type="text" class="item-source" required value="' + item.source + '"/></td></tr>';
     out += '</tbody></table>';
     // Show hide "air change rate" and "heat recovery efficiannecy" accordint to the ventilation system
-    if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV')
-    {
+    if (item.ventilation_type == 'DEV' || item.ventilation_type == 'MEV' || item.ventilation_type == 'MVHR' || item.ventilation_type == 'MV') {
         // $('.item-air_change_rate').parent().parent().show('fast');
         $('.item-specific_fan_power').parent().parent().show('fast');
-    }
-    else
-    {
+    } else {
         //$('.item-air_change_rate').parent().parent().hide('fast');
         $('.item-specific_fan_power').parent().parent().hide('fast');
     }
-    if (item.ventilation_type == 'MVHR')
+    if (item.ventilation_type == 'MVHR') {
         $('.item-heat_recovery_efficiency').parent().parent().show('fast');
-    else
+    } else {
         $('.item-heat_recovery_efficiency').parent().parent().hide('fast');
+    }
     return out;
 };
 libraryHelper.prototype.extract_ventilation_points_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', ventilation_rate: 25, description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
@@ -2425,10 +2453,11 @@ libraryHelper.prototype.extract_ventilation_points_item_to_html = function (item
  return out;
  };*/
 libraryHelper.prototype.intentional_vents_and_flues_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', source: '--', type: 'Chimney', ventilation_rate: 40, description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
@@ -2444,10 +2473,11 @@ libraryHelper.prototype.intentional_vents_and_flues_item_to_html = function (ite
     return out;
 };
 libraryHelper.prototype.intentional_vents_and_flues_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', source: '--', type: 'Chimney', ventilation_rate: 40, description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
@@ -2475,10 +2505,11 @@ libraryHelper.prototype.intentional_vents_and_flues_measures_item_to_html = func
     return out;
 };
 libraryHelper.prototype.water_usage_item_to_html = function (item, tag) {
-    if (item == undefined)
+    if (item == undefined) {
         item = {tag: '', name: 'name', source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="water-efficiency-item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="water-efficiency-item-name" value="' + item.name + '" /></td></tr>';
@@ -2498,28 +2529,31 @@ libraryHelper.prototype.water_usage_item_to_html = function (item, tag) {
     return out;
 };
 libraryHelper.prototype.storage_type_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "name", manufacturer_loss_factor: 0, temperature_factor_a: 0, storage_volume: 0, loss_factor_b: 0, volume_factor_b: 0, temperature_factor_b: 0, insulation_type: 'very thick', declared_loss_factor_known: true, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: 'name', manufacturer_loss_factor: 0, temperature_factor_a: 0, storage_volume: 0, loss_factor_b: 0, volume_factor_b: 0, temperature_factor_b: 0, insulation_type: 'very thick', declared_loss_factor_known: true, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Category </td><td><select class="item-category">';
     var categories = ['Cylinders with inmersion', 'Indirectly heated cylinders'];
     for (index in categories) {
-        if (item.category == categories[index])
+        if (item.category == categories[index]) {
             out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Storage volume</td><td><input type="number" min="0" class="item-storage_volume" value="' + item.storage_volume + '" /></td></tr>';
     out += '<tr><td>Insulation type</td><td><input type="text" class="item-insulation_type" value="' + item.insulation_type + '" /></td></tr>';
-    if (item.declared_loss_factor_known === true)
+    if (item.declared_loss_factor_known === true) {
         out += '<tr><td>Manufacturer\' declared loss factor known</td><td><input type="checkbox" class="item-declared_loss_factor_known" checked  /></td></tr>';
-    else
+    } else {
         out += '<tr><td>Manufacturer\' declared loss factor known</td><td><input type="checkbox" class="item-declared_loss_factor_known" /></td></tr>';
+    }
     out += '<tr class="if-declared-loss-factor"><td>Manufacturer\'s declared loss factor (kWh/day)</td><td><input type="number" min="0" class="item-manufacturer_loss_factor" value="' + item.manufacturer_loss_factor + '" /></td></tr>';
     out += '<tr class="if-declared-loss-factor"><td>Temperature factor</td><td><input type="number" min="0" class="item-temperature_factor_a" value="' + item.temperature_factor_a + '" /></td></tr>';
     out += '<tr class="if-not-declared-loss-factor"><td>Hot water storage loss factor (kWh/litre/day)</td><td><input type="text" class="item-loss_factor_b" value="' + item.loss_factor_b + '" /></td></tr>';
@@ -2530,36 +2564,38 @@ libraryHelper.prototype.storage_type_item_to_html = function (item, tag) {
     if (item.declared_loss_factor_known === true) {
         out = out.replace(/class="if-declared-loss-factor"/g, ' class="if-declared-loss-factor" style="display:table-row"');
         out = out.replace(/class="if-not-declared-loss-factor"/g, ' class="if-not-declared-loss-factor" style="display:none"');
-    }
-    else {
+    } else {
         out = out.replace(/class="if-declared-loss-factor"/g, ' class="if-declared-loss-factor" style="display:none"');
         out = out.replace(/class="if-not-declared-loss-factor"/g, ' class="if-not-declared-loss-factor" style="display:table-row"');
     }
     return out;
 };
 libraryHelper.prototype.storage_type_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "name", manufacturer_loss_factor: 0, temperature_factor_a: 0, storage_volume: 0, loss_factor_b: 0, volume_factor_b: 0, temperature_factor_b: 0, insulation_type: 'very thick', declared_loss_factor_known: true, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: 'name', manufacturer_loss_factor: 0, temperature_factor_a: 0, storage_volume: 0, loss_factor_b: 0, volume_factor_b: 0, temperature_factor_b: 0, insulation_type: 'very thick', declared_loss_factor_known: true, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Category </td><td><select class="item-category">';
     var categories = ['Cylinders with inmersion', 'Indirectly heated cylinders'];
     for (index in categories) {
-        if (item.category == categories[index])
+        if (item.category == categories[index]) {
             out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Storage volume</td><td><input type="number" min="0" class="item-storage_volume" value="' + item.storage_volume + '" /></td></tr>';
     out += '<tr><td>Insulation type</td><td><input type="text" class="item-insulation_type" value="' + item.insulation_type + '" /></td></tr>';
-    if (item.declared_loss_factor_known === true)
+    if (item.declared_loss_factor_known === true) {
         out += '<tr><td>Manufacturer\' declared loss factor known</td><td><input type="checkbox" class="item-declared_loss_factor_known" checked  /></td></tr>';
-    else
+    } else {
         out += '<tr><td>Manufacturer\' declared loss factor known</td><td><input type="checkbox" class="item-declared_loss_factor_known" /></td></tr>';
+    }
     out += '<tr class="if-declared-loss-factor"><td>Manufacturer\'s declared loss factor (kWh/day)</td><td><input type="number" min="0" class="item-manufacturer_loss_factor" value="' + item.manufacturer_loss_factor + '" /></td></tr>';
     out += '<tr class="if-declared-loss-factor"><td>Temperature factor</td><td><input type="number" min="0" class="item-temperature_factor_a" value="' + item.temperature_factor_a + '" /></td></tr>';
     out += '<tr class="if-not-declared-loss-factor"><td>Hot water storage loss factor (kWh/litre/day)</td><td><input type="text" class="item-loss_factor_b" value="' + item.loss_factor_b + '" /></td></tr>';
@@ -2581,28 +2617,29 @@ libraryHelper.prototype.storage_type_measures_item_to_html = function (item, tag
     if (item.declared_loss_factor_known === true) {
         out = out.replace(/class="if-declared-loss-factor"/g, ' class="if-declared-loss-factor" style="display:table-row"');
         out = out.replace(/class="if-not-declared-loss-factor"/g, ' class="if-not-declared-loss-factor" style="display:none"');
-    }
-    else {
+    } else {
         out = out.replace(/class="if-declared-loss-factor"/g, ' class="if-declared-loss-factor" style="display:none"');
         out = out.replace(/class="if-not-declared-loss-factor"/g, ' class="if-not-declared-loss-factor" style="display:table-row"');
     }
     return out;
 };
 libraryHelper.prototype.appliances_and_cooking_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "name", category: "Miscelanea", "norm_demand": 0, "units": "kWh", "utilisation_factor": 1, "frequency": 1, "reference_quantity": 1, "type_of_fuel": "Electricity", "efficiency": 1};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: 'name', category: 'Miscelanea', 'norm_demand': 0, 'units': 'kWh', 'utilisation_factor': 1, 'frequency': 1, 'reference_quantity': 1, 'type_of_fuel': 'Electricity', 'efficiency': 1};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Category</td><td><select class="item-category">';
     var categories = ['Computing', 'Cooking', 'Food storage', 'Other kitchen / cleaning', 'Laundry', 'Miscelanea', 'TV'];
     for (index in categories) {
-        if (item.category == categories[index])
+        if (item.category == categories[index]) {
             out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Norm demand</td><td><input type="number" min="0" class="item-norm-demand" value="' + item['norm_demand'] + '" /></td></tr>';
@@ -2613,10 +2650,11 @@ libraryHelper.prototype.appliances_and_cooking_item_to_html = function (item, ta
     out += '<tr><td>Type of fuel</td><td><select class="item-type-of-fuel">';
     var types_of_fuel = ['Gas', 'Oil', 'Solid fuel', 'Electricity'];
     for (index in types_of_fuel) {
-        if (item['type_of_fuel'] == types_of_fuel[index])
+        if (item['type_of_fuel'] == types_of_fuel[index]) {
             out += '<option value="' + types_of_fuel[index] + '" selected>' + types_of_fuel[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + types_of_fuel[index] + '">' + types_of_fuel[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Efficiency</td><td><input type="number" min="0" max="1" step="0.01" class="item-efficiency" value="' + item.efficiency + '" /></td></tr>';
@@ -2625,10 +2663,11 @@ libraryHelper.prototype.appliances_and_cooking_item_to_html = function (item, ta
 };
 libraryHelper.prototype.heating_control_item_to_html = function (item, tag) {
     console.log(item);
-    if (item == undefined)
-        item = {tag: '', name: "--", heating_control_type: 1, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', heating_control_type: 1, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
@@ -2653,20 +2692,22 @@ libraryHelper.prototype.heating_control_item_to_html = function (item, tag) {
     return out;
 };
 libraryHelper.prototype.heating_systems_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", category: 'Combi boiler', winter_efficiency: 100, summer_efficiency: 100, central_heating_pump: 0, fans_and_supply_pumps: 0, sfp: 1.5, responsiveness: 1, combi_loss: 0, primary_circuit_loss: 0, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', category: 'Combi boiler', winter_efficiency: 100, summer_efficiency: 100, central_heating_pump: 0, fans_and_supply_pumps: 0, sfp: 1.5, responsiveness: 1, combi_loss: 0, primary_circuit_loss: 0, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Category </td><td><select class="heating_systems item-category">';
     var categories = ['Combi boilers', 'System boilers', 'Heat pumps', 'Room heaters', 'Warm air systems', 'Hot water only'];
     for (index in categories) {
-        if (item.category == categories[index])
+        if (item.category == categories[index]) {
             out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Winter efficiency (space heating)</td><td><input type="text" class="item-winter_efficiency" required value="' + item.winter_efficiency + '"/></td></tr>';
@@ -2675,8 +2716,7 @@ libraryHelper.prototype.heating_systems_item_to_html = function (item, tag) {
     if (item.category != 'Warm air systems') {
         out += '<tr><td>Fans and supply pumps (kWh/year)</td><td><input type="text" class="item-fans_and_supply_pumps " required value="' + item.fans_and_supply_pumps + '"/></td></tr>';
         out += '<tr style="display: none"><td>Specific fan power (W/l/s) <i class="icon-question-sign" /></td><td><input type="text" class="item-sfp" required value="' + item.sfp + '"/></td></tr>';
-    }
-    else {
+    } else {
         out += '<tr style="display: none"><td>Fans and supply pumps (kWh/year)</td><td><input type="text" class="item-fans_and_supply_pumps " required value="' + item.fans_and_supply_pumps + '"/></td></tr>';
         out += '<tr><td>Specific fan power (kW)</td><td><input type="text" class="item-sfp" required value="' + item.sfp + '"/></td></tr>';
     }
@@ -2684,19 +2724,21 @@ libraryHelper.prototype.heating_systems_item_to_html = function (item, tag) {
     out += '<tr><td>Combi loss</td><td><select class="item-combi_loss" required>';
     var options = ['0', 'Instantaneous, without keep hot-facility', 'Instantaneous, with keep-hot facility controlled by time clock', 'Instantaneous, with keep-hot facility not controlled by time clock', 'Storage combi boiler >= 55 litres', 'Storage combi boiler < 55 litres'];
     for (index in options) {
-        if (item.instantaneous_water_heating == options[index])
+        if (item.instantaneous_water_heating == options[index]) {
             out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Primary circuit loss <i class="icon-question-sign" title="No primary loss for the following:\n\   - Electric inmersion heater.\n\   - Combi boiler\n\   - CPSU(including electric CPSU)\n\   - Boiler and thermal store within a single casing\n\   - Separate boiler and thermal store connected by no more than 1.5m of insulated pipework\n\ \n\For other cases (indirect cylinders and thermal stores connected by unsinsulated pipework or more than 1.5m of insulated pipework) the loss is calculated according to the amount of insulated pipework and the type of storage heating controls (in the Hot Water System section) - SAP2012 table 3, p. 199" /></td><td><select class="item-primary_circuit_loss">';
     var options = ['Yes', 'No'];
     for (index in options) {
-        if (item.primary_circuit_loss == options[index])
+        if (item.primary_circuit_loss == options[index]) {
             out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';
@@ -2704,20 +2746,22 @@ libraryHelper.prototype.heating_systems_item_to_html = function (item, tag) {
     return out;
 };
 libraryHelper.prototype.heating_systems_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", category: 'Combi boiler', winter_efficiency: 100, summer_efficiency: 100, central_heating_pump: 0, fans_and_supply_pumps: 0, responsiveness: 1, combi_loss: 0, primary_circuit_loss: 0, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', category: 'Combi boiler', winter_efficiency: 100, summer_efficiency: 100, central_heating_pump: 0, fans_and_supply_pumps: 0, responsiveness: 1, combi_loss: 0, primary_circuit_loss: 0, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Category </td><td><select class="item-category">';
     var categories = ['Combi boilers', 'System boilers', 'Heat pumps', 'Room heaters', 'Warm air systems', 'Hot water only'];
     for (index in categories) {
-        if (item.category == categories[index])
+        if (item.category == categories[index]) {
             out += '<option value="' + categories[index] + '" selected>' + categories[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + categories[index] + '">' + categories[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Winter efficiency (space heating)</td><td><input type="text" class="item-winter_efficiency" required value="' + item.winter_efficiency + '"/></td></tr>';
@@ -2728,19 +2772,21 @@ libraryHelper.prototype.heating_systems_measures_item_to_html = function (item, 
     out += '<tr><td>Combi loss</td><td><select class="item-combi_loss" required>';
     var options = ['0', 'Instantaneous, without keep hot-facility', 'Instantaneous, with keep-hot facility controlled by time clock', 'Instantaneous, with keep-hot facility not controlled by time clock', 'Storage combi boiler >= 55 litres', 'Storage combi boiler < 55 litres'];
     for (index in options) {
-        if (item.instantaneous_water_heating == options[index])
+        if (item.instantaneous_water_heating == options[index]) {
             out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Primary circuit loss <i class="icon-question-sign" title="No primary loss for the following:\n\   - Electric inmersion heater.\n\   - Combi boiler\n\   - CPSU(including electric CPSU)\n\   - Boiler and thermal store within a single casing\n\   - Separate boiler and thermal store connected by no more than 1.5m of insulated pipework\n\ \n\For other cases (indirect cylinders and thermal stores connected by unsinsulated pipework or more than 1.5m of insulated pipework) the loss is calculated according to the amount of insulated pipework and the type of storage heating controls (in the Hot Water System section) - SAP2012 table 3, p. 199" /></td><td><select class="item-primary_circuit_loss">';
     var options = ['Yes', 'No'];
     for (index in options) {
-        if (item.primary_circuit_loss == options[index])
+        if (item.primary_circuit_loss == options[index]) {
             out += '<option value="' + options[index] + '" selected>' + options[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + options[index] + '">' + options[index] + '</option>';
+        }
     }
     out += '</select></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';
@@ -2759,10 +2805,11 @@ libraryHelper.prototype.heating_systems_measures_item_to_html = function (item, 
     return out;
 };
 libraryHelper.prototype.pipework_insulation_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", source: '--', pipework_insulation: 'First 1m from cylinder insulated', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', source: '--', pipework_insulation: 'First 1m from cylinder insulated', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
@@ -2787,10 +2834,11 @@ libraryHelper.prototype.pipework_insulation_item_to_html = function (item, tag) 
     return out;
 };
 libraryHelper.prototype.hot_water_control_type_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", control_type: 'Cylinder thermostat, water heating separately timed', source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', control_type: 'Cylinder thermostat, water heating separately timed', source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
@@ -2814,10 +2862,11 @@ libraryHelper.prototype.hot_water_control_type_item_to_html = function (item, ta
     return out;
 };
 libraryHelper.prototype.space_heating_control_type_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", control_type: 1, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', control_type: 1, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
@@ -2838,15 +2887,16 @@ libraryHelper.prototype.space_heating_control_type_item_to_html = function (item
     return out;
 };
 libraryHelper.prototype.clothes_drying_facilities_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';
-    out += '<tr><td colspan="2"><br />Fields to be used when applying a measure</td></tr>'
+    out += '<tr><td colspan="2"><br />Fields to be used when applying a measure</td></tr>';
     out += '<tr><td>Description</td><td><textarea rows="4" cols="50" class="item-description">' + item.description + '</textarea></td></tr>';
     out += '<tr><td>Performance</td><td><input type="text" class="item-performance" value="' + item.performance + '" /></td></tr>';
     out += '<tr><td>Benefits</td><td><input type="text" class="item-benefits" value="' + item.benefits + '" /></td></tr>';
@@ -2862,10 +2912,11 @@ libraryHelper.prototype.clothes_drying_facilities_item_to_html = function (item,
     return out;
 };
 libraryHelper.prototype.generation_measures_item_to_html = function (item, tag) {
-    if (item == undefined)
-        item = {tag: '', name: "--", kWp: 0, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
-    else if (tag != undefined)
+    if (item == undefined) {
+        item = {tag: '', name: '--', kWp: 0, source: '--', description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
+    } else if (tag != undefined) {
         item.tag = tag;
+    }
     var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
@@ -2889,45 +2940,48 @@ libraryHelper.prototype.generation_measures_item_to_html = function (item, tag) 
  *****************************************************************/
 libraryHelper.prototype.systems_get_item_to_save = function () {
     var item = {};
-    var system = $(".edit-system-tag").val();
+    var system = $('.edit-system-tag').val();
     item[system] = {
-        name: $(".edit-system-name").val(),
-        efficiency: $(".edit-system-efficiency").val(),
-        winter: $(".edit-system-winter").val(),
-        summer: $(".edit-system-summer").val(),
-        fuel: $(".edit-system-fuel").val(),
-        fans_and_pumps: $(".edit-system-fans_and_pumps").val(),
-        combi_keep_hot: $(".edit-system-combi_keep_hot").val(),
-        description: $(".edit-system-description").val(),
-        performance: $(".edit-system-performance").val(),
-        benefits: $(".edit-system-benefits").val(),
-        cost: $(".edit-system-cost").val(),
-        who_by: $(".edit-system-who_by").val(),
-        disruption: $(".edit-system-disruption").val(),
-        associated_work: $(".edit-system-associated_work").val(),
-        key_risks: $(".edit-system-key_risks").val(),
-        notes: $(".edit-system-notes").val(),
-        maintenance: $(".edit-system-maintenance").val()
+        name: $('.edit-system-name').val(),
+        efficiency: $('.edit-system-efficiency').val(),
+        winter: $('.edit-system-winter').val(),
+        summer: $('.edit-system-summer').val(),
+        fuel: $('.edit-system-fuel').val(),
+        fans_and_pumps: $('.edit-system-fans_and_pumps').val(),
+        combi_keep_hot: $('.edit-system-combi_keep_hot').val(),
+        description: $('.edit-system-description').val(),
+        performance: $('.edit-system-performance').val(),
+        benefits: $('.edit-system-benefits').val(),
+        cost: $('.edit-system-cost').val(),
+        who_by: $('.edit-system-who_by').val(),
+        disruption: $('.edit-system-disruption').val(),
+        associated_work: $('.edit-system-associated_work').val(),
+        key_risks: $('.edit-system-key_risks').val(),
+        notes: $('.edit-system-notes').val(),
+        maintenance: $('.edit-system-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.elements_get_item_to_save = function () {
     var item = {};
-    var type = $(".create-element-type").val();
-    var tag = $(".create-element-tag").val();
+    var type = $('.create-element-type').val();
+    var tag = $('.create-element-tag').val();
     item[tag] = {};
-    item[tag].name = $(".create-element-name").val();
-    item[tag].description = $(".create-element-description").val();
+    item[tag].name = $('.create-element-name').val();
+    item[tag].description = $('.create-element-description').val();
     //item[tag].location = $(".create-element-location").val();
-    item[tag].source = $(".create-element-source").val();
-    item[tag].uvalue = 1.0 * $(".create-element-uvalue").val();
-    item[tag].kvalue = 1.0 * $(".create-element-kvalue").val();
-    if (type == "Window" || type == "Door" || type == "Roof_light")
-        item[tag].g = $(".create-element-g").val();
-    if (type == "Window" || type == "Door" || type == "Roof_light")
-        item[tag].gL = $(".create-element-gL").val();
-    if (type == "Window" || type == "Door" || type == "Roof_light")
-        item[tag].ff = $(".create-element-ff").val();
+    item[tag].source = $('.create-element-source').val();
+    item[tag].uvalue = 1.0 * $('.create-element-uvalue').val();
+    item[tag].kvalue = 1.0 * $('.create-element-kvalue').val();
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
+        item[tag].g = $('.create-element-g').val();
+    }
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
+        item[tag].gL = $('.create-element-gL').val();
+    }
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
+        item[tag].ff = $('.create-element-ff').val();
+    }
     item[tag].tags = [type];
     //item[tag].criteria = $(".create-element-criteria").val().split(",");
 
@@ -2958,131 +3012,147 @@ libraryHelper.prototype.elements_get_item_to_save = function () {
 };
 libraryHelper.prototype.elements_measures_get_item_to_save = function () {
     var item = {};
-    var type = $(".create-element-type").val();
-    var tag = $(".create-element-tag").val();
+    var type = $('.create-element-type').val();
+    var tag = $('.create-element-tag').val();
     item[tag] = {};
-    item[tag].name = $(".create-element-name").val();
-    item[tag].description = $(".create-element-description").val();
+    item[tag].name = $('.create-element-name').val();
+    item[tag].description = $('.create-element-description').val();
     //item[tag].location = $(".create-element-location").val();
-    item[tag].source = $(".create-element-source").val();
-    item[tag].uvalue = 1.0 * $(".create-element-uvalue").val();
-    item[tag].kvalue = 1.0 * $(".create-element-kvalue").val();
-    if (type == "Window" || type == "Door" || type == "Roof_light")
-        item[tag].g = $(".create-element-g").val();
-    if (type == "Window" || type == "Door" || type == "Roof_light")
-        item[tag].gL = $(".create-element-gL").val();
-    if (type == "Window" || type == "Door" || type == "Roof_light")
-        item[tag].ff = $(".create-element-ff").val();
+    item[tag].source = $('.create-element-source').val();
+    item[tag].uvalue = 1.0 * $('.create-element-uvalue').val();
+    item[tag].kvalue = 1.0 * $('.create-element-kvalue').val();
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
+        item[tag].g = $('.create-element-g').val();
+    }
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
+        item[tag].gL = $('.create-element-gL').val();
+    }
+    if (type == 'Window' || type == 'Door' || type == 'Roof_light') {
+        item[tag].ff = $('.create-element-ff').val();
+    }
     item[tag].tags = [type];
     //item[tag].criteria = $(".create-element-criteria").val().split(",");
 
     // Measures
-    if ($('.create-element-name').val() !== "")
-        item[tag].name = $(".create-element-name").val();
-    if ($('.create-element-description').val() !== "")
-        item[tag].description = $(".create-element-description").val();
-    if ($('.create-element-min_cost').val() !== "")
-        item[tag].min_cost = $(".create-element-min_cost").val();
-    if ($('.create-element-performance').val() !== "")
-        item[tag].performance = $(".create-element-performance").val();
-    if ($('.create-element-benefits').val() !== "")
-        item[tag].benefits = $(".create-element-benefits").val();
-    if ($('.create-element-cost').val() !== "")
-        item[tag].cost = $(".create-element-cost").val();
-    item[tag].cost_units = $(".item-cost-units").val();
-    if ($('.create-element-who_by').val() !== "")
-        item[tag]["who_by"] = $(".create-element-who_by").val();
-    if ($('.create-element-disruption').val() !== "")
-        item[tag].disruption = $(".create-element-disruption").val();
-    if ($('.create-element-associated_work').val() !== "")
-        item[tag]["associated_work"] = $(".create-element-associated_work").val();
-    if ($('.create-element-key_risks').val() !== "")
-        item[tag]["key_risks"] = $(".create-element-key_risks").val();
-    if ($('.create-element-notes').val() !== "")
-        item[tag].notes = $(".create-element-notes").val();
-    if ($('.create-element-maintenance').val() !== "")
-        item[tag].maintenance = $(".create-element-maintenance").val();
-    if (type == 'Wall')
-        item[tag].EWI = $(".create-element-ewi").prop('checked');
+    if ($('.create-element-name').val() !== '') {
+        item[tag].name = $('.create-element-name').val();
+    }
+    if ($('.create-element-description').val() !== '') {
+        item[tag].description = $('.create-element-description').val();
+    }
+    if ($('.create-element-min_cost').val() !== '') {
+        item[tag].min_cost = $('.create-element-min_cost').val();
+    }
+    if ($('.create-element-performance').val() !== '') {
+        item[tag].performance = $('.create-element-performance').val();
+    }
+    if ($('.create-element-benefits').val() !== '') {
+        item[tag].benefits = $('.create-element-benefits').val();
+    }
+    if ($('.create-element-cost').val() !== '') {
+        item[tag].cost = $('.create-element-cost').val();
+    }
+    item[tag].cost_units = $('.item-cost-units').val();
+    if ($('.create-element-who_by').val() !== '') {
+        item[tag]['who_by'] = $('.create-element-who_by').val();
+    }
+    if ($('.create-element-disruption').val() !== '') {
+        item[tag].disruption = $('.create-element-disruption').val();
+    }
+    if ($('.create-element-associated_work').val() !== '') {
+        item[tag]['associated_work'] = $('.create-element-associated_work').val();
+    }
+    if ($('.create-element-key_risks').val() !== '') {
+        item[tag]['key_risks'] = $('.create-element-key_risks').val();
+    }
+    if ($('.create-element-notes').val() !== '') {
+        item[tag].notes = $('.create-element-notes').val();
+    }
+    if ($('.create-element-maintenance').val() !== '') {
+        item[tag].maintenance = $('.create-element-maintenance').val();
+    }
+    if (type == 'Wall') {
+        item[tag].EWI = $('.create-element-ewi').prop('checked');
+    }
     return item;
 };
 libraryHelper.prototype.draught_proofing_measures_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        q50: $(".item-q50").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        q50: $('.item-q50').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.ventilation_systems_measures_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        ventilation_type: $(".item-ventilation_type").val(),
-        system_air_change_rate: $(".item-air_change_rate").val(),
-        balanced_heat_recovery_efficiency: $(".item-heat_recovery_efficiency").val(),
-        specific_fan_power: $(".item-specific_fan_power").val(),
-        description: $(".item-description").val(),
-        source: $(".item-source").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        ventilation_type: $('.item-ventilation_type').val(),
+        system_air_change_rate: $('.item-air_change_rate').val(),
+        balanced_heat_recovery_efficiency: $('.item-heat_recovery_efficiency').val(),
+        specific_fan_power: $('.item-specific_fan_power').val(),
+        description: $('.item-description').val(),
+        source: $('.item-source').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.ventilation_systems_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        ventilation_type: $(".item-ventilation_type").val(),
-        system_air_change_rate: $(".item-air_change_rate").val(),
-        balanced_heat_recovery_efficiency: $(".item-heat_recovery_efficiency").val(),
-        specific_fan_power: $(".item-specific_fan_power").val(),
-        source: $(".item-source").val(),
+        name: $('.item-name').val(),
+        ventilation_type: $('.item-ventilation_type').val(),
+        system_air_change_rate: $('.item-air_change_rate').val(),
+        balanced_heat_recovery_efficiency: $('.item-heat_recovery_efficiency').val(),
+        specific_fan_power: $('.item-specific_fan_power').val(),
+        source: $('.item-source').val(),
     };
     return item;
 };
 libraryHelper.prototype.extract_ventilation_points_get_item_to_save = function () {
     console.log($('.item-tag'));
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        ventilation_rate: $(".item-ventilation-rate").val(),
-        type: $(".item-type").val(),
+        name: $('.item-name').val(),
+        ventilation_rate: $('.item-ventilation-rate').val(),
+        type: $('.item-type').val(),
         //location: $(".item-location").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
@@ -3107,288 +3177,288 @@ libraryHelper.prototype.extract_ventilation_points_get_item_to_save = function (
  };*/
 libraryHelper.prototype.intentional_vents_and_flues_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        source: $(".item-name").val(),
-        type: $(".item-type").val(),
-        ventilation_rate: $(".item-ventilation_rate").val()
+        name: $('.item-name').val(),
+        source: $('.item-name').val(),
+        type: $('.item-type').val(),
+        ventilation_rate: $('.item-ventilation_rate').val()
     };
     return item;
 };
 libraryHelper.prototype.intentional_vents_and_flues_measures_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        source: $(".item-name").val(),
-        type: $(".item-type").val(),
-        ventilation_rate: $(".item-ventilation_rate").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        source: $('.item-name').val(),
+        type: $('.item-type').val(),
+        ventilation_rate: $('.item-ventilation_rate').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.water_usage_get_item_to_save = function () {
     var item = {};
-    var tag = $(".water-efficiency-item-tag").val();
+    var tag = $('.water-efficiency-item-tag').val();
     item[tag] = {
-        name: $(".water-efficiency-item-name").val(),
-        ventilation_rate: 1.0 * $(".water-efficiency-item-ventilation_rate").val(),
-        description: $(".water-efficiency-item-description").val(),
-        performance: $(".water-efficiency-item-performance").val(),
-        benefits: $(".water-efficiency-item-benefits").val(),
-        cost: $(".water-efficiency-item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".water-efficiency-item-who_by").val(),
-        disruption: $(".water-efficiency-item-disruption").val(),
-        associated_work: $(".water-efficiency-item-associated_work").val(),
-        key_risks: $(".water-efficiency-item-key_risks").val(),
-        notes: $(".water-efficiency-item-notes").val(),
-        maintenance: $(".water-efficiency-item-maintenance").val()
+        name: $('.water-efficiency-item-name').val(),
+        ventilation_rate: 1.0 * $('.water-efficiency-item-ventilation_rate').val(),
+        description: $('.water-efficiency-item-description').val(),
+        performance: $('.water-efficiency-item-performance').val(),
+        benefits: $('.water-efficiency-item-benefits').val(),
+        cost: $('.water-efficiency-item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.water-efficiency-item-who_by').val(),
+        disruption: $('.water-efficiency-item-disruption').val(),
+        associated_work: $('.water-efficiency-item-associated_work').val(),
+        key_risks: $('.water-efficiency-item-key_risks').val(),
+        notes: $('.water-efficiency-item-notes').val(),
+        maintenance: $('.water-efficiency-item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.storage_type_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        category: $(".item-category").val(),
-        manufacturer_loss_factor: $(".item-manufacturer_loss_factor").val(),
-        temperature_factor_a: $(".item-temperature_factor_a").val(),
-        storage_volume: $(".item-storage_volume").val(),
-        loss_factor_b: $(".item-loss_factor_b").val(),
-        volume_factor_b: $(".item-volume_factor_b").val(),
-        temperature_factor_b: $(".item-temperature_factor_b").val(),
-        insulation_type: $(".item-insulation_type").val(),
-        declared_loss_factor_known: $(".item-declared_loss_factor_known").prop('checked'),
-        source: $(".item-source").val()
+        name: $('.item-name').val(),
+        category: $('.item-category').val(),
+        manufacturer_loss_factor: $('.item-manufacturer_loss_factor').val(),
+        temperature_factor_a: $('.item-temperature_factor_a').val(),
+        storage_volume: $('.item-storage_volume').val(),
+        loss_factor_b: $('.item-loss_factor_b').val(),
+        volume_factor_b: $('.item-volume_factor_b').val(),
+        temperature_factor_b: $('.item-temperature_factor_b').val(),
+        insulation_type: $('.item-insulation_type').val(),
+        declared_loss_factor_known: $('.item-declared_loss_factor_known').prop('checked'),
+        source: $('.item-source').val()
     };
     return item;
 };
 libraryHelper.prototype.storage_type_measures_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        category: $(".item-category").val(),
-        manufacturer_loss_factor: $(".item-manufacturer_loss_factor").val(),
-        temperature_factor_a: $(".item-temperature_factor_a").val(),
-        storage_volume: $(".item-storage_volume").val(),
-        loss_factor_b: $(".item-loss_factor_b").val(),
-        volume_factor_b: $(".item-volume_factor_b").val(),
-        temperature_factor_b: $(".item-temperature_factor_b").val(),
-        insulation_type: $(".item-insulation_type").val(),
-        declared_loss_factor_known: $(".item-declared_loss_factor_known").prop('checked'),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        category: $('.item-category').val(),
+        manufacturer_loss_factor: $('.item-manufacturer_loss_factor').val(),
+        temperature_factor_a: $('.item-temperature_factor_a').val(),
+        storage_volume: $('.item-storage_volume').val(),
+        loss_factor_b: $('.item-loss_factor_b').val(),
+        volume_factor_b: $('.item-volume_factor_b').val(),
+        temperature_factor_b: $('.item-temperature_factor_b').val(),
+        insulation_type: $('.item-insulation_type').val(),
+        declared_loss_factor_known: $('.item-declared_loss_factor_known').prop('checked'),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.appliances_and_cooking_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        category: $(".item-category").val(),
-        "norm_demand": $(".item-norm-demand").val(),
-        units: $(".item-units").val(),
-        "utilisation_factor": $(".item-utilisation-factor").val(),
-        frequency: $(".item-frequency").val(),
-        "reference_quantity": $(".item-reference-quantity").val(),
-        'type_of_fuel': $(".item-type-of-fuel").val(),
-        efficiency: $(".item-efficiency").val()
+        name: $('.item-name').val(),
+        category: $('.item-category').val(),
+        'norm_demand': $('.item-norm-demand').val(),
+        units: $('.item-units').val(),
+        'utilisation_factor': $('.item-utilisation-factor').val(),
+        frequency: $('.item-frequency').val(),
+        'reference_quantity': $('.item-reference-quantity').val(),
+        'type_of_fuel': $('.item-type-of-fuel').val(),
+        efficiency: $('.item-efficiency').val()
     };
     return item;
 };
 libraryHelper.prototype.heating_systems_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        category: $(".item-category").val(),
-        winter_efficiency: $(".item-winter_efficiency").val(),
-        summer_efficiency: $(".item-summer_efficiency").val(),
-        central_heating_pump: $(".item-central_heating_pump").val(),
-        fans_and_supply_pumps: $(".item-fans_and_supply_pumps").val(),
-        sfp: $(".item-sfp").val(),
-        responsiveness: $(".item-responsiveness").val(),
-        combi_loss: $(".item-combi_loss").val(),
-        primary_circuit_loss: $(".item-primary_circuit_loss").val(),
-        source: $(".item-source").val()
+        name: $('.item-name').val(),
+        category: $('.item-category').val(),
+        winter_efficiency: $('.item-winter_efficiency').val(),
+        summer_efficiency: $('.item-summer_efficiency').val(),
+        central_heating_pump: $('.item-central_heating_pump').val(),
+        fans_and_supply_pumps: $('.item-fans_and_supply_pumps').val(),
+        sfp: $('.item-sfp').val(),
+        responsiveness: $('.item-responsiveness').val(),
+        combi_loss: $('.item-combi_loss').val(),
+        primary_circuit_loss: $('.item-primary_circuit_loss').val(),
+        source: $('.item-source').val()
     };
     return item;
 };
 libraryHelper.prototype.heating_systems_measures_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        category: $(".item-category").val(),
-        winter_efficiency: $(".item-winter_efficiency").val(),
-        summer_efficiency: $(".item-summer_efficiency").val(),
-        central_heating_pump: $(".item-central_heating_pump").val(),
-        fans_and_supply_pumps: $(".item-fans_and_supply_pumps").val(),
-        sfp: $(".item-sfp").val(),
-        responsiveness: $(".item-responsiveness").val(),
-        combi_loss: $(".item-combi_loss").val(),
-        primary_circuit_loss: $(".item-primary_circuit_loss").val(),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        category: $('.item-category').val(),
+        winter_efficiency: $('.item-winter_efficiency').val(),
+        summer_efficiency: $('.item-summer_efficiency').val(),
+        central_heating_pump: $('.item-central_heating_pump').val(),
+        fans_and_supply_pumps: $('.item-fans_and_supply_pumps').val(),
+        sfp: $('.item-sfp').val(),
+        responsiveness: $('.item-responsiveness').val(),
+        combi_loss: $('.item-combi_loss').val(),
+        primary_circuit_loss: $('.item-primary_circuit_loss').val(),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.heating_control_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        heating_control_type: $(".item-heating_control_type").val(),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        heating_control_type: $('.item-heating_control_type').val(),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.pipework_insulation_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        pipework_insulation: $(".item-pipework_insulation").val(),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        pipework_insulation: $('.item-pipework_insulation').val(),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.hot_water_control_type_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        control_type: $(".item-control_type").val(),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        control_type: $('.item-control_type').val(),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.space_heating_control_type_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        control_type: $(".item-control_type").val(),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        control_type: $('.item-control_type').val(),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.clothes_drying_facilities_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        source: $(".item-source").val(),
-        description: $(".item-description").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        source: $('.item-source').val(),
+        description: $('.item-description').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
 libraryHelper.prototype.generation_measures_get_item_to_save = function () {
     var item = {};
-    var tag = $(".item-tag").val();
+    var tag = $('.item-tag').val();
     item[tag] = {
-        name: $(".item-name").val(),
-        description: $(".item-description").val(),
-        kWp: $(".item-kWp").val(),
-        performance: $(".item-performance").val(),
-        benefits: $(".item-benefits").val(),
-        cost: $(".item-cost").val(),
-        cost_units: $(".item-cost-units").val(),
-        who_by: $(".item-who_by").val(),
-        disruption: $(".item-disruption").val(),
-        associated_work: $(".item-associated_work").val(),
-        key_risks: $(".item-key_risks").val(),
-        notes: $(".item-notes").val(),
-        maintenance: $(".item-maintenance").val()
+        name: $('.item-name').val(),
+        description: $('.item-description').val(),
+        kWp: $('.item-kWp').val(),
+        performance: $('.item-performance').val(),
+        benefits: $('.item-benefits').val(),
+        cost: $('.item-cost').val(),
+        cost_units: $('.item-cost-units').val(),
+        who_by: $('.item-who_by').val(),
+        disruption: $('.item-disruption').val(),
+        associated_work: $('.item-associated_work').val(),
+        key_risks: $('.item-key_risks').val(),
+        notes: $('.item-notes').val(),
+        maintenance: $('.item-maintenance').val()
     };
     return item;
 };
@@ -3401,37 +3471,41 @@ libraryHelper.prototype.load_user_libraries = function (callback) {
     $.ajax({
         url: urlHelper.api.libraries(),
         async: false,
-        datatype: "json",
+        datatype: 'json',
         error: handleServerError('loading libraries'),
         success: function (result) {
             for (library in result) {
-                if (mylibraries[result[library].type] === undefined)
+                if (mylibraries[result[library].type] === undefined) {
                     mylibraries[result[library].type] = [];
+                }
                 mylibraries[result[library].type].push(result[library]);
             }
-            if (callback !== undefined)
+            if (callback !== undefined) {
                 callback();
+            }
             myself.library_list = mylibraries;
         }});
 };
 libraryHelper.prototype.display_library_users = function (library_id) {
     $.ajax({
-        url: path + "assessment/getsharedlibrary.json",
-        data: "id=" + library_id,
+        url: path + 'assessment/getsharedlibrary.json',
+        data: 'id=' + library_id,
         error: handleServerError('loading library users'),
         success: function (shared) {
-            var out = "<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>";
-            var write = "";
+            var out = '<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>';
+            var write = '';
             for (var i in shared) {
                 write = shared[i].write == 1 ? 'Yes' : 'No';
-                if (shared[i].username != p.author)
-                    out += "<tr><td>" + shared[i].username + "</td><td>" + write + "</td><td><i style='cursor:pointer' class='icon-trash remove-user' data-library-id='" + library_id + "' username='" + shared[i].username + "'></i></td></tr>";
-                else
-                    out += "<tr><td>" + shared[i].username + "</td><td>" + write + "</td><td>&nbsp;</td></tr>";
+                if (shared[i].username != p.author) {
+                    out += '<tr><td>' + shared[i].username + '</td><td>' + write + "</td><td><i style='cursor:pointer' class='icon-trash remove-user' data-library-id='" + library_id + "' username='" + shared[i].username + "'></i></td></tr>";
+                } else {
+                    out += '<tr><td>' + shared[i].username + '</td><td>' + write + '</td><td>&nbsp;</td></tr>';
+                }
             }
-            if (out == "<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>")
+            if (out == '<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>') {
                 out = "<tr><td colspan='3'>This library is currently private</td></tr>";
-            $("#shared-with-table").html(out);
+            }
+            $('#shared-with-table').html(out);
         }});
 };
 libraryHelper.prototype.get_library_by_id = function (id) {
@@ -3449,7 +3523,7 @@ libraryHelper.prototype.populate_measure_new_item = function (type_of_library) {
     var original_item = JSON.parse($('#apply-measure-ok').attr('item'));
     var new_item = library[item_index];
     $('#apply-measure-item-fields').html('');
-    var function_name = type_of_library + "_item_to_html";
+    var function_name = type_of_library + '_item_to_html';
     var out = this[function_name](new_item, item_index);
     $('#apply-measure-item-fields').html(out);
 };
@@ -3463,8 +3537,8 @@ libraryHelper.prototype.set_library_name = function (library_id, new_name, callb
         type: 'PATCH',
         data: body,
         async: false,
-        datatype: "json",
-        contentType: "application/json;charset=utf-8",
+        datatype: 'json',
+        contentType: 'application/json;charset=utf-8',
         error: handleServerError('renaming library'),
         success: function (response) {
             var library = library_helper.get_library_by_id(library_id);
@@ -3478,9 +3552,9 @@ libraryHelper.prototype.populate_library_modal = function (origin) {
     // Populate the select to choose library to display
     var out = '';
     this.library_list[this.type].forEach(function (library) {
-        out += "<option value=" + library.id + ">" + library.name + "</option>";
+        out += '<option value=' + library.id + '>' + library.name + '</option>';
     });
-    $("#library-select").html(out);
+    $('#library-select').html(out);
     // Heading of the modal
     $('#show-library-modal .modal-header h3').html(this.library_names[this.type]);
     // Draw the library
@@ -3488,54 +3562,55 @@ libraryHelper.prototype.populate_library_modal = function (origin) {
     $('#library_table').html('');
     var function_name = this.type + '_library_to_html';
     out = this[function_name](origin, id);
-    $("#library_table").html(out);
+    $('#library_table').html(out);
     // Add library id to "Add item from library" button
     $('#create-in-library').attr('data-library-id', id);
 };
 libraryHelper.prototype.populate_selects_in_apply_measure_modal = function (type_of_library) {
     var out = '';
     this.library_list[type_of_library].forEach(function (library) {
-        out += "<option value=" + library.id + ">" + library.name + "</option>";
+        out += '<option value=' + library.id + '>' + library.name + '</option>';
     });
-    $("#replace-from-lib").html(out);
-    $("#replace-from-lib").attr('library_type', type_of_library);
+    $('#replace-from-lib').html(out);
+    $('#replace-from-lib').attr('library_type', type_of_library);
     this.onChangeApplyMeasureReplaceFromLib(type_of_library); // This one to populate the select for items
 };
 libraryHelper.prototype.delete_library_item = function (library_id, tag) {
     var myself = this;
-        $.ajax({
-            type: "DELETE",
-            async: false,
-            url: urlHelper.api.libraryItem(library_id, tag),
-            error: handleServerError('deleting item from library'),
-            success: function() {
-                $('#confirm-delete-library-item-modal').modal('hide');
-                myself.load_user_libraries();
-            },
-        });
-}
+    $.ajax({
+        type: 'DELETE',
+        async: false,
+        url: urlHelper.api.libraryItem(library_id, tag),
+        error: handleServerError('deleting item from library'),
+        success: function() {
+            $('#confirm-delete-library-item-modal').modal('hide');
+            myself.load_user_libraries();
+        },
+    });
+};
 
 libraryHelper.prototype.get_list_of_libraries_for_select = function (library_type) {
-    var out = ''
+    var out = '';
     this.library_list[library_type].forEach(function (library) {
-        out += "<option value=" + library.id + ">" + library.name + "</option>";
+        out += '<option value=' + library.id + '>' + library.name + '</option>';
     });
     return out;
-}
+};
 
 libraryHelper.prototype.get_list_of_items_for_select = function (libraryid) {
-    var out = ''
+    var out = '';
     var library = this.get_library_by_id(libraryid);
     for (item in library.data) {
         if (library.type == 'elements' || library.type == 'elements_measures') {
-            if (library.data[item].tags[0].toUpperCase() == original_item.type.toUpperCase())
+            if (library.data[item].tags[0].toUpperCase() == original_item.type.toUpperCase()) {
                 out += '<option value="' + item + '">' + item + ': ' + library.data[item].name + '</option>';
-        }
-        else
+            }
+        } else {
             out += '<option value="' + item + '">' + item + ': ' + library.data[item].name + '</option>';
+        }
     }
     return out;
-}
+};
 
 libraryHelper.prototype.get_list_of_items_for_select_by_category = function (libraryid, category_to_show) {
     var library = this.get_library_by_id(libraryid).data;
@@ -3543,41 +3618,44 @@ libraryHelper.prototype.get_list_of_items_for_select_by_category = function (lib
     var items_by_category = {};
     for (var item in library) {
         var category = library[item].category;
-        if (items_by_category[category] == undefined)
+        if (items_by_category[category] == undefined) {
             items_by_category[category] = {};
+        }
         items_by_category[category][item] = library[item];
     }
 
-// Generate output string according to the category_to_show passed to the function, if the category exist we return optionns for that category, if it doesn't exist we return all the items sorted by category
+    // Generate output string according to the category_to_show passed to the function, if the category exist we return optionns for that category, if it doesn't exist we return all the items sorted by category
     var options = '';
     if (items_by_category[category_to_show] != undefined) {
         for (item in library) {
-            if (library[item].category == category_to_show)
+            if (library[item].category == category_to_show) {
                 options += '<option value="' + item + '">' + library[item].name + '</option>';
+            }
         }
-    }
-    else {
+    } else {
         for (category in items_by_category) {
             options += '<optgroup label="' + category + '">';
-            for (index in items_by_category[category])
+            for (index in items_by_category[category]) {
                 options += '<option value="' + index + '">' + index + ': ' + items_by_category[category][index].name + '</option>';
+            }
             options += '</optgroup>';
         }
     }
     return options;
-}
+};
 
 libraryHelper.prototype.orderObjectsByKeys = function (obj, expected) {
 
     var keys = Object.keys(obj).sort(function keyOrder(k1, k2) {
         v1 = k1.toUpperCase();
         v2 = k2.toUpperCase();
-        if (v1 < v2)
+        if (v1 < v2) {
             return -1;
-        else if (v1 > v2)
+        } else if (v1 > v2) {
             return +1;
-        else
+        } else {
             return 0;
+        }
     });
     var i, after = {};
     for (i = 0; i < keys.length; i++) {
@@ -3594,10 +3672,11 @@ libraryHelper.prototype.get_cost_units_select = function (item) {
     var units = ['sqm', 'unit', 'ln m', 'kWp'];
     var out = '<select class="item-cost-units">';
     for (index in units) {
-        if (item.cost_units != units[index])
+        if (item.cost_units != units[index]) {
             out += '<option value="' + units[index] + '">' + units[index] + '</option>';
-        else
+        } else {
             out += '<option value="' + units[index] + '" selected>' + units[index] + '</option>';
+        }
     }
 
     out += '</select>';
@@ -3606,8 +3685,9 @@ libraryHelper.prototype.get_cost_units_select = function (item) {
 
 libraryHelper.prototype.hide_modals_temporaly = function () {
     $('.modal').each(function () {
-        if ($(this).css('display') == 'block')
+        if ($(this).css('display') == 'block') {
             $(this).attr('temp-hidden', 'true');
+        }
     });
     $('.modal').modal('hide');
 };
@@ -3616,13 +3696,13 @@ libraryHelper.prototype.show_temporally_hidden_modals = function () {
 };
 
 libraryHelper.prototype.populateShareLibWithOrgSelect = function (form, fromOrgID) {
-    var select = form.find("select");
+    var select = form.find('select');
     mhep_helper.list_organisations().then(organisations => {
         organisations.forEach(function (org) {
             if (fromOrgID == org.id) {
-                return // disable sharing a library from one org to itself
+                return; // disable sharing a library from one org to itself
             }
-            var option = document.createElement("option");
+            var option = document.createElement('option');
             option.textContent = org.name;
             option.value = org.id;
             select.append(option);

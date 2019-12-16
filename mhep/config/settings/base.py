@@ -1,16 +1,14 @@
 """
 Base settings to build other settings files upon.
 """
-
-import environ
 import logging
 
+import environ
 import sentry_sdk
-
+from corsheaders.defaults import default_headers
+from corsheaders.defaults import default_methods
 from sentry_sdk.integrations.django import DjangoIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
-from corsheaders.defaults import default_methods
-from corsheaders.defaults import default_headers
 
 ROOT_DIR = environ.Path(__file__) - 3  # (mhep/config/settings/base.py - 3 = mhep/)
 APPS_DIR = ROOT_DIR.path("mhep")

@@ -1,9 +1,8 @@
-console.log("debug libraries_manager.js");
+console.log('debug libraries_manager.js');
 
-var library_helper = new libraryHelper('', $("#openbem"));
+var library_helper = new libraryHelper('', $('#openbem'));
 
-function librariesmanager_UpdateUI()
-{
+function librariesmanager_UpdateUI() {
     //library_helper.init();
     $('#libraries-table').html('');
     // Sort alphabetically
@@ -50,7 +49,7 @@ function librariesmanager_UpdateUI()
             row.find('.library-access').html(access);
             row.find('.library-owner').html(library.owner.name);
 
-            if (library.owner.type != "organisation") {
+            if (library.owner.type != 'organisation') {
                 row.find('.share-library').hide();
             }
 

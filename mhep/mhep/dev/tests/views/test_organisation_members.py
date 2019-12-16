@@ -1,12 +1,10 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from ... import VERSION
 from ..factories import OrganisationFactory
-
-from mhep.users.tests.factories import UserFactory
-
 from .mixins import AssertErrorMixin
+from mhep.users.tests.factories import UserFactory
 
 
 class SetUpMixin:
@@ -30,7 +28,7 @@ class TestCreateOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
         self.client.force_authenticate(self.org_admin)
 
         response = self.client.post(
-            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.non_member.id}/",
+            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.non_member.id}/"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -40,7 +38,7 @@ class TestCreateOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
         self.client.force_authenticate(self.org_admin)
 
         response = self.client.post(
-            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/",
+            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -52,7 +50,7 @@ class TestDeleteOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
         self.client.force_authenticate(self.org_admin)
 
         response = self.client.delete(
-            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/",
+            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -64,7 +62,7 @@ class TestDeleteOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
         self.client.force_authenticate(self.org_admin)
 
         response = self.client.delete(
-            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/",
+            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -76,7 +74,7 @@ class TestDeleteOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
         self.client.force_authenticate(self.org_admin)
 
         response = self.client.delete(
-            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/",
+            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT
@@ -86,7 +84,7 @@ class TestDeleteOrganisationMembers(SetUpMixin, AssertErrorMixin, APITestCase):
         self.client.force_authenticate(self.org_admin)
 
         response = self.client.delete(
-            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/",
+            f"/{VERSION}/api/organisations/{self.org.id}/members/{self.member.id}/"
         )
 
         assert response.status_code == status.HTTP_204_NO_CONTENT

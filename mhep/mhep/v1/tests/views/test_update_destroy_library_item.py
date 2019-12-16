@@ -1,7 +1,6 @@
 from freezegun import freeze_time
-
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from ... import VERSION
 from ...models import Library
@@ -11,7 +10,7 @@ from ..factories import LibraryFactory
 class TestUpdateDestroyLibraryItem(APITestCase):
     def test_destroy_library_item(self):
         library = LibraryFactory.create(
-            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"},},
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"}}
         )
 
         self.client.force_authenticate(library.owner)
@@ -25,12 +24,9 @@ class TestUpdateDestroyLibraryItem(APITestCase):
         assert retrieved.data == {"tag1": {"name": "foo"}}
 
     def test_update_library_item(self):
-        library = LibraryFactory.create(data={"tag1": {"name": "foo"},},)
+        library = LibraryFactory.create(data={"tag1": {"name": "foo"}})
 
-        replacement_data = {
-            "name": "bar",
-            "other": "data",
-        }
+        replacement_data = {"name": "bar", "other": "data"}
 
         with freeze_time("2019-06-01T16:35:34Z"):
             self.client.force_authenticate(library.owner)
@@ -47,10 +43,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
     def test_update_library_item_fails_if_tag_doesnt_exist(self):
         library = LibraryFactory.create()
 
-        replacement_data = {
-            "name": "bar",
-            "other": "data",
-        }
+        replacement_data = {"name": "bar", "other": "data"}
 
         self.client.force_authenticate(library.owner)
 

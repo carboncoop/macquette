@@ -1,11 +1,11 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
-from mhep.users.tests.factories import UserFactory
-from ... import VERSION
+from .. import factories
 from ... import models
 from ... import serializers
-from .. import factories
+from ... import VERSION
+from mhep.users.tests.factories import UserFactory
 
 
 class TestEditImageNote(APITestCase):

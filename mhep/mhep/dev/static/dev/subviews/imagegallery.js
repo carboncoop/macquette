@@ -2,8 +2,8 @@ class ImageGallery {
     constructor({ root, id, data }) {
         this.root = root;
         this.element = {
-            list: this.root.querySelector(".gallery-list"),
-            fileControl: this.root.querySelector(".gallery-files"),
+            list: this.root.querySelector('.gallery-list'),
+            fileControl: this.root.querySelector('.gallery-files'),
         };
         this.projectId = id;
         this.list = data;
@@ -55,7 +55,7 @@ class ImageGallery {
                 const imageIndex = this.list.findIndex(elem => elem.id === id);
                 this.list[imageIndex] = newData;
                 this.view();
-            })
+            });
     }
 
     addImage(new_image) {
@@ -115,8 +115,8 @@ class ImageGallery {
     // ----------------------------------------------------------------- //
 
     view() {
-        const galleryItems = this.list.map(item => this.imageToHTML(item)).join("");
-        const deleteDisabled = this.selected.length === 0 ? "disabled" : "";
+        const galleryItems = this.list.map(item => this.imageToHTML(item)).join('');
+        const deleteDisabled = this.selected.length === 0 ? 'disabled' : '';
 
         this.element.list.innerHTML = `
             <h4>Gallery</h4>
@@ -132,9 +132,9 @@ class ImageGallery {
     }
 
     imageToHTML({ id, url, thumbnail_url, thumbnail_width, thumbnail_height, name, note }) {
-        const cardClasses = this.isSelected(id) ? "gallery-card--selected" : "";
-        const starClasses = this.isFeatured(id) ? "icon-star" : "icon-star-empty";
-        const isSelected = this.isSelected(id) ? "checked" : "";
+        const cardClasses = this.isSelected(id) ? 'gallery-card--selected' : '';
+        const starClasses = this.isFeatured(id) ? 'icon-star' : 'icon-star-empty';
+        const isSelected = this.isSelected(id) ? 'checked' : '';
 
         const noteHTML = this.isEditing(id)
             ? `<input class="gallery-editor" type="text" name='${id}' value="${note}">`
@@ -171,7 +171,7 @@ class ImageGallery {
     setupHandlers() {
         const idFromEvent = evt => parseInt(evt.target.dataset.id, 10);
 
-        $(this.root).on("change", ".gallery-checkbox", evt => {
+        $(this.root).on('change', '.gallery-checkbox', evt => {
             const checkbox = evt.target;
             const id = parseInt(checkbox.name, 10);
             if (checkbox.checked) {
@@ -183,19 +183,19 @@ class ImageGallery {
             this.view();
         });
 
-        $(this.root).on("click", ".gallery-feature", evt => {
+        $(this.root).on('click', '.gallery-feature', evt => {
             this.setFeatured(idFromEvent(evt));
             this.view();
         });
 
-        $(this.root).on("click", ".gallery-edit", evt => {
+        $(this.root).on('click', '.gallery-edit', evt => {
             this.startEditing(idFromEvent(evt));
             this.view();
-            $(this.root).find(".gallery-editor").focus();
+            $(this.root).find('.gallery-editor').focus();
         });
 
         const saveNote = () => {
-            const input = this.root.querySelector(".gallery-editor");
+            const input = this.root.querySelector('.gallery-editor');
 
             const id = parseInt(input.name, 10);
             const note = input.value;
@@ -205,24 +205,24 @@ class ImageGallery {
             this.view();
         };
 
-        $(this.root).on("click", ".gallery-save-note", saveNote);
-        $(this.root).on("keydown", ".gallery-editor", evt => {
-            if (evt.key === "Enter") {
+        $(this.root).on('click', '.gallery-save-note', saveNote);
+        $(this.root).on('keydown', '.gallery-editor', evt => {
+            if (evt.key === 'Enter') {
                 saveNote();
-            } else if (evt.key === "Esc" || evt.key === "Escape") {
+            } else if (evt.key === 'Esc' || evt.key === 'Escape') {
                 this.stopEditing();
                 this.view();
             }
         });
 
-        $(this.root).on("click", ".gallery-delete", evt => {
-            if (window.confirm("Are you sure you want to delete this image?")) {
+        $(this.root).on('click', '.gallery-delete', evt => {
+            if (window.confirm('Are you sure you want to delete this image?')) {
                 this.delete([ idFromEvent(evt) ]);
                 this.view();
             }
         });
 
-        $(this.root).on("click", ".gallery-delete-many", evt => {
+        $(this.root).on('click', '.gallery-delete-many', evt => {
             const n = this.selected.length;
             if (window.confirm(`Are you sure you want to delete these ${n} images?`)) {
                 this.delete(this.selected);
@@ -230,7 +230,7 @@ class ImageGallery {
             }
         });
 
-        $(this.root).on("click", ".gallery-upload", evt => {
+        $(this.root).on('click', '.gallery-upload', evt => {
             this.upload(this.element.fileControl.files);
         });
     }
@@ -239,10 +239,10 @@ class ImageGallery {
 let __imagegallery = null;
 
 function imagegallery_initUI() {
-    data = project["master"];
+    data = project['master'];
 
     __imagegallery = new ImageGallery({
-        root: document.querySelector(".gallery"),
+        root: document.querySelector('.gallery'),
         id: p.id,
         data: p.images,
     });

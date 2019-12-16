@@ -1,16 +1,16 @@
 console.log('Debug ventilation.js');
 
-if (typeof library_helper != "undefined")
+if (typeof library_helper != 'undefined') {
     library_helper.type = 'systems';
-else
-    var library_helper = new libraryHelper('systems', $("#openbem"));
+} else {
+    var library_helper = new libraryHelper('systems', $('#openbem'));
+}
 
 $("[key='data.ventilation.ventilation_type']").change(function () {
 
     var v = $(this).val();
     var ventilation_type;
-    switch (v)
-    {
+    switch (v) {
         case 'NV':
         case 'IE':
         case 'PS':
@@ -34,12 +34,11 @@ $("[key='data.ventilation.air_permeability_test']").change(function () {
 
     var val = $(this)[0].checked;
     if (val == true) {
-        $("#structural").hide('slow');
-        $("#air_permeability_value_tbody").show('slow');
-    }
-    else {
-        $("#structural").show('slow');
-        $("#air_permeability_value_tbody").hide('slow');
+        $('#structural').hide('slow');
+        $('#air_permeability_value_tbody').show('slow');
+    } else {
+        $('#structural').show('slow');
+        $('#air_permeability_value_tbody').hide('slow');
     }
 
 });
@@ -65,22 +64,23 @@ $('#openbem').on('click', '.apply-ventilation-measure-from-lib', function () {
     // Set variables in library_helper
     library_helper.init();
     library_helper.type_of_measure = $(this).attr('type');
-    if (library_helper.type_of_measure == 'add_extract_ventilation_points')
+    if (library_helper.type_of_measure == 'add_extract_ventilation_points') {
         library_helper.type = 'extract_ventilation_points';
-    else if (library_helper.type_of_measure == 'add_intentional_vents_and_flues')
+    } else if (library_helper.type_of_measure == 'add_intentional_vents_and_flues') {
         library_helper.type = 'intentional_vents_and_flues';
-    else if (library_helper.type_of_measure == 'add_CDF')
+    } else if (library_helper.type_of_measure == 'add_CDF') {
         library_helper.type = 'clothes_drying_facilities';
-    else if (library_helper.type_of_measure == 'bulk_measure_intentional_vents_and_flues')
+    } else if (library_helper.type_of_measure == 'bulk_measure_intentional_vents_and_flues') {
         library_helper.type = 'intentional_vents_and_flues_measures';
-    else
+    } else {
         library_helper.type = library_helper.type_of_measure;
+    }
     // Prepare modal
     $('#apply-measure-ventilation-finish').hide('slow');
     $('#apply-measure-ventilation-modal .modal-body > div').hide('slow');
     // Populate selects in modal to choose library and measure
     var out = library_helper.get_list_of_libraries_for_select(library_helper.type);
-    $("#apply-measure-ventilation-library-select").html(out);
+    $('#apply-measure-ventilation-library-select').html(out);
     var library_id = $('#apply-measure-ventilation-library-select').val();
     out = library_helper.get_list_of_items_for_select(library_id);
     $('#apply-measure-ventilation-items-select').html(out);
@@ -166,7 +166,7 @@ $('#openbem').on('click', '#apply-IVF-bulk-measure', function () {
     $('#apply-IVF-bulk-measure-modal').modal('show');
 });
 $('#openbem').on('change', '#apply-measure-ventilation-library-select', function () {
-    var library_id = $("#apply-measure-ventilation-library-select").val();
+    var library_id = $('#apply-measure-ventilation-library-select').val();
     out = library_helper.get_list_of_items_for_select(library_id);
     $('#apply-measure-ventilation-items-select').html(out);
     var tag = $('#apply-measure-ventilation-items-select').val();
@@ -176,7 +176,7 @@ $('#openbem').on('change', '#apply-measure-ventilation-library-select', function
     $('#apply-measure-ventilation-modal .modal-body').html(out);
 });
 $('#openbem').on('change', '#apply-measure-ventilation-items-select', function () {
-    var library_id = $("#apply-measure-ventilation-library-select").val();
+    var library_id = $('#apply-measure-ventilation-library-select').val();
     var tag = $('#apply-measure-ventilation-items-select').val();
     var function_name = library_helper.type + '_item_to_html';
     var item = library_helper.get_library_by_id(library_id).data[tag];
@@ -185,24 +185,29 @@ $('#openbem').on('change', '#apply-measure-ventilation-items-select', function (
 });
 $('#openbem').on('click', '#apply-measure-ventilation-ok', function () {
 
-// The first time we apply a measure to an element we record its original stage
+    // The first time we apply a measure to an element we record its original stage
     if (data.measures.ventilation[library_helper.type] == undefined) { // If it is the first time we apply a measure to this element iin this scenario
         data.measures.ventilation[library_helper.type] = {};
     }
     switch (library_helper.type_of_measure) {
         case 'draught_proofing_measures':
-            if (data.measures.ventilation[library_helper.type].original_structural_infiltration == undefined) // first time
+            // first time
+            if (data.measures.ventilation[library_helper.type].original_structural_infiltration == undefined) {
                 data.measures.ventilation[library_helper.type].original_structural_infiltration = data.ventilation.structural_infiltration;
+            }
             var measure = library_helper.draught_proofing_measures_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             add_quantity_and_cost_to_measure(measure[tag]);
             // Update data object and add measure
-            if (measure[tag].q50 < 0) // Draught lobby
+            // Draught lobby
+            if (measure[tag].q50 < 0) {
                 data.ventilation.air_permeability_value -= measure[tag].q50;
-            else
+            } else {
                 data.ventilation.air_permeability_value = measure[tag].q50;
+            }
             data.measures.ventilation[library_helper.type].measure = measure[tag];
             update();
             data.measures.ventilation[library_helper.type].measure.structural_infiltration = data.ventilation.structural_infiltration_from_test;
@@ -210,11 +215,14 @@ $('#openbem').on('click', '#apply-measure-ventilation-ok', function () {
             $('#apply-measure-ventilation-modal').modal('hide');
             break;
         case 'ventilation_systems_measures':
-            if (data.measures.ventilation[library_helper.type].original == undefined) // first time
+            // first time
+            if (data.measures.ventilation[library_helper.type].original == undefined) {
                 data.measures.ventilation[library_helper.type].original = data.ventilation.ventilation_type;
+            }
             var measure = library_helper.ventilation_systems_measures_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             add_quantity_and_cost_to_measure(measure[tag]);
             // Update data object and add measure
@@ -239,8 +247,9 @@ $('#openbem').on('click', '#apply-measure-ventilation-ok', function () {
             break;
         case 'add_intentional_vents_and_flues':
             var measure = library_helper.intentional_vents_and_flues_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             measure[tag].id = get_IVF_max_id() + 1;
             measure[tag].location = '--';
@@ -255,8 +264,9 @@ $('#openbem').on('click', '#apply-measure-ventilation-ok', function () {
             break;
         case 'add_CDF':
             var measure = library_helper.clothes_drying_facilities_get_item_to_save();
-            for (z in measure)
+            for (z in measure) {
                 var tag = z;
+            }
             measure[tag].tag = tag;
             measure[tag].id = get_CDF_max_id() + 1;
             add_quantity_and_cost_to_measure(measure[tag]);
@@ -353,31 +363,32 @@ $('#openbem').on('click', '.edit-item-IVF', function () {
     library_helper.onEditItem($(this));
 });
 $('#openbem').on('click', '#IVF-bulk-measure-check-all', function () {
-    if ($('#IVF-bulk-measure-check-all').prop('checked') === true)
+    if ($('#IVF-bulk-measure-check-all').prop('checked') === true) {
         $('input.bulk-IVF').prop('checked', true);
-    else
+    } else {
         $('input.bulk-IVF').prop('checked', false);
+    }
 });
 
 function ventilation_initUI() {
-    if (data.measures == undefined)
+    if (data.measures == undefined) {
         data.measures = {};
-    if (data.measures.ventilation == undefined)
+    }
+    if (data.measures.ventilation == undefined) {
         data.measures.ventilation = {};
+    }
     // Structural infiltration
     if (data.ventilation.air_permeability_test) {
-        $("#structural").hide('slow');
-        $("#air_permeability_value_tbody").show('slow');
-    }
-    else {
-        $("#structural").show('slow');
-        $("#air_permeability_value_tbody").hide('slow');
+        $('#structural').hide('slow');
+        $('#air_permeability_value_tbody').show('slow');
+    } else {
+        $('#structural').show('slow');
+        $('#air_permeability_value_tbody').hide('slow');
     }
 
     // Ventilation system
     var ventilation_type;
-    switch (data.ventilation.ventilation_type)
-    {
+    switch (data.ventilation.ventilation_type) {
         case 'NV':
         case 'IE':
         case 'PS':
@@ -398,30 +409,30 @@ function ventilation_initUI() {
             ventilation_type = 'd';
             break;
     }
-    switch (ventilation_type)
-    {
+    switch (ventilation_type) {
         case 'a':
-            $(".system_air_change_rate_input").show('slow');
-            $(".balanced_heat_recovery_efficiency_input").show('slow');
+            $('.system_air_change_rate_input').show('slow');
+            $('.balanced_heat_recovery_efficiency_input').show('slow');
             $('#fans_and_vents_div').hide('slow');
             break;
         case 'b':
-            $(".system_air_change_rate_input").show('slow');
-            $(".balanced_heat_recovery_efficiency_input").hide('slow');
+            $('.system_air_change_rate_input').show('slow');
+            $('.balanced_heat_recovery_efficiency_input').hide('slow');
             $('#fans_and_vents_div').hide('slow');
             break;
         case 'c':
-            $(".system_air_change_rate_input").show('slow');
-            $(".balanced_heat_recovery_efficiency_input").hide('slow');
+            $('.system_air_change_rate_input').show('slow');
+            $('.balanced_heat_recovery_efficiency_input').hide('slow');
             $('#fans_and_vents_div').hide('slow');
             break;
         case 'd':
-            $(".system_air_change_rate_input").hide('slow');
-            $(".balanced_heat_recovery_efficiency_input").hide('slow');
-            if (data.ventilation.ventilation_type == 'NV')
+            $('.system_air_change_rate_input').hide('slow');
+            $('.balanced_heat_recovery_efficiency_input').hide('slow');
+            if (data.ventilation.ventilation_type == 'NV') {
                 $('#fans_and_vents_div').hide('slow');
-            else
+            } else {
                 $('#fans_and_vents_div').show('slow');
+            }
             break;
     }
 
@@ -430,7 +441,7 @@ function ventilation_initUI() {
     for (z in data.ventilation.EVP) {
         var item = data.ventilation.EVP[z];
         var out = '<tr><td>' + item.tag + ': ' + item.name + '</td><td><input type="text" style="width: 190px" key="data.ventilation.EVP.' + z + '.location"></td><td>' + item.type + '</td><td style="padding-left:100px">' + item.ventilation_rate + '</td>';
-        out += '<td> <button class="apply-ventilation-measure-from-lib if-not-master" type="extract_ventilation_points" item_id="' + item.id + '" style="margin-right:25px">Apply Measure</button>'
+        out += '<td> <button class="apply-ventilation-measure-from-lib if-not-master" type="extract_ventilation_points" item_id="' + item.id + '" style="margin-right:25px">Apply Measure</button>';
         out += '<span class="edit-item-EVP" row="' + z + '" tag="' + item.tag + '" style="cursor:pointer; margin-right:15px" item=\'' + JSON.stringify(item) + '\' title="Editing a system this way is not considered a Measure"> <a><i class = "icon-edit"> </i></a></span>';
         out += '<span class = "delete-EVP" row="' + z + '" style="cursor:pointer" title="Deleting an element this way is not considered a Measure" ><a> <i class="icon-trash" ></i></a></span>';
         out += '<span class="revert-to-original" item-id="' + item.id + '" item-type="ventilation-EVP" style="margin-left:15px; display:inline-block;cursor: pointer"><img src="' + urlHelper.static('img/undo.gif') + '" style="width:14px" /><span class="text" /></span>';
@@ -444,7 +455,7 @@ function ventilation_initUI() {
     for (z in data.ventilation.IVF) {
         var item = data.ventilation.IVF[z];
         var out = '<tr><td>' + item.tag + ': ' + item.name + '</td><td><input type="text" style="width: 190px" key="data.ventilation.IVF.' + z + '.location"></td><td>' + item.type + '</td><td style="padding-left:100px">' + item.ventilation_rate + '</td>';
-        out += '<td> <button class="apply-ventilation-measure-from-lib if-not-master" type="intentional_vents_and_flues_measures" item_id="' + item.id + '" style="margin-right:25px">Apply Measure</button>'
+        out += '<td> <button class="apply-ventilation-measure-from-lib if-not-master" type="intentional_vents_and_flues_measures" item_id="' + item.id + '" style="margin-right:25px">Apply Measure</button>';
         out += '<span class="edit-item-IVF" row="' + z + '" tag="' + item.tag + '" style="cursor:pointer; margin-right:15px" item=\'' + JSON.stringify(item) + '\' title="Editing a system this way is not considered a Measure"> <a><i class = "icon-edit"> </i></a></span>';
         out += '<span class = "delete-IVF" row="' + z + '" style="cursor:pointer" title="Deleting an element this way is not considered a Measure" ><a> <i class="icon-trash" ></i></a></span>';
         out += '<p class="IVF-measured-applied" item_id="' + item.id + '" style="display:none; margin-top: 5px">Measure applied</p></td></tr> ';
@@ -455,28 +466,33 @@ function ventilation_initUI() {
     $('#CDF').html('');
     for (z in data.ventilation.CDF) {
         var item = data.ventilation.CDF[z];
-        var out = '<tr><td style="padding-left:75px;width:5px;border:none"><span class = "delete-CDF" row="' + z + '" style="cursor:pointer" title="Deleting an element this way is not considered a Measure" ><a> <i class="icon-trash" ></i></a></span></td>'
+        var out = '<tr><td style="padding-left:75px;width:5px;border:none"><span class = "delete-CDF" row="' + z + '" style="cursor:pointer" title="Deleting an element this way is not considered a Measure" ><a> <i class="icon-trash" ></i></a></span></td>';
         out += '<td>' + item.tag + ': ' + item.name + '</td>';
         out+= '<td><span style="display:none; margin-left: 25px" class="CDF-measure-applied" item_id="' + data.ventilation.CDF[z].id + '">Measure applied</span></td></tr>';
         $('#CDF').append(out);
     }
 
     // Measure applied
-    if (data.measures.ventilation['draught_proofing_measures'] != undefined)
+    if (data.measures.ventilation['draught_proofing_measures'] != undefined) {
         $('#draught-proofing_measure-applied').html('Measure applied: ' + data.measures.ventilation['draught_proofing_measures'].measure.name);
-    if (data.measures.ventilation['ventilation_systems_measures'] != undefined)
+    }
+    if (data.measures.ventilation['ventilation_systems_measures'] != undefined) {
         $('#ventilation-type-measured-applied').show();
+    }
     if (data.measures.ventilation['intentional_vents_and_flues'] != undefined) {
-        for (var id in data.measures.ventilation['intentional_vents_and_flues'])
+        for (var id in data.measures.ventilation['intentional_vents_and_flues']) {
             $('.IVF-measured-applied[item_id=' + id + ']').show();
+        }
     }
     if (data.measures.ventilation['intentional_vents_and_flues_measures'] != undefined) {
-        for (var id in data.measures.ventilation['intentional_vents_and_flues_measures'])
+        for (var id in data.measures.ventilation['intentional_vents_and_flues_measures']) {
             $('.IVF-measured-applied[item_id=' + id + ']').show();
+        }
     }
     if (data.measures.ventilation['clothes_drying_facilities'] != undefined) {
-        for (var id in data.measures.ventilation['clothes_drying_facilities'])
+        for (var id in data.measures.ventilation['clothes_drying_facilities']) {
             $('.CDF-measure-applied[item_id=' + id + ']').show();
+        }
     }
 
     show_hide_if_master();
@@ -490,12 +506,14 @@ function get_IVF_max_id() {
     var max_id = 0;
     // Find the max id
     for (z in data.ventilation.IVF) {
-        if (data.ventilation.IVF[z].id != undefined && data.ventilation.IVF[z].id > max_id)
+        if (data.ventilation.IVF[z].id != undefined && data.ventilation.IVF[z].id > max_id) {
             max_id = data.ventilation.IVF[z].id;
+        }
     }
     for (z in data.measures.ventilation.intentional_vents_and_flues_measures) {
-        if (z > max_id)
+        if (z > max_id) {
             max_id = z;
+        }
     }
     return max_id;
 }
@@ -504,12 +522,14 @@ function get_EVP_max_id() {
     var max_id = 0;
     // Find the max id
     for (z in data.ventilation.EVP) {
-        if (data.ventilation.EVP[z].id != undefined && data.ventilation.EVP[z].id > max_id)
+        if (data.ventilation.EVP[z].id != undefined && data.ventilation.EVP[z].id > max_id) {
             max_id = data.ventilation.EVP[z].id;
+        }
     }
     for (z in data.measures.ventilation.EVP) {
-        if (z > max_id)
+        if (z > max_id) {
             max_id = z;
+        }
     }
     return max_id;
 }
@@ -518,29 +538,35 @@ function get_CDF_max_id() {
     var max_id = 0;
     // Find the max id
     for (z in data.ventilation.CDF) {
-        if (data.ventilation.CDF[z].id != undefined && data.ventilation.CDF[z].id > max_id)
+        if (data.ventilation.CDF[z].id != undefined && data.ventilation.CDF[z].id > max_id) {
             max_id = data.ventilation.CDF[z].id;
+        }
     }
     for (z in data.measures.ventilation.CDF) {
-        if (z > max_id)
+        if (z > max_id) {
             max_id = z;
+        }
     }
     return max_id;
 }
 
 function edit_item(item, index, item_subsystem) {
-    for (z in item)
-        item = item[z]; // item comes in the format: system = {electric:{bla bla bla}} and we transform it to: system = {bla bla bla}
+    for (z in item) {
+        item = item[z];
+    } // item comes in the format: system = {electric:{bla bla bla}} and we transform it to: system = {bla bla bla}
 
     var object = '';
-    if (library_helper.type === 'intentional_vents_and_flues')
+    if (library_helper.type === 'intentional_vents_and_flues') {
         object = 'IVF';
-    if (library_helper.type === 'extract_ventilation_points')
+    }
+    if (library_helper.type === 'extract_ventilation_points') {
         object = 'EVP';
+    }
 
     for (z in data.ventilation[object][index]) { // We copy over all the properties that are not asked when editting an system, like id or tag
-        if (item[z] == undefined)
+        if (item[z] == undefined) {
             item[z] = data.ventilation[object][index][z];
+        }
     }
 
     data.ventilation[object][index] = item;
@@ -568,16 +594,18 @@ function get_EVP_by_id(item_id) {
 function apply_measure_intentional_vents_and_flues() {
     var original_item = get_IVF_by_id(library_helper.item_id);
     var measure = library_helper.intentional_vents_and_flues_measures_get_item_to_save();
-    for (z in measure)
+    for (z in measure) {
         var tag = z;
+    }
     measure[tag].tag = tag;
     if (data.measures.ventilation[library_helper.type][library_helper.item_id] == undefined) { // first time
         data.measures.ventilation[library_helper.type][library_helper.item_id] = {};
         data.measures.ventilation[library_helper.type][library_helper.item_id].original = original_item;
     }
     for (z in original_item) {
-        if (measure[tag][z] == undefined)
+        if (measure[tag][z] == undefined) {
             measure[tag][z] = original_item[z];
+        }
     }
     add_quantity_and_cost_to_measure(measure[tag]);
     // Update data object and add measure
@@ -587,8 +615,10 @@ function apply_measure_intentional_vents_and_flues() {
     // Cjeck if a measure was already applied to this element in a bulk measure
     for (var measure_id in data.measures.ventilation.intentional_vents_and_flues_measures) {
         var old_measure = data.measures.ventilation.intentional_vents_and_flues_measures[measure_id];
-        if (old_measure.original_elements != undefined)  // this is a bulk measure, we need to look inside
+        // this is a bulk measure, we need to look inside
+        if (old_measure.original_elements != undefined) {
             check_and_delete_element_from_bulk_measure_IVF(original_item.id, measure_id);
+        }
     }
 }
 
@@ -596,8 +626,9 @@ function apply_bulk_measure_intentional_vents_and_flues() {
     var original_elements = {};
     var total_cost = 0;
     var measure = library_helper.intentional_vents_and_flues_measures_get_item_to_save();
-    for (z in measure)
+    for (z in measure) {
         var tag = z;
+    }
     measure[tag].tag = tag;
     measure[tag].quantity = 0;
     measure[tag].cost_total = 0;
@@ -607,15 +638,18 @@ function apply_bulk_measure_intentional_vents_and_flues() {
         var original_item = get_IVF_by_id(id);
         original_elements[id] = original_item;
         // Replace original item with the measure
-        for (z in measure[tag])
+        for (z in measure[tag]) {
             data.ventilation.IVF[original_item.row][z] = measure[tag][z];
+        }
         // Check if there is already a measure applied to the element, if so delete it
         if (data.measures.ventilation.intentional_vents_and_flues_measures != undefined) {
             for (var measure_id in data.measures.ventilation.intentional_vents_and_flues_measures) {
                 var old_measure = data.measures.ventilation.intentional_vents_and_flues_measures[measure_id];
-                if (measure_id == id) // A measure was applied to this element
+                // A measure was applied to this element
+                if (measure_id == id) {
                     delete (data.measures.ventilation.intentional_vents_and_flues_measures[measure_id]);
-                else if (old_measure.original_elements != undefined) { // this is a bulk measure, we need to look inside
+                } else if (old_measure.original_elements != undefined) {
+                    // this is a bulk measure, we need to look inside
                     check_and_delete_element_from_bulk_measure_IVF(id, measure_id);
                 }
             }
@@ -636,12 +670,14 @@ function apply_extract_ventilation_points() {
         data.measures.ventilation[library_helper.type][library_helper.item_id].original = original_item;
     }
     var measure = library_helper.extract_ventilation_points_get_item_to_save();
-    for (z in measure)
+    for (z in measure) {
         var tag = z;
+    }
     measure[tag].tag = tag;
     for (z in original_item) {
-        if (measure[tag][z] == undefined)
+        if (measure[tag][z] == undefined) {
             measure[tag][z] = original_item[z];
+        }
     }
     add_quantity_and_cost_to_measure(measure[tag]);
     // Update data object and add measure
@@ -655,8 +691,9 @@ function apply_measure_add_extract_ventilation_points() {
 
     // Fetch measure
     var single_measure = library_helper.extract_ventilation_points_get_item_to_save();
-    for (var z in single_measure)
+    for (var z in single_measure) {
         var tag = z;
+    }
     single_measure[tag].tag = tag;
     add_quantity_and_cost_to_measure(single_measure[tag]);
 
@@ -665,8 +702,7 @@ function apply_measure_add_extract_ventilation_points() {
         single_measure[tag].id = get_EVP_max_id() + 1;
         data.ventilation.EVP.push(single_measure[tag]);
         var measure = single_measure;
-    }
-    else {
+    } else {
         var measure = single_measure;
         var original_elements = {};
         measure[tag].original_elements = {};
@@ -686,18 +722,20 @@ function apply_measure_add_extract_ventilation_points() {
         data.measures.ventilation[library_helper.type][measure[tag].id] = {};
     }
     data.measures.ventilation[library_helper.type][measure[tag].id].measure = measure[tag];
-    if (n_to_add == 1)
+    if (n_to_add == 1) {
         data.measures.ventilation[library_helper.type][measure[tag].id].original = 'empty';
-    else
+    } else {
         data.measures.ventilation[library_helper.type][measure[tag].id].original_elements = original_elements;
+    }
 }
 
 function check_and_delete_element_from_bulk_measure_IVF(IVF_id, measure_id) {
     var old_measure = data.measures.ventilation.intentional_vents_and_flues_measures[measure_id];
     if (old_measure.original_elements[IVF_id] != undefined) {
         delete(old_measure.original_elements[IVF_id]);
-        if (Object.keys(old_measure.original_elements).length == 0)
+        if (Object.keys(old_measure.original_elements).length == 0) {
             delete(data.measures.ventilation.intentional_vents_and_flues_measures[measure_id]);
+        }
         // Recalculate cost of the old bulk measure
         old_measure.measure.quantity = Object.keys(old_measure.original_elements).length;
         old_measure.measure.cost_total = old_measure.measure.cost * old_measure.measure.quantity;

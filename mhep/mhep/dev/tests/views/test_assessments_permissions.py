@@ -1,10 +1,10 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
-
-from mhep.users.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
 from ... import VERSION
-from ..factories import AssessmentFactory, OrganisationFactory
+from ..factories import AssessmentFactory
+from ..factories import OrganisationFactory
+from mhep.users.tests.factories import UserFactory
 
 
 class AssessmentPermissionTestsMixin:
@@ -45,9 +45,7 @@ class AssessmentPermissionTestsMixin:
         self.client.force_authenticate(non_owner)
 
         response = self._call_endpoint(assessment)
-        self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, "Not found.",
-        )
+        self._assert_error(response, status.HTTP_404_NOT_FOUND, "Not found.")
 
 
 class TestGetAssessmentPermissions(AssessmentPermissionTestsMixin, APITestCase):
@@ -64,14 +62,10 @@ class TestGetAssessmentPermissions(AssessmentPermissionTestsMixin, APITestCase):
 
 class TestUpdateAssessmentPermissions(AssessmentPermissionTestsMixin, APITestCase):
     def _call_endpoint(self, assessment):
-        update_fields = {
-            "data": {"new": "data"},
-        }
+        update_fields = {"data": {"new": "data"}}
 
         return self.client.patch(
-            f"/{VERSION}/api/assessments/{assessment.id}/",
-            update_fields,
-            format="json",
+            f"/{VERSION}/api/assessments/{assessment.id}/", update_fields, format="json"
         )
 
     def _assert_success(self, response):

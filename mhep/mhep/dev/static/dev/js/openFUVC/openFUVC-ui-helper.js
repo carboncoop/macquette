@@ -51,8 +51,9 @@ openFUVC.prototype.add_modal_to_DOM = function () {
     var scripts = document.getElementsByTagName('script');
     for(var i = 0; i < scripts.length;i++){
         var pos = scripts[i].src.indexOf('openFUVC-ui-helper.js');
-        if(pos != -1)
+        if(pos != -1) {
             src = scripts[i].src.slice(0,pos);
+        }
     }
     //console.log (src);
     $.ajax({
@@ -95,7 +96,7 @@ openFUVC.prototype.ini_modal = function () {
 
     // Adjust modal height
     this.adjust_modal_height();
-}
+};
 
 openFUVC.prototype.add_events = function () {
     var openFUVC_helper = this;
@@ -104,18 +105,18 @@ openFUVC.prototype.add_events = function () {
         openFUVC_helper.adjust_modal_height();
     });
     $('#openFUVC-modal').on('change', 'select', function () {
-        if ($(this).find('option.other').is(':selected'))
+        if ($(this).find('option.other').is(':selected')) {
             $(this).siblings('p.other').show();
-        else
+        } else {
             $(this).siblings('p.other').hide();
+        }
     });
     $('#openFUVC-modal').on('change', 'select.material2', function () {
         var layer =  $(this).parent().parent().attr('layer');
         if ($(this).find('option[value=none]').is(':selected')){
             $('tr[layer='+layer+'] .length-material2').hide().attr('required', false);
             $('tr[layer='+layer+'] .spacing').hide().attr('required', false);            
-        }            
-        else{
+        } else{
             $('tr[layer='+layer+'] .length-material2').show().attr('required', true);
             $('tr[layer='+layer+'] .spacing').show().attr('required', true);            
         }      
@@ -128,8 +129,7 @@ openFUVC.prototype.add_events = function () {
         if ($(this).val() != 'none') {
             $('tr#base_insulation_thickness').show();
             $('tr#base_insulation_thickness input').attr('required', true);
-        }
-        else {
+        } else {
             $('tr#base_insulation_thickness').hide();
             $('tr#base_insulation_thickness input').attr('required', false);
         }
@@ -142,8 +142,7 @@ openFUVC.prototype.add_events = function () {
             $('tr#edge_insulation_thermal_conductivity input').attr('required', true);
             $('tr#edge_insulation_thickness input').attr('required', true);
             $('tr#edge_insulation_length input').attr('required', true);
-        }
-        else {
+        } else {
             $('tr#edge_insulation_thermal_conductivity').hide();
             $('tr#edge_insulation_thickness').hide();
             $('tr#edge_insulation_length').hide();
@@ -156,8 +155,7 @@ openFUVC.prototype.add_events = function () {
         if ($(this).val() == 'manually') {
             $('#wind_speed_annual_average input').attr('disabled', false);
             $('#external_temperature_annual_average input').attr('disabled', false);
-        }
-        else {
+        } else {
             var index = $(this).val();
             $('#wind_speed_annual_average input').attr('disabled', true).val(openFUVC_helper.get_wind_speed_annual_average(index).toFixed(2));
             $('#external_temperature_annual_average input').attr('disabled', true).val(openFUVC_helper.get_external_temperature_annual_average(index).toFixed(2));
@@ -201,8 +199,7 @@ openFUVC.prototype.add_events = function () {
         if ($('#openFUVC-form')[0].checkValidity() === false) {
             // Trigger browser validation (shows errors in UI)
             $('<input type="submit" />').hide().appendTo('#openFUVC-form').click().remove();
-        }
-        else {
+        } else {
             var type_of_floor = $('#type-of-floor select').val();
             var data = openFUVC_helper.fetch_inputs(type_of_floor);
             var uvalue = openFUVC_helper.calc(type_of_floor, data);
@@ -243,8 +240,7 @@ openFUVC.prototype.add_options_to_select = function (selector, source) {
         for (var index in source) {
             $(selector).append('<option value="' + index + '">' + source[index] + '</option>');
         }
-    }
-    else if (typeof (source) == 'object') {
+    } else if (typeof (source) == 'object') {
         for (var field in source) {
             $(selector).prepend('<option value="' + source[field][1] + '">' + source[field][0] + '</option>');
         }
@@ -255,26 +251,30 @@ openFUVC.prototype.add_options_floor_deck_material1 = function (selector) {
     elements = this.dataset.floor_deck.air_gaps;
 
     $(selector).prepend('</optgroup>');
-    for (var index in elements)
+    for (var index in elements) {
         $(selector).prepend('<option value="' + elements[index][1] + '">' + elements[index][0] + '</option>');
+    }
     $(selector).prepend('<optgroup label="Air gaps">');
 
     elements = this.dataset.floor_deck.finishes;
     $(selector).prepend('</optgroup>');
-    for (var index in elements)
+    for (var index in elements) {
         $(selector).prepend('<option value="' + elements[index][1] + '">' + elements[index][0] + '</option>');
+    }
     $(selector).prepend('<optgroup label="Finishes">');
 
     elements = this.dataset.floor_deck.insulation;
     $(selector).prepend('</optgroup>');
-    for (var index in elements)
+    for (var index in elements) {
         $(selector).prepend('<option value="' + elements[index][1] + '">' + elements[index][0] + '</option>');
+    }
     $(selector).prepend('<optgroup label="Insulation">');
 
     var elements = this.dataset.floor_deck.structural_elements;
     $(selector).prepend('</optgroup>');
-    for (var index in elements)
+    for (var index in elements) {
         $(selector).prepend('<option value="' + elements[index][1] + '">' + elements[index][0] + '</option>');
+    }
     $(selector).prepend('<optgroup label="Structural elements">');
 };
 
@@ -354,13 +354,12 @@ openFUVC.prototype.fetch_inputs = function (type_of_floor) {
                     var layer = {
                         thickness: $(this).find('.thickness').val(),
                         thermal_conductivity_1: $(this).find('.material1').val(),
-                    }
+                    };
                     if($(this).find('.material2').val() != 'none'){
                         layer.length_2 = $(this).find('.length-material2').val();
                         layer.thermal_conductivity_2 = $(this).find('.material2').val();
                         layer.spacing = $(this).find('.spacing').val();
-                    }
-                    else{                    
+                    } else{                    
                         layer.length_2 = 0;
                         layer.thermal_conductivity_2 = 1; // doesn't matter the value
                         layer.spacing = 1; // meaning meterial 1 has 100%
@@ -371,18 +370,17 @@ openFUVC.prototype.fetch_inputs = function (type_of_floor) {
         case 'exposed_floor_above_GL':
             data.unheated_space_thermal_resistance = $('#unheated_space_thermal_resistance select').val();
             data.floor_deck_layers = [];
-               $('.layer').each(function () {
+            $('.layer').each(function () {
                 if ($(this).attr('layer') !='template'){
                     var layer = {
                         thickness: $(this).find('.thickness').val(),
                         thermal_conductivity_1: $(this).find('.material1').val(),
-                    }
+                    };
                     if($(this).find('.material2').val() != 'none'){
                         layer.length_2 = $(this).find('.length-material2').val();
                         layer.thermal_conductivity_2 = $(this).find('.material2').val();
                         layer.spacing = $(this).find('.spacing').val();
-                    }
-                    else{                    
+                    } else{                    
                         layer.length_2 = 0;
                         layer.thermal_conductivity_2 = 1; // doesn't matter the value
                         layer.spacing = 1; // meaning meterial 1 has 100%
@@ -395,8 +393,8 @@ openFUVC.prototype.fetch_inputs = function (type_of_floor) {
 };
 
 openFUVC.prototype.show_require_floor_inputs = function (type_of_floor) {
-    var selector = "#openFUVC-modal .modal-body";
-// Hide all inputs and selects, then show the ones for the type_of_floor
+    var selector = '#openFUVC-modal .modal-body';
+    // Hide all inputs and selects, then show the ones for the type_of_floor
     $(selector + ' .suspended_floor').hide();
     $(selector + ' .heated_basement').hide();
     $(selector + ' .slab_on_ground').hide();

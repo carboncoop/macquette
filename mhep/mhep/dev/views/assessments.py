@@ -1,24 +1,22 @@
 import io
 import os
-import PIL
 
+import PIL
 from django.core.files.base import ContentFile
+from rest_framework import generics
+from rest_framework import parsers
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import generics, status, parsers
 
-from ..models import Assessment, Image
-from ..permissions import (
-    IsMemberOfConnectedOrganisation,
-    IsMemberOfOrganisation,
-    IsAssessmentOwner,
-)
-from ..serializers import (
-    AssessmentFullSerializer,
-    AssessmentMetadataSerializer,
-    ImageSerializer,
-    FeaturedImageSerializer,
-)
+from ..models import Assessment
+from ..models import Image
+from ..permissions import IsAssessmentOwner
+from ..permissions import IsMemberOfConnectedOrganisation
+from ..serializers import AssessmentFullSerializer
+from ..serializers import AssessmentMetadataSerializer
+from ..serializers import FeaturedImageSerializer
+from ..serializers import ImageSerializer
 from .mixins import AssessmentQuerySetMixin
 
 
@@ -31,7 +29,7 @@ class ListCreateAssessments(generics.ListCreateAPIView):
 
 
 class RetrieveUpdateDestroyAssessment(
-    AssessmentQuerySetMixin, generics.RetrieveUpdateDestroyAPIView,
+    AssessmentQuerySetMixin, generics.RetrieveUpdateDestroyAPIView
 ):
     serializer_class = AssessmentFullSerializer
     permission_classes = [
