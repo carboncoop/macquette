@@ -171,7 +171,7 @@ function draw_space_heating_targetbar(parent, data) {
         is_unknown
             ? 0
             : Math.round(data.space_heating_demand_m2);
-    const width = Math.min($(`${parent} #spaceheating`).width(), 400);
+    const width = $(`${parent} #spaceheating`).width();
 
     $(`${parent} #spaceheating`).html(
         targetbarSVG({
@@ -196,7 +196,7 @@ function draw_primary_energy_targetbar(parent, data) {
         is_unknown
             ? 0
             : Math.round(data.primary_energy_use_m2);
-    const width = Math.min($(`${parent} #primaryenergy`).width(), 400);
+    const width = $(`${parent} #primaryenergy`).width();
 
     $(`${parent} #primaryenergy`).html(
         targetbarSVG({
@@ -219,7 +219,7 @@ function draw_co2_targetbar(parent, data) {
         is_unknown
             ? 0
             : Math.round(data.kgco2perm2);
-    const width = Math.min($(`${parent} #co2`).width(), 400);
+    const width = $(`${parent} #co2`).width();
 
     $(`${parent} #co2`).html(
         targetbarSVG({
@@ -243,7 +243,7 @@ function draw_perperson_targetbar(parent, data) {
         is_unknown
             ? 0
             : Math.round(data.kwhdpp.toFixed(1));
-    const width = Math.min($(`${parent} #perperson`).width(), 400);
+    const width = $(`${parent} #perperson`).width();
 
     $(`${parent} #perperson`).html(
         targetbarSVG({
