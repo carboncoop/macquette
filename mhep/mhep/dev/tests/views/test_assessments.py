@@ -38,7 +38,6 @@ class TestListAssessments(APITestCase):
                 name="test assessment 1",
                 description="test description",
                 data={"foo": "bar"},
-                openbem_version="10.1.1",
                 owner=user,
             )
 
@@ -50,7 +49,6 @@ class TestListAssessments(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
             "status": "In progress",
-            "openbem_version": "10.1.1",
             "name": "test assessment 1",
             "description": "test description",
             "author": user.username,
@@ -109,7 +107,6 @@ class TestGetAssessment(APITestCase):
                 description="test description",
                 data={"foo": "bar"},
                 status="In progress",
-                openbem_version="10.1.1",
             )
 
         i = ImageFactory.create(assessment=a)
@@ -124,7 +121,6 @@ class TestGetAssessment(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
             "status": "In progress",
-            "openbem_version": "10.1.1",
             "name": "test name",
             "description": "test description",
             "author": self.me.username,
@@ -151,7 +147,6 @@ class TestGetAssessment(APITestCase):
             a = AssessmentFactory.create(
                 owner=self.me,
                 name="test name",
-                openbem_version="10.1.1",
                 description="",
                 data={},
             )
@@ -165,7 +160,6 @@ class TestGetAssessment(APITestCase):
             "created_at": "2019-06-01T16:35:34Z",
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
-            "openbem_version": "10.1.1",
             "name": "test name",
             # defaults:
             "description": "",
@@ -188,7 +182,6 @@ class TestGetAssessment(APITestCase):
             description="test description",
             data={"foo": "bar"},
             status="In progress",
-            openbem_version="10.1.1",
         )
 
         i1 = ImageFactory.create(assessment=a)
@@ -239,7 +232,6 @@ class TestUpdateAssessment(APITestCase):
                 description="test description",
                 data={"foo": "bar"},
                 status="In progress",
-                openbem_version="10.1.1",
             )
 
         super().setUpClass()
@@ -338,7 +330,6 @@ class TestDestroyAssessment(APITestCase):
                 description="test description",
                 data={"foo": "bar"},
                 status="In progress",
-                openbem_version="10.1.1",
             )
 
         super().setUpClass()
@@ -350,7 +341,6 @@ class TestDestroyAssessment(APITestCase):
             description="test description",
             data={"foo": "bar"},
             status="In progress",
-            openbem_version="10.1.1",
         )
 
         assessment_count = Assessment.objects.count()

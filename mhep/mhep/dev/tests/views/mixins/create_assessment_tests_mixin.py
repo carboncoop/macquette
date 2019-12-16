@@ -28,7 +28,6 @@ class CreateAssessmentTestsMixin:
         new_assessment = {
             "name": "test assessment 1",
             "description": "test description 1",
-            "openbem_version": "10.1.1",
             "data": {"foo": "baz"},  # data is specifically *not* returned
         }
 
@@ -42,7 +41,6 @@ class CreateAssessmentTestsMixin:
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
             "status": "In progress",
-            "openbem_version": "10.1.1",
             "name": "test assessment 1",
             "description": "test description 1",
             "author": self.user.username,
@@ -59,7 +57,6 @@ class CreateAssessmentTestsMixin:
 
         new_assessment = {
             "name": "test assessment 1",
-            "openbem_version": "10.1.1",
             "description": "test description 1",
         }
 
@@ -74,7 +71,6 @@ class CreateAssessmentTestsMixin:
 
         new_assessment = {
             "name": "test assessment 1",
-            "openbem_version": "10.1.1",
             "description": "test description 1",
         }
 
@@ -89,7 +85,6 @@ class CreateAssessmentTestsMixin:
 
         new_assessment = {
             "name": "test assessment 1",
-            "openbem_version": "10.1.1",
             "data": {"foo": "baz"},
         }
 
@@ -101,7 +96,6 @@ class CreateAssessmentTestsMixin:
     def test_returns_forbidden_if_not_logged_in(self):
         new_assessment = {
             "name": "test assessment 1",
-            "openbem_version": "10.1.1",
         }
 
         response = self.post_to_create_endpoint(new_assessment)
@@ -112,7 +106,7 @@ class CreateAssessmentTestsMixin:
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {"openbem_version": "10.1.1", "description": "test description 2",},
+            {"description": "test description 2",},
             status.HTTP_400_BAD_REQUEST,
             {
                 "name": [
@@ -123,41 +117,11 @@ class CreateAssessmentTestsMixin:
             },
         )
 
-    def test_create_assessment_fails_if_openbem_version_missing(self):
-        self.client.force_authenticate(self.user)
-
-        self.assert_create_fails(
-            {"name": "test assessment 1", "description": "test description 2",},
-            status.HTTP_400_BAD_REQUEST,
-            {
-                "openbem_version": [
-                    exceptions.ErrorDetail(
-                        string="This field is required.", code="required"
-                    )
-                ]
-            },
-        )
-
-    def test_create_assessment_fails_if_openbem_version_is_not_valid_choice(self):
-        self.client.force_authenticate(self.user)
-
-        self.assert_create_fails(
-            {"name": "test assessment 1", "openbem_version": "foo",},
-            status.HTTP_400_BAD_REQUEST,
-            {
-                "openbem_version": [
-                    exceptions.ErrorDetail(
-                        string='"foo" is not a valid choice.', code="invalid_choice",
-                    )
-                ]
-            },
-        )
-
     def test_create_assessment_fails_if_status_is_not_valid_choice(self):
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {"name": "test assessment 1", "openbem_version": "10.1.1", "status": "bar"},
+            {"name": "test assessment 1", "status": "bar"},
             status.HTTP_400_BAD_REQUEST,
             {
                 "status": [
