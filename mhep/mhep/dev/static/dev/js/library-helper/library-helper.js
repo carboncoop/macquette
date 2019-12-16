@@ -1,3 +1,28 @@
+const LIBRARY_NAMES = {
+    'elements': 'Fabric elements',
+    'systems': 'Energy systems',
+    'elements_measures': 'Fabric elements measures',
+    'draught_proofing_measures': 'Draught proofing measures',
+    'ventilation_systems_measures': 'Ventilation system measures',
+    'ventilation_systems': 'Ventilation systems',
+    'extract_ventilation_points': 'Extract ventilation points',
+    //'extract_ventilation_points_measures': 'Extract ventilation points measures',
+    'intentional_vents_and_flues': 'Intentional vents and flues',
+    'intentional_vents_and_flues_measures': 'Intentional vents and flues measures',
+    'water_usage': 'Water usage',
+    'storage_type': 'Type of storages',
+    'storage_type_measures': 'Type of storage measure',
+    'appliances_and_cooking': 'Appliances and Cooking',
+    'heating_control': 'Heating controls',
+    'heating_systems': 'Heating systems',
+    'heating_systems_measures': 'Heating systems mesaures',
+    'pipework_insulation': 'Pipework insulation measures',
+    'hot_water_control_type': 'Storage control types',
+    'space_heating_control_type': 'Space heating control types',
+    'clothes_drying_facilities': 'Clothes drying facilities',
+    'generation_measures': 'Generation measures'
+};
+
 function libraryHelper(type, container) {
     this.container = container;
     this.library_list = {};
@@ -5,15 +30,11 @@ function libraryHelper(type, container) {
     // Variables to link the view with the controller
     this.type = type;
     this.library_id = 0;
-    this.library_names = {}; // I know this should not be here :p
-    //this.library_html_strings ={};
+    this.library_names = {};
 
     this.init();
     this.append_modals();
     this.add_events();
-    //$('#modal-share-library').modal('show');
-
-
 }
 
 //  //if ($('#library-select').val() != undefined) Needs to be removed from every function where it appears. Ensure we always pass the library id
@@ -22,32 +43,10 @@ function libraryHelper(type, container) {
  * Methods called in the constructor
  ***********************************/
 
+libraryHelper.library_names = LIBRARY_NAMES;
+
 libraryHelper.prototype.init = function () {
     this.load_user_libraries(); // Populates this.library_list
-    this.library_names = {
-        'elements': 'Fabric elements',
-        'systems': 'Energy systems',
-        'elements_measures': 'Fabric elements measures',
-        'draught_proofing_measures': 'Draught proofing measures',
-        'ventilation_systems_measures': 'Ventilation system measures',
-        'ventilation_systems': 'Ventilation systems',
-        'extract_ventilation_points': 'Extract ventilation points',
-        //'extract_ventilation_points_measures': 'Extract ventilation points measures',
-        'intentional_vents_and_flues': 'Intentional vents and flues',
-        'intentional_vents_and_flues_measures': 'Intentional vents and flues measures',
-        'water_usage': 'Water usage',
-        'storage_type': 'Type of storages',
-        'storage_type_measures': 'Type of storage measure',
-        'appliances_and_cooking': 'Appliances and Cooking',
-        'heating_control': 'Heating controls',
-        'heating_systems': 'Heating systems',
-        'heating_systems_measures': 'Heating systems mesaures',
-        'pipework_insulation': 'Pipework insulation measures',
-        'hot_water_control_type': 'Storage control types',
-        space_heating_control_type: 'Space heating control types',
-        'clothes_drying_facilities': 'Clothes drying facilities',
-        'generation_measures': 'Generation measures'
-    };
 };
 libraryHelper.prototype.add_events = function () {
     var myself = this;
@@ -3466,24 +3465,27 @@ libraryHelper.prototype.generation_measures_get_item_to_save = function () {
  * Other methods
  ***************************************************/
 libraryHelper.prototype.load_user_libraries = function (callback) {
-    var mylibraries = {};
-    var myself = this;
     $.ajax({
         url: urlHelper.api.libraries(),
         async: false,
         datatype: 'json',
         error: handleServerError('loading libraries'),
-        success: function (result) {
-            for (library in result) {
-                if (mylibraries[result[library].type] === undefined) {
-                    mylibraries[result[library].type] = [];
-                }
-                mylibraries[result[library].type].push(result[library]);
+        success: result => {
+            let libraries_by_type = {};
+            for (let type of Object.keys(libraryHelper.library_names)) {
+                libraries_by_type[type] = [];
             }
+
+            for (let library of result) {
+                let type = library.type;
+                libraries_by_type[type].push(library);
+            }
+
             if (callback !== undefined) {
                 callback();
             }
-            myself.library_list = mylibraries;
+
+            this.library_list = libraries_by_type;
         }});
 };
 libraryHelper.prototype.display_library_users = function (library_id) {
