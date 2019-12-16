@@ -2,7 +2,8 @@ from django.contrib import admin
 from django.contrib.auth import admin as auth_admin
 from django.contrib.auth import get_user_model
 
-from mhep.users.forms import UserChangeForm, UserCreationForm
+from mhep.users.forms import UserChangeForm
+from mhep.users.forms import UserCreationForm
 
 User = get_user_model()
 

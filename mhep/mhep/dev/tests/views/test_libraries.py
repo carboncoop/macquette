@@ -1,12 +1,12 @@
 from freezegun import freeze_time
-
+from rest_framework import exceptions
+from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework import exceptions, status
 
 from ... import VERSION
 from ...models import Library
-from ..factories import LibraryFactory, OrganisationFactory
-
+from ..factories import LibraryFactory
+from ..factories import OrganisationFactory
 from mhep.users.tests.factories import UserFactory
 
 
@@ -37,7 +37,7 @@ class TestListLibraries(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "name": l1.name,
             "type": l1.type,
-            "permissions": {"can_write": True, "can_share": False,},
+            "permissions": {"can_write": True, "can_share": False},
             "data": l1.data,
             "owner": {
                 "id": f"{self.me.id}",
@@ -52,7 +52,7 @@ class TestListLibraries(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "name": l2.name,
             "type": l2.type,
-            "permissions": {"can_write": True, "can_share": False,},
+            "permissions": {"can_write": True, "can_share": False},
             "data": l2.data,
             "owner": {
                 "id": f"{self.me.id}",
@@ -67,9 +67,9 @@ class TestListLibraries(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "name": global_lib.name,
             "type": global_lib.type,
-            "permissions": {"can_write": False, "can_share": False,},
+            "permissions": {"can_write": False, "can_share": False},
             "data": global_lib.data,
-            "owner": {"id": None, "name": "Global", "type": "global",},
+            "owner": {"id": None, "name": "Global", "type": "global"},
         } == response.data[2]
 
     def test_includes_libraries_from_my_organisations(self):
@@ -238,7 +238,7 @@ class TestCreateLibraries(APITestCase):
                 "updated_at": "2019-06-01T16:35:34Z",
                 "name": "test library 1",
                 "type": "test type 1",
-                "permissions": {"can_write": True, "can_share": False,},
+                "permissions": {"can_write": True, "can_share": False},
                 "data": {"foo": "bar"},
                 "owner": {
                     "id": f"{self.me.id}",
@@ -314,14 +314,12 @@ class TestUpdateLibrary(APITestCase):
             lib = LibraryFactory.create(owner_user=self.me)
 
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "data": {"new": "data"},
-            }
+            updateFields = {"data": {"new": "data"}}
 
             self.client.force_authenticate(self.me)
 
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json"
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
@@ -338,13 +336,11 @@ class TestUpdateLibrary(APITestCase):
             lib = LibraryFactory.create(owner_user=self.me)
 
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "name": "updated name",
-            }
+            updateFields = {"name": "updated name"}
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json"
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
@@ -375,7 +371,7 @@ class TestCreateLibraryItem(APITestCase):
         cls.library = LibraryFactory.create(data={"tag1": {"name": "foo"}})
 
     def test_create_library_item(self):
-        item_data = {"tag": "tag2", "item": {"name": "bar",}}
+        item_data = {"tag": "tag2", "item": {"name": "bar"}}
 
         self.client.force_authenticate(self.library.owner_user)
         response = self.client.post(
@@ -387,7 +383,7 @@ class TestCreateLibraryItem(APITestCase):
         assert response.status_code == status.HTTP_204_NO_CONTENT
 
     def test_create_library_item_fails_if_tag_already_exists(self):
-        item_data = {"tag": "tag1", "item": {"name": "bar",}}
+        item_data = {"tag": "tag1", "item": {"name": "bar"}}
 
         self.client.force_authenticate(self.library.owner_user)
         response = self.client.post(
@@ -405,7 +401,7 @@ class TestCreateLibraryItem(APITestCase):
 class TestUpdateDestroyLibraryItem(APITestCase):
     def test_destroy_library_item(self):
         library = LibraryFactory.create(
-            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"},},
+            data={"tag1": {"name": "foo"}, "tag2": {"name": "bar"}}
         )
 
         self.client.force_authenticate(library.owner_user)
@@ -419,12 +415,9 @@ class TestUpdateDestroyLibraryItem(APITestCase):
         assert retrieved.data == {"tag1": {"name": "foo"}}
 
     def test_update_library_item(self):
-        library = LibraryFactory.create(data={"tag1": {"name": "foo"},},)
+        library = LibraryFactory.create(data={"tag1": {"name": "foo"}})
 
-        replacement_data = {
-            "name": "bar",
-            "other": "data",
-        }
+        replacement_data = {"name": "bar", "other": "data"}
 
         with freeze_time("2019-06-01T16:35:34Z"):
             self.client.force_authenticate(library.owner_user)
@@ -441,10 +434,7 @@ class TestUpdateDestroyLibraryItem(APITestCase):
     def test_update_library_item_fails_if_tag_doesnt_exist(self):
         library = LibraryFactory.create()
 
-        replacement_data = {
-            "name": "bar",
-            "other": "data",
-        }
+        replacement_data = {"name": "bar", "other": "data"}
 
         self.client.force_authenticate(library.owner_user)
 

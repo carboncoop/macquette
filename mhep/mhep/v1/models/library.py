@@ -1,6 +1,7 @@
 from django.conf import settings
-from django.db import models
 from django.contrib.postgres.fields import JSONField
+from django.db import models
+
 from ..validators import validate_dict
 
 

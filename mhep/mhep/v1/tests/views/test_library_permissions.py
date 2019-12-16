@@ -1,10 +1,9 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
-
-from mhep.users.tests.factories import UserFactory
+from rest_framework.test import APITestCase
 
 from ... import VERSION
 from ..factories import LibraryFactory
+from mhep.users.tests.factories import UserFactory
 
 
 class CommonMixin:
@@ -66,17 +65,13 @@ class TestUpdateLibraryPermissions(CommonMixin, APITestCase):
         self.client.force_authenticate(non_owner)
 
         response = self._call_endpoint(self.library)
-        self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, "Not found.",
-        )
+        self._assert_error(response, status.HTTP_404_NOT_FOUND, "Not found.")
 
     def _call_endpoint(self, library):
-        update_fields = {
-            "data": {"new": "data"},
-        }
+        update_fields = {"data": {"new": "data"}}
 
         return self.client.patch(
-            f"/{VERSION}/api/libraries/{library.id}/", update_fields, format="json",
+            f"/{VERSION}/api/libraries/{library.id}/", update_fields, format="json"
         )
 
 
@@ -100,9 +95,7 @@ class TestDeleteLibraryPermissions(CommonMixin, APITestCase):
         self.client.force_authenticate(non_owner)
 
         response = self._call_endpoint(self.library)
-        self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, "Not found.",
-        )
+        self._assert_error(response, status.HTTP_404_NOT_FOUND, "Not found.")
 
     def _call_endpoint(self, library):
         return self.client.delete(f"/{VERSION}/api/libraries/{library.id}/")

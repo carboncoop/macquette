@@ -1,9 +1,11 @@
 from django.conf import settings
-from django.urls import include, path, reverse_lazy
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.views.generic.base import RedirectView
+from django.urls import include
+from django.urls import path
+from django.urls import reverse_lazy
 from django.views import defaults as default_views
+from django.views.generic.base import RedirectView
 
 admin.site.site_header = "My Home Energy Planner administration"
 admin.site.site_title = "Django admin"

@@ -1,12 +1,11 @@
 from freezegun import freeze_time
-
+from rest_framework import exceptions
+from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework import exceptions, status
 
 from ... import VERSION
 from ...models import Assessment
 from ..factories import AssessmentFactory
-
 from mhep.users.tests.factories import UserFactory
 
 
@@ -99,10 +98,7 @@ class TestUpdateAssessment(APITestCase):
 
     def test_updates_and_returns_as_expected(self):
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "data": {"new": "data"},
-                "status": "Complete",
-            }
+            updateFields = {"data": {"new": "data"}, "status": "Complete"}
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(
@@ -123,9 +119,7 @@ class TestUpdateAssessment(APITestCase):
 
     def test_fails_if_data_field_is_a_string(self):
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "data": {"foo string"},
-            }
+            updateFields = {"data": {"foo string"}}
             self.client.force_authenticate(self.me)
             response = self.client.patch(
                 f"/{VERSION}/api/assessments/{self.assessment.pk}/",
@@ -147,9 +141,7 @@ class TestUpdateAssessment(APITestCase):
         self.assessment.save()
 
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "data": {"new": "data"},
-            }
+            updateFields = {"data": {"new": "data"}}
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(

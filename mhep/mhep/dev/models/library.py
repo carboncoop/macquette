@@ -1,7 +1,7 @@
 from django.conf import settings
+from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.db.models import Q
-from django.contrib.postgres.fields import JSONField
 
 from ..validators import validate_dict
 from .organisation import Organisation
@@ -53,5 +53,5 @@ class Library(models.Model):
                 | (Q(owner_user__isnull=True) & Q(owner_organisation__isnull=False))
                 | (Q(owner_user__isnull=True) & Q(owner_organisation__isnull=True)),
                 name="owner_cant_be_both_user_and_organisation",
-            ),
+            )
         ]

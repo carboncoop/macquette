@@ -1,26 +1,23 @@
 from django.contrib.auth import get_user_model
-
-from rest_framework import generics, exceptions, status
+from rest_framework import exceptions
+from rest_framework import generics
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from ..models import Assessment, Library, Organisation
-from ..permissions import (
-    IsAdminOfOrganisation,
-    IsMemberOfOrganisation,
-    IsLibrarianOfOrganisation,
-)
-
-from ..serializers import (
-    AssessmentMetadataSerializer,
-    LibrarySerializer,
-    OrganisationSerializer,
-    OrganisationMetadataSerializer,
-    OrganisationLibrarianSerializer,
-    OrganisationMemberSerializer,
-)
-
 from .. import VERSION
+from ..models import Assessment
+from ..models import Library
+from ..models import Organisation
+from ..permissions import IsAdminOfOrganisation
+from ..permissions import IsLibrarianOfOrganisation
+from ..permissions import IsMemberOfOrganisation
+from ..serializers import AssessmentMetadataSerializer
+from ..serializers import LibrarySerializer
+from ..serializers import OrganisationLibrarianSerializer
+from ..serializers import OrganisationMemberSerializer
+from ..serializers import OrganisationMetadataSerializer
+from ..serializers import OrganisationSerializer
 from .exceptions import BadRequest
 
 User = get_user_model()
@@ -46,13 +43,10 @@ class ListOrganisations(generics.ListAPIView):
 
 
 class ListCreateOrganisationAssessments(
-    AddURLOrganisationToSerializerContextMixin, generics.ListCreateAPIView,
+    AddURLOrganisationToSerializerContextMixin, generics.ListCreateAPIView
 ):
 
-    permission_classes = [
-        IsAuthenticated,
-        IsMemberOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsMemberOfOrganisation]
     serializer_class = AssessmentMetadataSerializer
 
     def get_queryset(self, **kwargs):
@@ -65,14 +59,11 @@ class ListCreateOrganisationAssessments(
 
 
 class CreateOrganisationLibraries(
-    AddURLOrganisationToSerializerContextMixin, generics.CreateAPIView,
+    AddURLOrganisationToSerializerContextMixin, generics.CreateAPIView
 ):
 
     serializer_class = LibrarySerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsLibrarianOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsLibrarianOfOrganisation]
 
     def get_queryset(self, *args, **kwargs):
         org = self.get_object()
@@ -80,12 +71,9 @@ class CreateOrganisationLibraries(
         return getattr(org, f"{VERSION}_libraries").all()
 
 
-class CreateDeleteOrganisationLibrarians(generics.UpdateAPIView,):
+class CreateDeleteOrganisationLibrarians(generics.UpdateAPIView):
     serializer_class = OrganisationLibrarianSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsAdminOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsAdminOfOrganisation]
 
     def get_queryset(self, *args, **kwargs):
         return getattr(self.request.user, f"{VERSION}_organisations")
@@ -114,12 +102,9 @@ class CreateDeleteOrganisationLibrarians(generics.UpdateAPIView,):
         return Response("", status=status.HTTP_204_NO_CONTENT)
 
 
-class CreateDeleteOrganisationMembers(generics.UpdateAPIView,):
+class CreateDeleteOrganisationMembers(generics.UpdateAPIView):
     serializer_class = OrganisationMemberSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsAdminOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsAdminOfOrganisation]
 
     def get_queryset(self, *args, **kwargs):
         return getattr(self.request.user, f"{VERSION}_organisations")
@@ -166,10 +151,7 @@ class ShareUnshareOrganisationLibraries(
     generics.UpdateAPIView,  # UpdateAPIView acts on the Organisation model
 ):
     serializer_class = OrganisationLibrarianSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsAdminOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsAdminOfOrganisation]
 
     def get_queryset(self, *args, **kwargs):
         return getattr(self.request.user, f"{VERSION}_organisations")
@@ -203,19 +185,14 @@ class ShareUnshareOrganisationLibraries(
         return Response("", status=status.HTTP_204_NO_CONTENT)
 
 
-class ListOrganisationLibraryShares(
-    GetOrganisationLibraryMixin, generics.ListAPIView,
-):
+class ListOrganisationLibraryShares(GetOrganisationLibraryMixin, generics.ListAPIView):
     """
     for a given organisation library, this list the other organisations that this library is
     shared with
     """
 
     serializer_class = OrganisationMetadataSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsAdminOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsAdminOfOrganisation]
 
     def get_queryset(self, *args, **kwargs):
         """

@@ -4,29 +4,25 @@ import logging
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import DetailView
 from django.views.generic.base import TemplateView
-
-from rest_framework import generics, exceptions
+from rest_framework import exceptions
+from rest_framework import generics
+from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework import status
-
-from .models import Assessment, Organisation
-from .permissions import (
-    IsMemberOfConnectedOrganisation,
-    IsMemberOfOrganisation,
-    IsAssessmentOwner,
-    IsLibraryOwner,
-)
-from .serializers import (
-    AssessmentFullSerializer,
-    AssessmentMetadataSerializer,
-    LibraryItemSerializer,
-    LibrarySerializer,
-    OrganisationSerializer,
-)
 
 from . import VERSION
 from .helpers import build_static_dictionary
+from .models import Assessment
+from .models import Organisation
+from .permissions import IsAssessmentOwner
+from .permissions import IsLibraryOwner
+from .permissions import IsMemberOfConnectedOrganisation
+from .permissions import IsMemberOfOrganisation
+from .serializers import AssessmentFullSerializer
+from .serializers import AssessmentMetadataSerializer
+from .serializers import LibraryItemSerializer
+from .serializers import LibrarySerializer
+from .serializers import OrganisationSerializer
 
 STATIC_URLS = build_static_dictionary()
 
@@ -85,7 +81,7 @@ class ListCreateAssessments(generics.ListCreateAPIView):
 
 
 class RetrieveUpdateDestroyAssessment(
-    AssessmentQuerySetMixin, generics.RetrieveUpdateDestroyAPIView,
+    AssessmentQuerySetMixin, generics.RetrieveUpdateDestroyAPIView
 ):
     serializer_class = AssessmentFullSerializer
     permission_classes = [
@@ -117,9 +113,7 @@ class ListCreateLibraries(generics.ListCreateAPIView):
         return getattr(self.request.user, f"{VERSION}_libraries").all()
 
 
-class UpdateDestroyLibrary(
-    generics.UpdateAPIView, generics.DestroyAPIView,
-):
+class UpdateDestroyLibrary(generics.UpdateAPIView, generics.DestroyAPIView):
     serializer_class = LibrarySerializer
     permission_classes = [
         # IsAuthenticated will ensure we can filter (using get_queryset) based on User.libraries
@@ -148,12 +142,9 @@ class ListOrganisations(generics.ListAPIView):
         return getattr(self.request.user, f"{VERSION}_organisations").all()
 
 
-class CreateUpdateDeleteLibraryItem(generics.GenericAPIView,):
+class CreateUpdateDeleteLibraryItem(generics.GenericAPIView):
     serializer_class = LibraryItemSerializer
-    permission_classes = [
-        IsAuthenticated,
-        IsLibraryOwner,
-    ]
+    permission_classes = [IsAuthenticated, IsLibraryOwner]
 
     def get_queryset(self, *args, **kwargs):
         return getattr(self.request.user, f"{VERSION}_libraries").all()
@@ -176,7 +167,7 @@ class CreateUpdateDeleteLibraryItem(generics.GenericAPIView,):
 
         if tag in d:
             logging.warning(f"tag {tag} already exists in library {library.id}")
-            raise BadRequest(f"tag `{tag}` already exists in library {library.id}",)
+            raise BadRequest(f"tag `{tag}` already exists in library {library.id}")
 
         d[tag] = item
         library.data = d
@@ -217,10 +208,7 @@ class CreateUpdateDeleteLibraryItem(generics.GenericAPIView,):
 
 
 class ListCreateOrganisationAssessments(generics.ListCreateAPIView):
-    permission_classes = [
-        IsAuthenticated,
-        IsMemberOfOrganisation,
-    ]
+    permission_classes = [IsAuthenticated, IsMemberOfOrganisation]
     serializer_class = AssessmentMetadataSerializer
 
     def get_serializer_context(self):

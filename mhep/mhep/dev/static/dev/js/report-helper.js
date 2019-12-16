@@ -1,48 +1,48 @@
-function targetbarCarboncoop(element, options)
-{
-    var width = $("#" + element).width();
-    var height = $("#" + element).height();
+function targetbarCarboncoop(element, options) {
+    var width = $('#' + element).width();
+    var height = $('#' + element).height();
 
     // $("#"+element).html("<div style='padding-bottom:5px; font-size:16px; color:rgba(99,86,71,0.8);'>"+options.name+": <b style='float:right'>"+options.value+" "+options.units+"</b></div>");
-    $("#" + element).html("<div style='padding-bottom:5px; font-size:18px; color:rgba(99,86,71,0.8);'>" + options.name + "</div>");
-    var titleheight = $("#" + element + " div").height();
+    $('#' + element).html("<div style='padding-bottom:5px; font-size:18px; color:rgba(99,86,71,0.8);'>" + options.name + '</div>');
+    var titleheight = $('#' + element + ' div').height();
     var barheight = height - titleheight - 5;
     var barheight = 25 * options.values.length;
-    $("#" + element).append('<canvas id="' + element + '-canvas" width="' + width + '" height="' + barheight + '" style="max-width:100%"></canvas>');
+    $('#' + element).append('<canvas id="' + element + '-canvas" width="' + width + '" height="' + barheight + '" style="max-width:100%"></canvas>');
 
-    var c = document.getElementById(element + "-canvas");
-    var ctx = c.getContext("2d");
+    var c = document.getElementById(element + '-canvas');
+    var ctx = c.getContext('2d');
 
 
     var maxval = options.value;
     for (z in options.targets) {
-        if (options.targets[z] > maxval)
+        if (options.targets[z] > maxval) {
             maxval = options.targets[z];
+        }
     }
     maxval *= 1.2; // Always 20% larger than max target or value
 
     var xscale = width / maxval;
     var colors = options.colors;
 
-    ctx.fillStyle = "white";
+    ctx.fillStyle = 'white';
     ctx.fillRect(1, 1, width - 2, barheight - 2);
 
 
-    if (typeof options["values"] != "undefined") {
-        var subBarHeightFraction = 1 / options["values"].length;
-        for (var i = 0; i < options["values"].length; i++) {
+    if (typeof options['values'] != 'undefined') {
+        var subBarHeightFraction = 1 / options['values'].length;
+        for (var i = 0; i < options['values'].length; i++) {
             ctx.fillStyle = colors[i];
             var y = 1 + subBarHeightFraction * barheight * i;
             ctx.fillRect(1, y, (options.values[i] * xscale) - 2, subBarHeightFraction * barheight);
-            ctx.font = "13px Arial";
-            ctx.fillStyle = "rgba(99,86,71,1.0)";
-            ctx.fillText(options.values[i] + " " + options.units, 4, y + 16);
+            ctx.font = '13px Arial';
+            ctx.fillStyle = 'rgba(99,86,71,1.0)';
+            ctx.fillText(options.values[i] + ' ' + options.units, 4, y + 16);
         }
     } else {
-        ctx.fillStyle = "rgb(217, 58, 71)";
+        ctx.fillStyle = 'rgb(217, 58, 71)';
         ctx.fillRect(1, 1, (options.value * xscale) - 2, barheight - 2);
     }
-    ctx.font = "14px Arial";
+    ctx.font = '14px Arial';
     ctx.setLineDash([4, 4]);
 
     var i = 60;
@@ -52,30 +52,30 @@ function targetbarCarboncoop(element, options)
         //    i = 30;
         xpos = options.targets[z] * xscale;
 
-        ctx.strokeStyle = "rgba(99,86,71,0.8)";
+        ctx.strokeStyle = 'rgba(99,86,71,0.8)';
         ctx.beginPath();
         ctx.moveTo(xpos, 1);
         ctx.lineTo(xpos, barheight - 1);
         ctx.stroke();
 
-        ctx.textAlign = "left";
-        ctx.fillStyle = "rgba(99,86,71,1.0)";
+        ctx.textAlign = 'left';
+        ctx.fillStyle = 'rgba(99,86,71,1.0)';
         ctx.fillText(z + ':', xpos + 5, barheight - 70);
-        ctx.fillText(options.targets[z] + " " + options.units, xpos + 15, barheight - 54);
+        ctx.fillText(options.targets[z] + ' ' + options.units, xpos + 15, barheight - 54);
         i = i - 60;
         index++;
     }
 
     // draw target range
-    if (typeof options.targetRange != "undefined") {
-        ctx.fillStyle = "rgba(0,0,0,0.2)";
+    if (typeof options.targetRange != 'undefined') {
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.fillRect(options.targetRange[0] * xscale, 1, xscale * (options.targetRange[1] - options.targetRange[0]), barheight);
     }
 
     ctx.setLineDash([]);
-    ctx.strokeStyle = "rgba(99,86,71,0.8)";
+    ctx.strokeStyle = 'rgba(99,86,71,0.8)';
     ctx.strokeRect(1, 1, width - 2, barheight - 2);
-    ctx.font = "5px Ubuntu";
+    ctx.font = '5px Ubuntu';
 
 }
 
@@ -145,7 +145,7 @@ function BarChart(options) {
 
     self.context = function() {
         return self.canvas().getContext('2d');
-    }
+    };
 
 
     self.element = function(elementId) {
@@ -154,7 +154,7 @@ function BarChart(options) {
         }
 
         return self._element;
-    }
+    };
 
 
     self.draw = function(elementId) {
@@ -193,7 +193,7 @@ function BarChart(options) {
 
         // append canvas to element
         self.element().appendChild(self.canvas());
-    }
+    };
 
 
     self.drawChartTitle = function() {
@@ -208,14 +208,12 @@ function BarChart(options) {
 
         if (self._chartTitleTextAlign === 'left') {
             ctx.fillText(self._chartTitle, 0, self._fontSize * 2);
-        }
-        else if (self._chartTitleTextAlign === 'center') {
+        } else if (self._chartTitleTextAlign === 'center') {
             ctx.fillText(self._chartTitle, self._width / 2, self._fontSize * 2);
-        }
-        else if (self._chartTitleTextAlign === 'right') {
+        } else if (self._chartTitleTextAlign === 'right') {
             ctx.fillText(self._chartTitle, self._width, self._fontSize * 2);
         }
-    }
+    };
 
 
     self.drawYAxisLabel = function() {
@@ -230,14 +228,14 @@ function BarChart(options) {
         ctx.fillStyle = self._yAxisLabelColor;
         ctx.fillText(self._yAxisLabel, 0, 0);
         ctx.restore();
-    }
+    };
 
 
     self.drawScale = function() {
 
         if (self._division === 'auto') {
             var x = Math.floor(self.chartHigh() / 10);
-            var every = Math.round(x / 15) * 10
+            var every = Math.round(x / 15) * 10;
         } else {
             var every = self._division;
         }
@@ -253,8 +251,8 @@ function BarChart(options) {
         ctx.fillStyle = self._divisionLabelsColor;
 
         for (var i = low; i <= high; i += every) {
-            const x = self.horizontalPixelPosition(0)
-            const y = self.verticalPixelPosition(i)
+            const x = self.horizontalPixelPosition(0);
+            const y = self.verticalPixelPosition(i);
 
             ctx.beginPath();
             ctx.moveTo(x, y - 0.5);
@@ -263,7 +261,7 @@ function BarChart(options) {
             ctx.closePath();
             ctx.fillText(i, x - (self._fontSize / 2), y + (self._fontSize / 4));
         }
-    }
+    };
 
 
     self.drawBars = function() {
@@ -283,8 +281,7 @@ function BarChart(options) {
 
                         if (self.getLabelColor(data[i].value[i2].label)) {
                             barColor = self.getLabelColor(data[i].value[i2].label);
-                        }
-                        else if (self.getLabelColor(data[i].label)) {
+                        } else if (self.getLabelColor(data[i].label)) {
                             barColor = self.getLabelColor(data[i].label);
                         }
 
@@ -302,8 +299,7 @@ function BarChart(options) {
 
                         rawHorizontalPosition += barWidth / data[i].value.length;
                     }
-                }
-                else {
+                } else {
                     var verticalPos = self.verticalPixelPosition(self.barLow(data[i]));
                     var orderedData = [];
 
@@ -328,8 +324,7 @@ function BarChart(options) {
 
                         if (self.getLabelColor(orderedData[i2].label)) {
                             barColor = self.getLabelColor(orderedData[i2].label);
-                        }
-                        else if (self.getLabelColor(data[i].label)) {
+                        } else if (self.getLabelColor(data[i].label)) {
                             barColor = self.getLabelColor(data[i].label);
                         }
 
@@ -345,8 +340,7 @@ function BarChart(options) {
 
                     }
                 }
-            }
-            else {
+            } else {
                 barColor = self._defaultBarColor;
 
                 if (self.getLabelColor(data[i].label)) {
@@ -367,10 +361,12 @@ function BarChart(options) {
                 }
             }
         }
-    }
+    };
 
     self.drawErrorBars = function(xPos,yPos,variance,barCount) {
-        if (typeof barCount === 'undefined') { barCount = 1; }
+        if (typeof barCount === 'undefined') {
+            barCount = 1; 
+        }
         var ctx = self.context();
         var barWidth = self._barWidth / barCount;
         var barHeight = yPos;
@@ -381,20 +377,20 @@ function BarChart(options) {
 
         if ( yPos !== 0 ) {
             ctx.beginPath();
-                // Vertical Line
-                ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth / 2)), self.verticalPixelPosition((yPos) - errorVariance));
-                ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth / 2)), self.verticalPixelPosition((yPos) + errorVariance));
-                // Top Horizontal Line
-                ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth * .65)),self.verticalPixelPosition((yPos) + errorVariance));
-                ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth * .35)),self.verticalPixelPosition((yPos) + errorVariance));
-                // Bottom Horizontal Line
-                ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth * .65)),self.verticalPixelPosition((yPos) - errorVariance));
-                ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth * .35)),self.verticalPixelPosition((yPos) - errorVariance));
-                ctx.stroke();
+            // Vertical Line
+            ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth / 2)), self.verticalPixelPosition((yPos) - errorVariance));
+            ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth / 2)), self.verticalPixelPosition((yPos) + errorVariance));
+            // Top Horizontal Line
+            ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth * .65)),self.verticalPixelPosition((yPos) + errorVariance));
+            ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth * .35)),self.verticalPixelPosition((yPos) + errorVariance));
+            // Bottom Horizontal Line
+            ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth * .65)),self.verticalPixelPosition((yPos) - errorVariance));
+            ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth * .35)),self.verticalPixelPosition((yPos) - errorVariance));
+            ctx.stroke();
             ctx.closePath();
         }
 
-    }
+    };
 
     self.drawBarLabels = function() {
         var ctx = self.context();
@@ -413,7 +409,7 @@ function BarChart(options) {
             ctx.fillText(data[i].label, 0, 0);
             ctx.restore();
         }
-    }
+    };
 
 
     self.drawKey = function(keyData) {
@@ -462,7 +458,7 @@ function BarChart(options) {
                 }
             }
         }
-    }
+    };
 
 
     self.drawRange = function(low, high, label, color) {
@@ -481,7 +477,7 @@ function BarChart(options) {
             ctx.fillStyle = color || self._defaultRangeColor;
             ctx.fillText(label, self.getChartRightPos(), self.verticalPixelPosition(high) - (self._fontSize * 0.5));
         }
-    }
+    };
 
     self.drawTarget = function(target, label, color) {
         var ctx = self.context();
@@ -501,7 +497,7 @@ function BarChart(options) {
             ctx.fillStyle = color || self._defaultTargetColor;
             ctx.fillText(label, self.getChartRightPos(), self.verticalPixelPosition(target) - (self._fontSize * 0.5));
         }
-    }
+    };
 
     self.chartLow = function() {
         if (self._chartLow === null) {
@@ -516,7 +512,7 @@ function BarChart(options) {
         }
 
         return self._chartLow;
-    }
+    };
 
 
     self.chartHigh = function() {
@@ -532,7 +528,7 @@ function BarChart(options) {
                 //  values.push(self.barTotal(self._data[i]));
 
                 // } else {
-                    values.push(self.barTotal(self._data[i]));
+                values.push(self.barTotal(self._data[i]));
                 // }
             }
 
@@ -542,7 +538,7 @@ function BarChart(options) {
         }
 
         return self._chartHigh;
-    }
+    };
 
 
     /**
@@ -563,7 +559,7 @@ function BarChart(options) {
         }
 
         return barLow;
-    }
+    };
 
 
     /**
@@ -571,7 +567,7 @@ function BarChart(options) {
      */
     self.barHigh = function(bar) {
         return (self.barTotal(bar) > 0) ? self.barTotal(bar) : 0;
-    }
+    };
 
 
     /**
@@ -589,7 +585,7 @@ function BarChart(options) {
         }
 
         return barTotal;
-    }
+    };
 
 
     self.valueToPixels = function(value) {
@@ -597,7 +593,7 @@ function BarChart(options) {
         var valueAsPercentage = value / chartRange;
         var pixels = (self.getChartHeight() * valueAsPercentage);
         return Math.round(pixels);
-    }
+    };
 
 
     self.verticalPixelOffset = function() {
@@ -606,47 +602,47 @@ function BarChart(options) {
         var offsetAsPercentage = offset / chartRange;
         var pixelOffset = (self.getChartHeight() * offsetAsPercentage);
         return pixelOffset;
-    }
+    };
 
 
     self.verticalPixelPosition = function(value) {
         return self.getChartBottomPos() - self.verticalPixelOffset() - self.valueToPixels(value);
-    }
+    };
 
 
     self.getChartBottomPos = function() {
         return self._height - self.getBarLabelsHeight() - self.getKeyHeight(self._barColors);
-    }
+    };
 
 
     self.getChartHeight = function() {
         return self.getChartBottomPos() - self.getChartTitleHeight();
-    }
+    };
 
 
     self.getChartTitleHeight = function() {
         return (self._chartTitle) ? self._fontSize * 8 : self._fontSize * 0.5;
-    }
+    };
 
 
     self.horizontalPixelPosition = function(chartPos) {
         return self.getChartLeftPos() + chartPos;
-    }
+    };
 
 
     self.getChartWidth = function() {
         return self._width - self.getChartLeftPos();
-    }
+    };
 
 
     self.getChartRightPos = function() {
         return self._width;
-    }
+    };
 
 
     self.getChartLeftPos = function() {
         return self.getYAxisLabelWidth() + self.getYAxisScaleWidth();
-    }
+    };
 
 
     self.getYAxisLabelWidth = function() {
@@ -655,7 +651,7 @@ function BarChart(options) {
         }
 
         return 0;
-    }
+    };
 
 
     self.getYAxisScaleWidth = function() {
@@ -674,7 +670,7 @@ function BarChart(options) {
         }
 
         return self.widestText(textArray, self.font()) + (self._fontSize / 2);
-    }
+    };
 
 
     self.getBarLabelsHeight = function() {
@@ -687,22 +683,22 @@ function BarChart(options) {
         }
 
         return self.widestText(textArray, self.font()) + (fontSize * 2);
-    }
+    };
 
     self.getKeyHeight = function(keyData) {
         return (self.getKeyRows(keyData)) ? (self.getKeyRows(keyData) * self._fontSize * 1.6) + (self._fontSize * 7.2) : 0;
-    }
+    };
 
 
     self.getKeyColumns = function(keyData) {
         var colWidth = self.widestText(self.getKeyTextAsArray(keyData), self.font()) + (self._fontSize * 2) + 45;
         return Math.floor(self._width / colWidth);
-    }
+    };
 
 
     self.getKeyRows = function(keyData) {
         return Math.ceil(self.getKeyTextAsArray(keyData).length / self.getKeyColumns(keyData));
-    }
+    };
 
 
     self.getKeyTextAsArray = function(keyData) {
@@ -715,19 +711,19 @@ function BarChart(options) {
         }
 
         return textArray;
-    }
+    };
 
 
     self.getXAxisLabelFontSize = function() {
         return self._fontSize;
-    }
+    };
 
 
     let widestCache = {};
 
     self.widestText = function(textArray, font) {
         // This was a significant performance bottleneck.
-        let cacheKey = JSON.stringify({ "textArray": textArray, "font": font })
+        let cacheKey = JSON.stringify({ 'textArray': textArray, 'font': font });
         if (widestCache[cacheKey]) {
             return widestCache[cacheKey];
         }
@@ -738,27 +734,27 @@ function BarChart(options) {
         var ctx = cvs.getContext('2d');
         ctx.font = font;
 
-        let widths = textArray.map(str => ctx.measureText(str).width)
+        let widths = textArray.map(str => ctx.measureText(str).width);
         let max = Math.max(...widths);
 
         widestCache[cacheKey] = max;
         return max;
-    }
+    };
 
 
     self.font = function() {
         return self._fontSize + 'px ' + self._font;
-    }
+    };
 
 
     self.getLabelColor = function(label) {
         return (self._barColors[label]) ? self._barColors[label] : null;
-    }
+    };
 
 
     self.setHeight = function() {
         self._height = self._chartHeight + self.getChartTitleHeight() + self.getBarLabelsHeight() + self.getKeyHeight(self._barColors);
-    }
+    };
 
 
     self.objectLength = function(obj) {

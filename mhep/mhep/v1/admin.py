@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.db import models
 from django.forms import CheckboxSelectMultiple
 
-from . import VERSION
-from .models import Assessment, Library, Organisation
+from .models import Assessment
+from .models import Library
+from .models import Organisation
 
 
 @admin.register(Assessment)
@@ -25,9 +26,7 @@ class LibraryAdmin(admin.ModelAdmin):
 class OrganisationAdmin(admin.ModelAdmin):
     list_display = ["name", "number_of_assessments"]
     search_fields = ["name"]
-    formfield_overrides = {
-        models.ManyToManyField: {"widget": CheckboxSelectMultiple},
-    }
+    formfield_overrides = {models.ManyToManyField: {"widget": CheckboxSelectMultiple}}
 
     def number_of_assessments(self, obj):
         return obj.assessments.count()

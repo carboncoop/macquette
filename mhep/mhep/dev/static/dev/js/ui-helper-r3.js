@@ -1,7 +1,6 @@
 var view_html = {};
 
-function load_view(eid, view)
-{
+function load_view(eid, view) {
     if (view_html[view] != undefined) {
         $(eid).html(view_html[view]);
         return view_html[view];
@@ -11,14 +10,14 @@ function load_view(eid, view)
     if (!url) {
         console.error(`Couldn't find URL for 'subviews/${view}.html'`);
         console.error(
-            "If you are running the code locally, this could be because you have" +
-            " added a new page without running collectstatic."
+            'If you are running the code locally, this could be because you have' +
+            ' added a new page without running collectstatic.'
         );
-        alert("Error loading page.");
+        alert('Error loading page.');
         return;
     }
 
-    var result_html = "";
+    var result_html = '';
     $.ajax({
         url: url,
         async: false,
@@ -43,9 +42,8 @@ function load_view(eid, view)
 
     return result_html;
 }
-function varset(key, value)
-{
-    var lastval = "";
+function varset(key, value) {
+    var lastval = '';
     var p = key.split('.');
 
     switch (p.length) {
@@ -79,8 +77,7 @@ function varset(key, value)
     return lastval;
 }
 
-function varget(key)
-{
+function varget(key) {
     var p = key.split('.');
     var val = false;
 
@@ -127,46 +124,44 @@ function varget(key)
     return val;
 }
 
-function InitUI()
-{
+function InitUI() {
     // Call page specific updateui function
-    var functionname = page + "_initUI";
-    if (window[functionname] != undefined)
+    var functionname = page + '_initUI';
+    if (window[functionname] != undefined) {
         window[functionname]();
+    }
 
-    $(".monthly").each(function () {
+    $('.monthly').each(function () {
 
         var name = $(this).attr('key');
         var dp = $(this).attr('dp');
         var title = $(this).attr('title');
         var units = $(this).attr('units');
 
-        var out = "";
+        var out = '';
         var sum = 0;
-        for (var m = 0; m < 12; m++)
-        {
-            out += "<td key='" + name + "." + m + "' dp=" + dp + " units='" + units + "'></td>";
-            sum += varget(name + "." + m);
+        for (var m = 0; m < 12; m++) {
+            out += "<td key='" + name + '.' + m + "' dp=" + dp + " units='" + units + "'></td>";
+            sum += varget(name + '.' + m);
         }
         var mean = sum / 12.0;
 
-        $(this).html("<tr><td>" + title + "</td><td>sum:" + sum.toFixed(dp) + "<br>mean:" + mean.toFixed(dp) + "</td>" + out + "</tr>");
+        $(this).html('<tr><td>' + title + '</td><td>sum:' + sum.toFixed(dp) + '<br>mean:' + mean.toFixed(dp) + '</td>' + out + '</tr>');
     });
 
     $('.scenario-name').html(scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - ' + data.scenario_name);
 }
 
-function UpdateUI(data)
-{
+function UpdateUI(data) {
     // Call page specific updateui function
-    var functionname = page + "_UpdateUI";
-    if (window[functionname] != undefined)
+    var functionname = page + '_UpdateUI';
+    if (window[functionname] != undefined) {
         window[functionname]();
+    }
 
     getkeys('data', data);
 
-    for (z in keys)
-    {
+    for (z in keys) {
         var value = keys[z];
         var target = $("[key='" + z + "']");
 
@@ -174,77 +169,68 @@ function UpdateUI(data)
 
             var dp = 1 * target.attr('dp');
             var units = target.attr('units');
-            if (!isNaN(dp))
+            if (!isNaN(dp)) {
                 value = (1 * value).toFixed(dp);
+            }
 
-            if (units != undefined)
-                value += "" + units;
+            if (units != undefined) {
+                value += '' + units;
+            }
 
             if (target.is('span')) {
                 target.html(value);
-            }
-            else if (target.is('input[type=text]')) {
+            } else if (target.is('input[type=text]')) {
                 target.val(value);
-            }
-            else if (target.is('input[type=number]')) {
+            } else if (target.is('input[type=number]')) {
                 target.val(value);
-            }
-            else if (target.is('input[type=checkbox]')) {
+            } else if (target.is('input[type=checkbox]')) {
                 target.prop('checked', value);
-            }
-            else if (target.is('input[type=hidden]')) {
+            } else if (target.is('input[type=hidden]')) {
                 target.val(value);
-            }
-            else if (target.is('input[type=radio]')) {
+            } else if (target.is('input[type=radio]')) {
                 // Purposeful loose equals, because e.value will always be a string
                 // while 'value' might an integer... but "3" == 3 so who cares
-                let found = target.filter((_, e) => e.value == value)
+                let found = target.filter((_, e) => e.value == value);
                 if (found.length) {
-                    found[0].checked = true
+                    found[0].checked = true;
                 }
-            }
-            else if (target.is('textarea')) {
+            } else if (target.is('textarea')) {
                 target.html(value);
-            }
-            else if (target.is('select')) {
+            } else if (target.is('select')) {
                 target.val(value);
-            }
-            else if (target.is('td')) {
+            } else if (target.is('td')) {
                 target.html(value);
-            }
-            else if (target.is('th')) {
+            } else if (target.is('th')) {
                 target.html(value);
-            }
-            else if (target.is('div')) {
+            } else if (target.is('div')) {
                 target.html(value);
             }
         }
     }
 }
 
-function getkeys(key, val)
-{
+function getkeys(key, val) {
     switch (typeof val) {
-        case "object":
-            for (subkey in val)
-                getkeys(key + "." + subkey, val[subkey]);
+        case 'object':
+            for (subkey in val) {
+                getkeys(key + '.' + subkey, val[subkey]);
+            }
             break;
-        case "string":
+        case 'string':
             keys[key] = val;
             break;
-        case "number":
+        case 'number':
             keys[key] = val;
             break;
-        case "boolean":
+        case 'boolean':
             keys[key] = val;
             break;
     }
 }
 
-function getuikeys()
-{
+function getuikeys() {
     var uikeys = [];
-    $("[key]").each(function () {
+    $('[key]').each(function () {
         uikeys.push($(this).attr('key'));
     });
     return uikeys;
@@ -253,19 +239,20 @@ function getuikeys()
 Object.size = function (obj) {
     var size = 0, key;
     for (key in obj) {
-        if (obj.hasOwnProperty(key))
+        if (obj.hasOwnProperty(key)) {
             size++;
+        }
     }
     return size;
 };
 
 function alertifnotlogged(data) {
-    if (data === "Not logged") {
+    if (data === 'Not logged') {
         $('#modal-error-submitting-data').show();
     }
 }
 function alert_if_assessment_locked(data) {
-    if (data === "Assessment locked") {
+    if (data === 'Assessment locked') {
         $('#modal-assessment-locked').modal('show');
     }
 }
@@ -275,8 +262,9 @@ function get_fuels_for_select(category_to_show) {
     var fuels_by_category = {};
     for (var fuel in data.fuels) {
         var category = data.fuels[fuel].category;
-        if (fuels_by_category[category] == undefined)
+        if (fuels_by_category[category] == undefined) {
             fuels_by_category[category] = [];
+        }
         fuels_by_category[category].push(fuel);
     }
 
@@ -284,16 +272,17 @@ function get_fuels_for_select(category_to_show) {
     var options = '';
     if (fuels_by_category[category_to_show] != undefined) {
         for (fuel in data.fuels) {
-            if (data.fuels[fuel].category == category_to_show)
+            if (data.fuels[fuel].category == category_to_show) {
                 options += '<option value="' + fuel + '">' + fuel + '</option>';
+            }
         }
-    }
-    else {
+    } else {
         for (category in fuels_by_category) {
             if (category != 'generation') {
                 options += '<optgroup label="' + category + '">';
-                for (index in fuels_by_category[category])
+                for (index in fuels_by_category[category]) {
                     options += '<option value="' + fuels_by_category[category][index] + '">' + fuels_by_category[category][index] + '</option>';
+                }
                 options += '</optgroup>';
             }
         }
@@ -303,16 +292,18 @@ function get_fuels_for_select(category_to_show) {
 
 function get_a_fuel(type_of_fuel) { // Returns the first fuel for a specific type found in data.fuels for a specific type
     for (var fuel in data.fuels) {
-        if (data.fuels[fuel].category == type_of_fuel)
+        if (data.fuels[fuel].category == type_of_fuel) {
             return fuel;
+        }
     }
 }
 
 function get_fuel_categories() {
     var categories = [];
     for (var fuel in project.master.fuels) {
-        if (categories.indexOf(project.master.fuels[fuel].category) === -1)
+        if (categories.indexOf(project.master.fuels[fuel].category) === -1) {
             categories.push(project.master.fuels[fuel].category);
+        }
     }
     return categories;
 }
@@ -335,8 +326,7 @@ function get_hours_off_weekday(data) {
         var time_off_3 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off3_hours'], project.master.household['3a_heatinghours_weekday_off3_mins'], 0, 0);
         hours_off = (get_hours_three_periods(time_on_1, time_off_1, time_on_2, time_off_2, time_on_3, time_off_3));
 
-    }
-    else if (project.master.household['3a_heatinghours_weekday_off2_hours'] != undefined
+    } else if (project.master.household['3a_heatinghours_weekday_off2_hours'] != undefined
             && project.master.household['3a_heatinghours_weekday_off2_mins'] != undefined
             && (project.master.household['3a_heatinghours_weekday_on2_hours'] != project.master.household['3a_heatinghours_weekday_off2_hours']
                     || project.master.household['3a_heatinghours_weekday_on2_mins'] != project.master.household['3a_heatinghours_weekday_off2_mins'])) {
@@ -345,14 +335,13 @@ function get_hours_off_weekday(data) {
         var time_on_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on2_hours'], project.master.household['3a_heatinghours_weekday_on2_mins'], 0, 0);
         var time_off_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off2_hours'], project.master.household['3a_heatinghours_weekday_off2_mins'], 0, 0);
         hours_off = (get_hours_two_periods(time_on_1, time_off_1, time_on_2, time_off_2));
-    }
-    else if (project.master.household['3a_heatinghours_weekday_off1_hours'] != project.master.household['3a_heatinghours_weekday_on1_hours'] || project.master.household['3a_heatinghours_weekday_off1_mins'] != project.master.household['3a_heatinghours_weekday_on1_mins']) {
+    } else if (project.master.household['3a_heatinghours_weekday_off1_hours'] != project.master.household['3a_heatinghours_weekday_on1_hours'] || project.master.household['3a_heatinghours_weekday_off1_mins'] != project.master.household['3a_heatinghours_weekday_on1_mins']) {
         var time_off = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off1_hours'], project.master.household['3a_heatinghours_weekday_off1_mins'], 0, 0);
         var time_on = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on1_hours'], project.master.household['3a_heatinghours_weekday_on1_mins'], 0, 0);
         hours_off.push(get_hours_off_one_period(time_on, time_off));
-    }
-    else
+    } else {
         hours_off.push(0);
+    }
     return hours_off;
 }
 function get_hours_off_weekend(data) {
@@ -369,8 +358,7 @@ function get_hours_off_weekend(data) {
         var time_off_3 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off3_hours'], project.master.household['3a_heatinghours_weekend_off3_mins'], 0, 0);
         hours_off = (get_hours_three_periods(time_on_1, time_off_1, time_on_2, time_off_2, time_on_3, time_off_3));
 
-    }
-    else if (project.master.household['3a_heatinghours_weekend_off2_hours'] != undefined
+    } else if (project.master.household['3a_heatinghours_weekend_off2_hours'] != undefined
             && project.master.household['3a_heatinghours_weekend_off2_mins'] != undefined
             && (project.master.household['3a_heatinghours_weekend_on2_hours'] != project.master.household['3a_heatinghours_weekend_off2_hours']
                     || project.master.household['3a_heatinghours_weekend_on2_mins'] != project.master.household['3a_heatinghours_weekend_off2_mins'])) {
@@ -379,20 +367,20 @@ function get_hours_off_weekend(data) {
         var time_on_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on2_hours'], project.master.household['3a_heatinghours_weekend_on2_mins'], 0, 0);
         var time_off_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off2_hours'], project.master.household['3a_heatinghours_weekend_off2_mins'], 0, 0);
         hours_off = (get_hours_two_periods(time_on_1, time_off_1, time_on_2, time_off_2));
-    }
-    else if (project.master.household['3a_heatinghours_weekend_off1_hours'] != project.master.household['3a_heatinghours_weekend_on1_hours'] || project.master.household['3a_heatinghours_weekend_off1_mins'] != project.master.household['3a_heatinghours_weekend_on1_mins']) {
+    } else if (project.master.household['3a_heatinghours_weekend_off1_hours'] != project.master.household['3a_heatinghours_weekend_on1_hours'] || project.master.household['3a_heatinghours_weekend_off1_mins'] != project.master.household['3a_heatinghours_weekend_on1_mins']) {
         var time_off = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off1_hours'], project.master.household['3a_heatinghours_weekend_off1_mins'], 0, 0);
         var time_on = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on1_hours'], project.master.household['3a_heatinghours_weekend_on1_mins'], 0, 0);
         hours_off.push(get_hours_off_one_period(time_on, time_off));
-    }
-    else
+    } else {
         hours_off.push(0);
+    }
     return hours_off;
 }
 function get_hours_off_one_period(time_on, time_off) {
-    if (time_on > time_off)  // heating is on before midnight and off after midnight
+    // heating is on before midnight and off after midnight
+    if (time_on > time_off) {
         return(Math.abs(time_off - time_on) / 36e5);
-    else {
+    } else {
         time_on.setDate(time_on.getDate() + 1);
         return(Math.abs(time_on - time_off) / 36e5);
     }
@@ -417,42 +405,56 @@ function get_hours_three_periods(time_on_1, time_off_1, time_on_2, time_off_2, t
  ************************/
 function measures_costs(scenario) {
     var measures_total_cost = 0;
-    if (project[scenario].fabric.measures != undefined)
+    if (project[scenario].fabric.measures != undefined) {
         measures_total_cost += cost_of_measures_by_id(project[scenario].fabric.measures);
+    }
     if (project[scenario].measures.ventilation != undefined) {
-        if (project[scenario].measures.ventilation.extract_ventilation_points != undefined)
+        if (project[scenario].measures.ventilation.extract_ventilation_points != undefined) {
             measures_total_cost += cost_of_measures_by_id(project[scenario].measures.ventilation.extract_ventilation_points);
-        if (project[scenario].measures.ventilation.intentional_vents_and_flues != undefined)
+        }
+        if (project[scenario].measures.ventilation.intentional_vents_and_flues != undefined) {
             measures_total_cost += cost_of_measures_by_id(project[scenario].measures.ventilation.intentional_vents_and_flues);
-        if (project[scenario].measures.ventilation.intentional_vents_and_flues_measures != undefined)
+        }
+        if (project[scenario].measures.ventilation.intentional_vents_and_flues_measures != undefined) {
             measures_total_cost += cost_of_measures_by_id(project[scenario].measures.ventilation.intentional_vents_and_flues_measures);
-        if (project[scenario].measures.ventilation.draught_proofing_measures != undefined)
+        }
+        if (project[scenario].measures.ventilation.draught_proofing_measures != undefined) {
             measures_total_cost += project[scenario].measures.ventilation.draught_proofing_measures.measure.cost_total;
-        if (project[scenario].measures.ventilation.ventilation_systems_measures != undefined)
+        }
+        if (project[scenario].measures.ventilation.ventilation_systems_measures != undefined) {
             measures_total_cost += project[scenario].measures.ventilation.ventilation_systems_measures.measure.cost_total;
-        if (project[scenario].measures.ventilation.clothes_drying_facilities != undefined)
+        }
+        if (project[scenario].measures.ventilation.clothes_drying_facilities != undefined) {
             measures_total_cost += cost_of_measures_by_id(project[scenario].measures.ventilation.clothes_drying_facilities);
+        }
     }
     if (project[scenario].measures.water_heating != undefined) {
-        if (project[scenario].measures.water_heating.water_usage != undefined)
+        if (project[scenario].measures.water_heating.water_usage != undefined) {
             measures_total_cost += cost_of_measures_by_id(project[scenario].measures.water_heating.water_usage);
-        if (project[scenario].measures.water_heating.storage_type != undefined)
+        }
+        if (project[scenario].measures.water_heating.storage_type != undefined) {
             measures_total_cost += project[scenario].measures.water_heating.storage_type.measure.cost_total;
-        if (project[scenario].measures.water_heating.pipework_insulation != undefined)
+        }
+        if (project[scenario].measures.water_heating.pipework_insulation != undefined) {
             measures_total_cost += project[scenario].measures.water_heating.pipework_insulation.measure.cost_total;
-        if (project[scenario].measures.water_heating.hot_water_control_type != undefined)
+        }
+        if (project[scenario].measures.water_heating.hot_water_control_type != undefined) {
             measures_total_cost += project[scenario].measures.water_heating.hot_water_control_type.measure.cost_total;
+        }
     }
-    if (project[scenario].measures.space_heating_control_type != undefined)
+    if (project[scenario].measures.space_heating_control_type != undefined) {
         measures_total_cost += cost_of_measures_by_id(project[scenario].measures.space_heating_control_type);
-    if (project[scenario].measures.heating_systems != undefined)
+    }
+    if (project[scenario].measures.heating_systems != undefined) {
         measures_total_cost += cost_of_measures_by_id(project[scenario].measures.heating_systems);
+    }
     if (project[scenario].use_generation == 1 && project[scenario].measures.PV_generation != undefined) {
         measures_total_cost += project[scenario].measures.PV_generation.measure.cost_total;
     }
     if (project[scenario].measures.LAC != undefined) {
-        if (project[scenario].measures.LAC.lighting != undefined)
+        if (project[scenario].measures.LAC.lighting != undefined) {
             measures_total_cost += project[scenario].measures.LAC.lighting.measure.cost_total;
+        }
     }
     return measures_total_cost;
 }
@@ -463,27 +465,31 @@ function cost_of_measures_by_id(list_of_measures_by_id) {
     }
     return cost;
 }
-function add_quantity_and_cost_to_measure(measure) { // Add extra properties to measure
+// Add extra properties to measure
+function add_quantity_and_cost_to_measure(measure) {
+    // ares of EWI is bigger than the actual area of the wall
     if (measure.cost_units == 'sqm') {
-        if (measure.EWI != undefined && measure.EWI == true) // ares of EWI is bigger than the actual area of the wall
-            measure.area != undefined ? measure.quantity = 1.15 * measure.area : measure.quantity = 0; // We use measure.area not measure.netarea (See issue 382: https://github.com/emoncms/MyHomeEnergyPlanner/issues/382#event-1681266801)
-        else
+        if (measure.EWI != undefined && measure.EWI == true) {
+            measure.area != undefined ? measure.quantity = 1.15 * measure.area : measure.quantity = 0;
+        } else {
+            // We use measure.area not measure.netarea (See issue 382: https://github.com/emoncms/MyHomeEnergyPlanner/issues/382#event-1681266801)
             measure.area != undefined ? measure.quantity = 1.0 * measure.area : measure.quantity = 0;
-    }
-    else if (measure.cost_units == 'ln m')
+        }
+    } else if (measure.cost_units == 'ln m') {
         measure.perimeter != undefined ? measure.quantity = 1.0 * measure.perimeter : measure.quantity = 0;
-    else if (measure.cost_units == 'unit')
+    } else if (measure.cost_units == 'unit') {
         measure.quantity = 1;
-    else {
+    } else {
         measure.quantity = 1;
         measure.cost_units = 'unit';
     }
-    if (measure.min_cost != undefined)
+    if (measure.min_cost != undefined) {
         measure.cost_total = 1.0 * measure.min_cost + 1.0 * measure.quantity * measure.cost;
-    else
+    } else {
         measure.cost_total = 1.0 * measure.quantity * measure.cost;
+    }
 
-        measure.cost_total = 1.0 * measure.cost_total.toFixed(2);
+    measure.cost_total = 1.0 * measure.cost_total.toFixed(2);
 }
 
 
@@ -494,27 +500,25 @@ function init_revert_to_original_by_id(selector, item_id, type_of_item) {
     selector = selector + ' .revert-to-original[item-id="' + item_id + '"]';
     if (scenario != 'master') {
         if (measure_applied_to_item_by_id(type_of_item, item_id) != false && data.created_from != undefined) {
-            if (data.created_from == 'master')
+            if (data.created_from == 'master') {
                 $(selector + ' .text').html('Revert to master');
-            else {
+            } else {
                 var html = 'Revert to Scenario ' + data.created_from.split('scenario')[1];
                 $(selector + ' .text').html(html);
             }
             $(selector).show();
             // Check original element still exists, it may have been deleted
             if (item_exists_in_original(data.created_from, item_id, type_of_item) == false) {
-                $(selector).removeClass('revert-to-original').css('cursor', 'default').html('Original element doesn\'t<br />exist, cannot revert');
+                $(selector).removeClass('revert-to-original').css('cursor', 'default').html("Original element doesn't<br />exist, cannot revert");
                 return;
             }
             $('#openbem').on('click', selector, function () {
-                revert_to_original(item_id, type_of_item)
+                revert_to_original(item_id, type_of_item);
             });
-        }
-        else {
+        } else {
             $(selector).hide();
         }
-    }
-    else {
+    } else {
         $(selector).hide();
     }
 }
@@ -531,8 +535,9 @@ function measure_applied_to_item_by_id(type_of_item, item_id) {
             console.error('Type of item not valid');
     }
     for (var measure_id in measures_by_id) {
-        if (measure_id == item_id)
+        if (measure_id == item_id) {
             return true;
+        }
         /*else if (measure_applied_in_bulk(element_id) != false) {
          return true;
          }*/
@@ -546,14 +551,15 @@ function item_exists_in_original(original_scenario, item_id, type_of_item) {
             items_array = project[original_scenario].fabric.elements;
             break;
         case'ventilation-EVP':
-            items_array = project[original_scenario].ventilation.EVP
+            items_array = project[original_scenario].ventilation.EVP;
             break;
         default:
             console.error('Type of item not valid');
     }
     for (var e in items_array) {
-        if (items_array[e].id == item_id)
+        if (items_array[e].id == item_id) {
             return true;
+        }
     }
     return false;
 }
@@ -597,7 +603,8 @@ function revert_to_original(item_id, type_of_item) {
 }
 function get_item_index_by_id(id, array) {
     for (var index in array) {
-        if (array[index].id == id)
+        if (array[index].id == id) {
             return index;
+        }
     }
 }

@@ -1,9 +1,9 @@
 import pytest
 
-
 from .. import VERSION
 from ..models import Organisation
-from ..tests.factories import UserFactory, OrganisationFactory
+from ..tests.factories import OrganisationFactory
+from ..tests.factories import UserFactory
 
 pytestmark = pytest.mark.django_db
 

@@ -1,15 +1,15 @@
 import pathlib
 import tempfile
+
 from PIL import Image
-
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
-from mhep.users.tests.factories import UserFactory
-from ... import VERSION
 from ... import models
+from ... import VERSION
 from ...serializers import ImageSerializer
 from ..factories import AssessmentFactory
+from mhep.users.tests.factories import UserFactory
 
 IMG_WIDTH = 400
 IMG_HEIGHT = 300

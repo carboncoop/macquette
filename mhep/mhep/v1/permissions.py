@@ -1,4 +1,5 @@
-from rest_framework import exceptions, permissions
+from rest_framework import exceptions
+from rest_framework import permissions
 
 from .models import Organisation
 

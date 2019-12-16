@@ -1,6 +1,5 @@
 var mhep_helper = {
-    'list_assessments': function ()
-    {
+    'list_assessments': function () {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.assessments(),
@@ -8,14 +7,13 @@ var mhep_helper = {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("listing assessments")(jqXHR, textStatus, errorThrown);
+                    handleServerError('listing assessments')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
-    'get': function (id)
-    {
+    'get': function (id) {
         var result = {};
         $.ajax({
             url: urlHelper.api.assessment(id),
@@ -27,35 +25,32 @@ var mhep_helper = {
         });
         return result;
     },
-    'set': function (id, project, callback)
-    {
+    'set': function (id, project, callback) {
         var inputdata = {};
-        for (z in project)
-        {
+        for (z in project) {
             inputdata[z] = mhep_helper.extract_inputdata(project[z]);
         }
         var result = {};
         $.ajax({
-          type: 'PATCH',
-          url: urlHelper.api.assessment(id),
-          data: JSON.stringify({'data': inputdata}),
-          dataType: "json",
-          contentType: "application/json;charset=utf-8",
-          async: true,
-          error: handleServerError('updating assessment'),
-          success: function (data) {
-              callback(data)
-          },
+            type: 'PATCH',
+            url: urlHelper.api.assessment(id),
+            data: JSON.stringify({'data': inputdata}),
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
+            async: true,
+            error: handleServerError('updating assessment'),
+            success: function (data) {
+                callback(data);
+            },
         });
         //console.log(JSON.stringify(inputdata));
     },
-    'create': function (name, description, orgid, callback)
-    {
+    'create': function (name, description, orgid, callback) {
         var result = 0;
         // TODO: Link this version of openBEM to the app, don't hard code it like this.
         const newAssessment = {
-            "name": name,
-            "description": description,
+            'name': name,
+            'description': description,
         };
 
         var endpoint;
@@ -70,7 +65,7 @@ var mhep_helper = {
             url: endpoint,
             data: JSON.stringify(newAssessment),
             dataType: 'json',
-            contentType: "application/json;charset=utf-8",
+            contentType: 'application/json;charset=utf-8',
             async: false,
             error: handleServerError('creating assessment'),
             success: function (data) {
@@ -85,7 +80,7 @@ var mhep_helper = {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.assessment(id),
-                type: "DELETE",
+                type: 'DELETE',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('deleting assessment')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -96,32 +91,30 @@ var mhep_helper = {
             });
         });
     },
-    'set_status': function (id, status)
-    {
+    'set_status': function (id, status) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: 'PATCH',
                 url: urlHelper.api.assessment(id),
                 dataType: 'json',
-                contentType: "application/json;charset=utf-8",
+                contentType: 'application/json;charset=utf-8',
                 data: JSON.stringify({'status': status}),
                 success: function () {
                     resolve();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("setting assessment status")(jqXHR, textStatus, errorThrown);
+                    handleServerError('setting assessment status')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
-    'set_name_and_description': function (id, name, description)
-    {
+    'set_name_and_description': function (id, name, description) {
         $.ajax({type: 'PATCH',
             url: urlHelper.api.assessment(id),
             data: JSON.stringify({'name': name, 'description': description}),
-            dataType: "json",
-            contentType: "application/json;charset=utf-8",
+            dataType: 'json',
+            contentType: 'application/json;charset=utf-8',
             async: false,
             error: handleServerError('setting assessment name and description'),
             success: function (data) {
@@ -136,11 +129,11 @@ var mhep_helper = {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("listing organisations")(jqXHR, textStatus, errorThrown);
+                    handleServerError('listing organisations')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
     'list_users': function() {
         return new Promise((resolve, reject) => {
@@ -156,17 +149,17 @@ var mhep_helper = {
                         return resolve([]);
                     }
 
-                    handleServerError("listing users")(jqXHR, textStatus, errorThrown);
+                    handleServerError('listing users')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
     'add_member': function(orgid, userid) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.members(orgid, userid),
-                type: "POST",
+                type: 'POST',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('adding member')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -181,7 +174,7 @@ var mhep_helper = {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.members(orgid, userid),
-                type: "DELETE",
+                type: 'DELETE',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('removing member')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -205,14 +198,14 @@ var mhep_helper = {
                 url: apiURL,
                 type: 'POST',
                 data: JSON.stringify(libraryData),
-                datatype: "json",
-                contentType: "application/json;charset=utf-8",
+                datatype: 'json',
+                contentType: 'application/json;charset=utf-8',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('creating library')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 },
                 success: function (data) {
-                    resolve(data)
+                    resolve(data);
                 },
             });
         });
@@ -221,7 +214,7 @@ var mhep_helper = {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.shareUnshareOrganisationLibraries(fromOrgID, libraryID, toOrgID),
-                type: "POST",
+                type: 'POST',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('sharing library with organisation')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -236,7 +229,7 @@ var mhep_helper = {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.shareUnshareOrganisationLibraries(fromOrgID, libraryID, toOrgID),
-                type: "DELETE",
+                type: 'DELETE',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('stopping sharing library with organisation')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -255,17 +248,17 @@ var mhep_helper = {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("listing organisations library is shared with")(jqXHR, textStatus, errorThrown);
+                    handleServerError('listing organisations library is shared with')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
     'promote_user_as_librarian': function(orgid, userid) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.librarians(orgid, userid),
-                type: "POST",
+                type: 'POST',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('promoting user as librarian')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -280,7 +273,7 @@ var mhep_helper = {
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: urlHelper.api.librarians(orgid, userid),
-                type: "DELETE",
+                type: 'DELETE',
                 error: function(jqXHR, textStatus, errorThrown) {
                     handleServerError('demoting user as librarian')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
@@ -291,11 +284,10 @@ var mhep_helper = {
             });
         });
     },
-    'upload_image': function (assessment_id, file)
-    {
+    'upload_image': function (assessment_id, file) {
         return new Promise((resolve, reject) => {
-            const form = new FormData()
-            form.append("file", file)
+            const form = new FormData();
+            form.append('file', file);
 
             $.ajax({
                 type: 'POST',
@@ -307,52 +299,49 @@ var mhep_helper = {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("uploading image")(jqXHR, textStatus, errorThrown);
+                    handleServerError('uploading image')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
-    'set_featured_image': function(assessment_id, image_id)
-    {
+    'set_featured_image': function(assessment_id, image_id) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: 'POST',
                 url: urlHelper.api.setFeaturedImage(assessment_id),
                 dataType: 'json',
-                contentType: "application/json;charset=utf-8",
-                data: JSON.stringify({ "id": image_id }),
+                contentType: 'application/json;charset=utf-8',
+                data: JSON.stringify({ 'id': image_id }),
                 success: function (data) {
                     resolve();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("setting featured image")(jqXHR, textStatus, errorThrown);
+                    handleServerError('setting featured image')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
-    'set_image_note': function (id, note)
-    {
+    'set_image_note': function (id, note) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: 'PATCH',
                 url: urlHelper.api.image(id),
                 dataType: 'json',
-                contentType: "application/json;charset=utf-8",
-                data: JSON.stringify({ "note": note }),
+                contentType: 'application/json;charset=utf-8',
+                data: JSON.stringify({ 'note': note }),
                 success: function (data) {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("setting image note")(jqXHR, textStatus, errorThrown);
+                    handleServerError('setting image note')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
-    'delete_image': function (id)
-    {
+    'delete_image': function (id) {
         return new Promise((resolve, reject) => {
             $.ajax({
                 type: 'DELETE',
@@ -361,19 +350,18 @@ var mhep_helper = {
                     resolve();
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
-                    handleServerError("deleting image")(jqXHR, textStatus, errorThrown);
+                    handleServerError('deleting image')(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }
             });
-        })
+        });
     },
-    extract_inputdata: function (data)
-    {
+    extract_inputdata: function (data) {
         var inputdata = {};
         inputdata.scenario_name = data.scenario_name;
         inputdata.household = data.household;
         inputdata.region = data.region;
-        inputdata.altitude = data.altitude
+        inputdata.altitude = data.altitude;
         inputdata.use_custom_occupancy = data.use_custom_occupancy;
         inputdata.custom_occupancy = data.custom_occupancy;
         inputdata.floors = [];
@@ -420,13 +408,15 @@ var mhep_helper = {
                 notes: data.fabric.elements[z].notes || '',
                 maintenance: data.fabric.elements[z].maintenance || ''
             };
-            if (data.fabric.elements[z].EWI != undefined)
+            if (data.fabric.elements[z].EWI != undefined) {
                 inputdata.fabric.elements[z].EWI = data.fabric.elements[z].EWI;
-            if (data.fabric.elements[z].cost_total != undefined)
+            }
+            if (data.fabric.elements[z].cost_total != undefined) {
                 inputdata.fabric.elements[z].cost_total = data.fabric.elements[z].cost_total;
+            }
         }
 
-// Ventilation
+        // Ventilation
         inputdata.ventilation = {
             air_permeability_test: data.ventilation.air_permeability_test,
             air_permeability_value: data.ventilation.air_permeability_value,
@@ -498,10 +488,10 @@ var mhep_helper = {
                 fuel: data.appliancelist.list[z].fuel,
                 efficiency: data.appliancelist.list[z].efficiency,
                 hours: data.appliancelist.list[z].hours
-            }
+            };
         }
 
-// Apliances CarbonCoop
+        // Apliances CarbonCoop
         inputdata.applianceCarbonCoop = {list: []};
         for (z in data.applianceCarbonCoop.list) {
             inputdata.applianceCarbonCoop.list[z] = {
@@ -509,18 +499,18 @@ var mhep_helper = {
                 name: data.applianceCarbonCoop.list[z].name,
                 number_used: data.applianceCarbonCoop.list[z].number_used,
                 a_plus_rated: data.applianceCarbonCoop.list[z].a_plus_rated,
-                "norm_demand": data.applianceCarbonCoop.list[z]["norm_demand"],
+                'norm_demand': data.applianceCarbonCoop.list[z]['norm_demand'],
                 units: data.applianceCarbonCoop.list[z].units,
-                "utilisation_factor": data.applianceCarbonCoop.list[z]["utilisation_factor"],
+                'utilisation_factor': data.applianceCarbonCoop.list[z]['utilisation_factor'],
                 frequency: data.applianceCarbonCoop.list[z].frequency,
-                "reference_quantity": data.applianceCarbonCoop.list[z]["reference_quantity"],
+                'reference_quantity': data.applianceCarbonCoop.list[z]['reference_quantity'],
                 'type_of_fuel': data.applianceCarbonCoop.list[z]['type_of_fuel'],
                 efficiency: data.applianceCarbonCoop.list[z].efficiency,
                 fuel: data.applianceCarbonCoop.list[z].fuel
             };
         }
 
-// Temperature
+        // Temperature
         inputdata.temperature = {
             responsiveness: data.temperature.responsiveness,
             target: data.temperature.target,

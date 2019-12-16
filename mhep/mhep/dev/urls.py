@@ -1,28 +1,26 @@
-from django.urls import path, reverse_lazy
+from django.urls import path
+from django.urls import reverse_lazy
 from django.views.generic.base import RedirectView
 
 from . import VERSION
-
-from .views import (
-    AssessmentHTMLView,
-    CreateDeleteOrganisationLibrarians,
-    CreateDeleteOrganisationMembers,
-    CreateUpdateDeleteLibraryItem,
-    CreateOrganisationLibraries,
-    ListAssessmentsHTMLView,
-    ListCreateAssessments,
-    ListCreateLibraries,
-    ListCreateOrganisationAssessments,
-    ListOrganisations,
-    ListOrganisationLibraryShares,
-    ListUsers,
-    RetrieveUpdateDestroyAssessment,
-    ShareUnshareOrganisationLibraries,
-    UploadAssessmentImage,
-    SetFeaturedImage,
-    UpdateDestroyImage,
-    UpdateDestroyLibrary,
-)
+from .views import AssessmentHTMLView
+from .views import CreateDeleteOrganisationLibrarians
+from .views import CreateDeleteOrganisationMembers
+from .views import CreateOrganisationLibraries
+from .views import CreateUpdateDeleteLibraryItem
+from .views import ListAssessmentsHTMLView
+from .views import ListCreateAssessments
+from .views import ListCreateLibraries
+from .views import ListCreateOrganisationAssessments
+from .views import ListOrganisationLibraryShares
+from .views import ListOrganisations
+from .views import ListUsers
+from .views import RetrieveUpdateDestroyAssessment
+from .views import SetFeaturedImage
+from .views import ShareUnshareOrganisationLibraries
+from .views import UpdateDestroyImage
+from .views import UpdateDestroyLibrary
+from .views import UploadAssessmentImage
 
 app_name = "assessments"
 urlpatterns = [
@@ -31,10 +29,8 @@ urlpatterns = [
         RedirectView.as_view(url=reverse_lazy(f"{VERSION}:list-assessments")),
         name="index",
     ),
-    path("assessments/", ListAssessmentsHTMLView.as_view(), name="list-assessments",),
-    path(
-        "assessments/<int:pk>/", AssessmentHTMLView.as_view(), name="view-assessment",
-    ),
+    path("assessments/", ListAssessmentsHTMLView.as_view(), name="list-assessments"),
+    path("assessments/<int:pk>/", AssessmentHTMLView.as_view(), name="view-assessment"),
     path(
         "api/assessments/",
         view=ListCreateAssessments.as_view(),
@@ -55,7 +51,7 @@ urlpatterns = [
         view=UploadAssessmentImage.as_view(),
         name="upload-image-to-assessment",
     ),
-    path("api/images/<int:pk>/", view=UpdateDestroyImage.as_view(), name="image",),
+    path("api/images/<int:pk>/", view=UpdateDestroyImage.as_view(), name="image"),
     path(
         "api/libraries/",
         view=ListCreateLibraries.as_view(),

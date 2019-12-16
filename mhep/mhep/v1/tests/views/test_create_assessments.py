@@ -1,15 +1,13 @@
 from django.contrib.auth import get_user_model
-
 from freezegun import freeze_time
-
+from rest_framework import exceptions
+from rest_framework import status
 from rest_framework.test import APITestCase
-from rest_framework import exceptions, status
-
-from mhep.users.tests.factories import UserFactory
 
 from ... import VERSION
 from ...models import Assessment
 from ..factories import OrganisationFactory
+from mhep.users.tests.factories import UserFactory
 
 User = get_user_model()
 
@@ -102,10 +100,7 @@ class CreateAssessmentTestsMixin:
         assert "" == response.data["description"]
 
     def test_returns_forbidden_if_not_logged_in(self):
-        new_assessment = {
-            "name": "test assessment 1",
-            "openbem_version": "10.1.1",
-        }
+        new_assessment = {"name": "test assessment 1", "openbem_version": "10.1.1"}
 
         response = self.post_to_create_endpoint(new_assessment)
 
@@ -115,7 +110,7 @@ class CreateAssessmentTestsMixin:
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {"openbem_version": "10.1.1", "description": "test description 2",},
+            {"openbem_version": "10.1.1", "description": "test description 2"},
             status.HTTP_400_BAD_REQUEST,
             {
                 "name": [
@@ -130,7 +125,7 @@ class CreateAssessmentTestsMixin:
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {"name": "test assessment 1", "description": "test description 2",},
+            {"name": "test assessment 1", "description": "test description 2"},
             status.HTTP_400_BAD_REQUEST,
             {
                 "openbem_version": [
@@ -145,12 +140,12 @@ class CreateAssessmentTestsMixin:
         self.client.force_authenticate(self.user)
 
         self.assert_create_fails(
-            {"name": "test assessment 1", "openbem_version": "foo",},
+            {"name": "test assessment 1", "openbem_version": "foo"},
             status.HTTP_400_BAD_REQUEST,
             {
                 "openbem_version": [
                     exceptions.ErrorDetail(
-                        string='"foo" is not a valid choice.', code="invalid_choice",
+                        string='"foo" is not a valid choice.', code="invalid_choice"
                     )
                 ]
             },
@@ -165,7 +160,7 @@ class CreateAssessmentTestsMixin:
             {
                 "status": [
                     exceptions.ErrorDetail(
-                        string='"bar" is not a valid choice.', code="invalid_choice",
+                        string='"bar" is not a valid choice.', code="invalid_choice"
                     )
                 ]
             },

@@ -1,10 +1,12 @@
-from django.contrib.auth import get_user_model
-
 import datetime
 
+from django.contrib.auth import get_user_model
 from rest_framework import serializers
 
-from .models import Assessment, Image, Library, Organisation
+from .models import Assessment
+from .models import Image
+from .models import Library
+from .models import Organisation
 
 User = get_user_model()
 
@@ -177,11 +179,7 @@ class LibrarySerializer(StringIDMixin, serializers.ModelSerializer):
                 "name": owner_user.username,
             }
         else:
-            return {
-                "type": "global",
-                "id": None,
-                "name": "Global",
-            }
+            return {"type": "global", "id": None, "name": "Global"}
 
     def create(self, validated_data):
         organisation = self.context.get("organisation", None)
@@ -205,14 +203,7 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Organisation
-        fields = [
-            "id",
-            "name",
-            "assessments",
-            "members",
-            "permissions",
-            "report",
-        ]
+        fields = ["id", "name", "assessments", "members", "permissions", "report"]
 
     def get_assessments(self, obj):
         return obj.assessments.count()
@@ -246,10 +237,7 @@ class OrganisationMetadataSerializer(OrganisationSerializer):
 
     class Meta:
         model = Organisation
-        fields = [
-            "id",
-            "name",
-        ]
+        fields = ["id", "name"]
 
 
 class UserSerializer(StringIDMixin, serializers.ModelSerializer):
@@ -258,10 +246,7 @@ class UserSerializer(StringIDMixin, serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = [
-            "id",
-            "name",
-        ]
+        fields = ["id", "name"]
 
     def get_name(self, user):
         return user.username

@@ -1,7 +1,6 @@
-console.log("debug commentary.js");
+console.log('debug commentary.js');
 
-function commentary_UpdateUI()
-{
+function commentary_UpdateUI() {
 
 }
 
@@ -20,9 +19,9 @@ function commentary_initUI() {
         if (s != 'master') {
             data = project[s];
             $('#overviews').append('<div id="overview-' + s + '" class="overview" style="width:50%; display:inline-block"></div>');
-            load_view("#overview-" + s, 'topgraphic');
+            load_view('#overview-' + s, 'topgraphic');
             $('#overviews #overview-' + s + ' #scenario-name').html(s.charAt(0).toUpperCase() + s.slice(1) + ' - ' + data.scenario_name);
-            draw_openbem_graphics("#overview-" + s);
+            draw_openbem_graphics('#overview-' + s);
         }
     }
 
@@ -31,9 +30,9 @@ function commentary_initUI() {
 }
 
 var textAreaLength = 0;
-$("#openbem").on("textInput", '[key="data.household.commentary"]', function () { // I have added this event because the Commentary box in Household questionnaire was not getting saved when the assessor refreshed the page or moved to another one before losing the focus of the input (which is what triggers the onChange event)
+$('#openbem').on('textInput', '[key="data.household.commentary"]', function () { // I have added this event because the Commentary box in Household questionnaire was not getting saved when the assessor refreshed the page or moved to another one before losing the focus of the input (which is what triggers the onChange event)
     if ($(this)[0].value.length - textAreaLength > 15) {
         textAreaLength = $(this)[0].value.length;
-        $(this).trigger("change");
+        $(this).trigger('change');
     }
 });

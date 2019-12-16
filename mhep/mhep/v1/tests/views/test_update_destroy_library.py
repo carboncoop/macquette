@@ -1,12 +1,10 @@
 from freezegun import freeze_time
-
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
 from ... import VERSION
 from ...models import Library
 from ..factories import LibraryFactory
-
 from mhep.users.tests.factories import UserFactory
 
 
@@ -26,14 +24,12 @@ class TestUpdateLibrary(APITestCase):
             lib = LibraryFactory.create(owner=self.me)
 
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "data": {"new": "data"},
-            }
+            updateFields = {"data": {"new": "data"}}
 
             self.client.force_authenticate(self.me)
 
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json"
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code
@@ -50,13 +46,11 @@ class TestUpdateLibrary(APITestCase):
             lib = LibraryFactory.create(owner=self.me)
 
         with freeze_time("2019-07-13T12:10:12Z"):
-            updateFields = {
-                "name": "updated name",
-            }
+            updateFields = {"name": "updated name"}
 
             self.client.force_authenticate(self.me)
             response = self.client.patch(
-                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json",
+                f"/{VERSION}/api/libraries/{lib.pk}/", updateFields, format="json"
             )
 
         assert status.HTTP_204_NO_CONTENT == response.status_code

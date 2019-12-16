@@ -1,13 +1,12 @@
+from django import http
 from django.conf import settings
 from django.test import TestCase
 from django.urls import reverse
-from django import http
-
 from rest_framework import status
 
 from ... import VERSION
-from ..factories import AssessmentFactory, OrganisationFactory
-
+from ..factories import AssessmentFactory
+from ..factories import OrganisationFactory
 from mhep.users.tests.factories import UserFactory
 
 

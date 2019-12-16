@@ -1,9 +1,9 @@
-from rest_framework.test import APITestCase
 from rest_framework import status
+from rest_framework.test import APITestCase
 
-from mhep.users.tests.factories import UserFactory
-from ... import VERSION
 from .. import factories
+from ... import VERSION
+from mhep.users.tests.factories import UserFactory
 
 
 class TestSetFeaturedImage(APITestCase):
@@ -55,7 +55,7 @@ class TestSetFeaturedImage(APITestCase):
 
     def test_image_belongs_to_other_assessment(self):
         a = factories.AssessmentFactory.create(owner=self.me)
-        i1 = factories.ImageFactory.create(assessment=a)
+        factories.ImageFactory.create(assessment=a)
 
         b = factories.AssessmentFactory.create(owner=self.me)
         i2 = factories.ImageFactory.create(assessment=b)

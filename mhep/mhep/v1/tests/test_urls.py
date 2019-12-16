@@ -1,10 +1,12 @@
 import pytest
+from django.urls import resolve
+from django.urls import reverse
+
+from .. import VERSION
+from ..models import Assessment
+from ..models import Library
 
 # from django.conf import settings
-from django.urls import reverse, resolve
-
-from ..models import Assessment, Library
-from .. import VERSION
 
 pytestmark = pytest.mark.django_db
 

@@ -1,12 +1,13 @@
+from typing import Any
+from typing import Sequence
+
 import factory
-
-from typing import Any, Sequence
-
-from ..models import Assessment, Library, Organisation
-from mhep.users.tests.factories import UserFactory
-
-
 from faker.providers import BaseProvider
+
+from ..models import Assessment
+from ..models import Library
+from ..models import Organisation
+from mhep.users.tests.factories import UserFactory
 
 
 # create new provider class. Note that the class name _must_ be ``Provider``.

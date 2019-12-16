@@ -7,17 +7,19 @@ function fuelsmanager_initUI() {
     // Sort by category
     var fuels_by_category = {};
     for (var fuel in project.master.fuels) {
-        var category = project.master.fuels[fuel].category
-        if (fuels_by_category[category] == undefined)
+        var category = project.master.fuels[fuel].category;
+        if (fuels_by_category[category] == undefined) {
             fuels_by_category[category] = [];
+        }
         fuels_by_category[category].push(fuel);
     }
 
     // Sort categories alphabetically
     var categories_sorted = [];
 
-    for (var category in fuels_by_category)
+    for (var category in fuels_by_category) {
         categories_sorted.push(category);
+    }
 
     categories_sorted.sort(function (a, b) {
         var textA = a[0].toUpperCase();
@@ -27,23 +29,24 @@ function fuelsmanager_initUI() {
 
 
     // Add fuels to table
-    var html = "";
+    var html = '';
     for (var category_index in categories_sorted) {
         var category = categories_sorted[category_index];
-        html += "<tr style='background-color:#eee'><th class='header' colspan=6>" + category + "</th>";
-        html += "<tr>" + $('#fuelsmanager-table-header-template').html() + '</tr>';
+        html += "<tr style='background-color:#eee'><th class='header' colspan=6>" + category + '</th>';
+        html += '<tr>' + $('#fuelsmanager-table-header-template').html() + '</tr>';
         fuels_by_category[category].forEach(function (fuel) {
-            html += "<tr>";
-            html += "<td>" + fuel + "</td>";
+            html += '<tr>';
+            html += '<td>' + fuel + '</td>';
             html += "<td><input style='width:85px;' min=0 step=0.001 type='number' dp=3 key='data.fuels." + fuel + ".co2factor' /></td>";
             html += "<td><input style='width:85px;' min=0 step=0.001 type='number' dp=3 key='data.fuels." + fuel + ".primaryenergyfactor' /></td>";
             html += "<td><input style='width:85px;' min=0 step=0.01 type='number' dp=2 key='data.fuels." + fuel + ".fuelcost' /></td>";
             html += "<td><input style='width:85px;' min=0 step=1 type='number' dp=0 key='data.fuels." + fuel + ".standingcharge' /></td>";
-            if (is_in_default_fuels(fuel) == false)
+            if (is_in_default_fuels(fuel) == false) {
                 html += "<td><i class='icon-trash delete-fuel' style='cursor:pointer' fuel='" + fuel + "'></i></td>";
-            else
-                html += "<td></td>";
-            html += "</tr>";
+            } else {
+                html += '<td></td>';
+            }
+            html += '</tr>';
         });
 
     }
@@ -72,12 +75,12 @@ $('#openbem').on('click', '.delete-fuel', function () {
         $('#delete_fuel-modal .modal-body').html('Are you sure you want to delete ' + fuel_to_delete + '?');
         $('#delete-fuel-ok').attr('fuel', fuel_to_delete);
         $('#delete_fuel-modal #delete-fuel-ok').show();
-    }
-    else {
+    } else {
         var html = '<p>' + fuel + ' cannot be deleted.</p><p>It is used in: ' + scenarios_that_use_this_fuel[0];
         scenarios_that_use_this_fuel.forEach(function (scenario, index) {
-            if (index > 0)
+            if (index > 0) {
                 html += ', ' + scenario;
+            }
         });
         html += '</p>';
         $('#delete_fuel-modal .modal-body').html(html);
@@ -128,8 +131,9 @@ $('#openbem').on('change', '#new-fuel-category', function () {
 
 function is_in_default_fuels(fuel) {
     for (f in datasets.fuels) {
-        if (fuel == f)
+        if (fuel == f) {
             return true;
+        }
     }
     return false;
 }
