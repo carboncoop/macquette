@@ -401,3 +401,12 @@ button.demote-role {
     font-size: 1rem;
     color: var(--brown-1);
 }
+
+
+
+
+
+tr.item {
+    vertical-align: top;
+}
+
