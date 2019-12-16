@@ -53,11 +53,9 @@ var mhep_helper = {
     {
         var result = 0;
         // TODO: Link this version of openBEM to the app, don't hard code it like this.
-        const openBEM_version = "10.1.1";
         const newAssessment = {
             "name": name,
             "description": description,
-            "openbem_version": openBEM_version,
         };
 
         var endpoint;
@@ -368,22 +366,6 @@ var mhep_helper = {
                 }
             });
         })
-    },
-    'set_openBEM_version': function (id, version, callback)
-    {
-        $.ajax({type: 'PATCH',
-            url: urlHelper.api.assessment(id),
-            data: JSON.stringify({'openbem_version': version}),
-            dataType: "json",
-            contentType: "application/json;charset=utf-8",
-            error: handleServerError('setting openBEM version'),
-            success: function (data) {
-                if (data == false) {
-                    window.alert("There was an error updating openBEM version");
-                }
-                callback(data);
-            },
-        });
     },
     extract_inputdata: function (data)
     {

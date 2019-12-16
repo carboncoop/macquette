@@ -46,7 +46,6 @@ class TestListAssessmentsForOrganisation(APITestCase):
                 name="test assessment 1",
                 description="test description",
                 data={"foo": "bar"},
-                openbem_version="10.1.1",
                 owner=self.org_member,
                 organisation=self.organisation,
             )
@@ -62,7 +61,6 @@ class TestListAssessmentsForOrganisation(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
             "status": "In progress",
-            "openbem_version": "10.1.1",
             "name": "test assessment 1",
             "description": "test description",
             "author": self.org_member.username,
@@ -147,7 +145,6 @@ class TestCreateAssessmentForOrganisation(CreateAssessmentTestsMixin, APITestCas
         new_assessment = {
             "name": "test assessment 1",
             "description": "test description 1",
-            "openbem_version": "10.1.1",
         }
 
         response = self.client.post(
@@ -169,7 +166,6 @@ class TestCreateAssessmentForOrganisation(CreateAssessmentTestsMixin, APITestCas
         new_assessment = {
             "name": "test assessment 1",
             "description": "test description 1",
-            "openbem_version": "10.1.1",
         }
 
         response = self.client.post(

@@ -9,11 +9,6 @@ STATUS_CHOICES = [
     ("Test", "Test"),
 ]
 
-OPENBEM_VERSION_CHOICES = [
-    ("10.1.0", "v10.1.0"),
-    ("10.1.1", "v10.1.1"),
-]
-
 
 class Assessment(models.Model):
     owner = models.ForeignKey(
@@ -36,10 +31,8 @@ class Assessment(models.Model):
     name = models.TextField()
     description = models.TextField(blank=True)
 
-    openbem_version = models.CharField(max_length=20, choices=OPENBEM_VERSION_CHOICES,)
-
     status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="In progress",
+        max_length=20, choices=STATUS_CHOICES, default="In progress"
     )
 
     featured_image = models.ForeignKey(
