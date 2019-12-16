@@ -470,7 +470,7 @@ libraryHelper.prototype.onCreateNewLibrary = function () {
 
 };
 libraryHelper.prototype.onCreateInLibrary = function (library_id) {
-    $('#modal-create-in-library .modal-header h3').html('Create ' + page);
+    $('#modal-create-in-library .modal-header h3').html('Create item in ' + LIBRARY_NAMES[this.type]);
     $('#modal-create-in-library .btn').show('fast');
     $('#modal-create-in-library #create-in-library-finish').hide('fast');
     // Populate the select to choose library to copy from
