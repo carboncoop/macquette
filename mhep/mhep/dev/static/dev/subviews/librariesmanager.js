@@ -5,29 +5,22 @@ var library_helper = new libraryHelper('', $('#openbem'));
 function librariesmanager_UpdateUI() {
     //library_helper.init();
     $('#libraries-table').html('');
-    // Sort alphabetically
-    var library_list = [];
-    for (t in library_helper.library_list) {
-        library_list.push(library_helper.library_list[t]);
-    }
-    library_list.sort(function (a, b) {
-        var textA = a[0].type.toUpperCase();
-        var textB = b[0].type.toUpperCase();
-        return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-    });
+
+    const libraries_by_type = library_helper.library_list;
 
     var templateTable = $('#libraries-manager-table-template');
     var templateRow = $('#libraries-manager-row-template');
 
-    library_list.forEach(function (array_libraries_of_same_type, index) {
-        var type = array_libraries_of_same_type[0].type;
+    for (let type of Object.keys(libraries_by_type).sort()) {
+        let name = LIBRARY_NAMES[type];
+        let libraries = libraries_by_type[type];
 
         var table = templateTable.clone();
         table.removeAttr('id');
 
-        table.find('.library-type-name').html(library_helper.library_names[type]);
+        table.find('.library-type-name').html(name);
 
-        array_libraries_of_same_type.forEach(function (library) {
+        for (let library of libraries) {
             var row = templateRow.clone();
             row.removeAttr('id');
 
@@ -55,13 +48,12 @@ function librariesmanager_UpdateUI() {
 
             row.show();
             table.find('tbody').append(row);
-        });
+        }
 
         table.find('[data-library-type=""]').attr('data-library-type', type);
 
         table.show();
         $('#libraries-table').append(table);
 
-    });
+    }
 }
-
