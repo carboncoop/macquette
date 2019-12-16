@@ -61,6 +61,7 @@ a:hover {
 #wrapper {
     background: white;
     max-width: 1150px;
+    margin: 15px 15px 15px 305px;
 }
 
 .block-header {
