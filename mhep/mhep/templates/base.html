@@ -8,48 +8,15 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <!-- HTML5 shim, for IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="{% static 'js/html5shiv-3.7.3/html5shiv.min.js' %}"></script>
-    <![endif]-->
-
-
     {% block css %}
-
-    <!-- Your stuff: Third-party CSS libraries go here -->
-
     <link href="{% static 'css/bootstrap-4.3.1/bootstrap.min.css' %}" rel="stylesheet">
-
     {% endblock %}
 
   </head>
 
   <body>
 
-    <div class="mb-1">
-      <nav class="navbar navbar-expand-md navbar-light bg-light">
-        <button class="navbar-toggler navbar-toggler-right" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <a class="navbar-brand">My Home Energy Planner</a>
-
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                {% if request.user.is_authenticated %}
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'index' %}">Latest version</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'versions:list-versions' %}">All versions</a>
-                </li>
-                {% endif %}
-            </ul>
-        </div>
-      </nav>
-
-    </div>
-
-    <div class="container">
+    <div class="container mt-5">
 
       {% if messages %}
           {% for message in messages %}
@@ -57,13 +24,10 @@
           {% endfor %}
       {% endif %}
 
-      {% block content %}
-        <p>Use this document as a way to quick start any new project.</p>
-      {% endblock content %}
-
     </div> <!-- /container -->
 
-    {% block modal %}{% endblock modal %}
+    {% block content %}
+    {% endblock content %}
 
     <!-- Le javascript
     ================================================== -->
@@ -83,8 +47,6 @@
       <script src="{% static 'js/jquery-3.3.1/jquery-3.3.1.slim.min.js' %}"></script>
       <script src="{% static 'js/popper-1.14.7/popper.min.js' %}"></script>
       <script src="{% static 'js/bootstrap-4.3.1/bootstrap.min.js' %}"></script>
-
-      <!-- Your stuff: Third-party javascript libraries go here -->
 
     {% endblock javascript %}
   </body>

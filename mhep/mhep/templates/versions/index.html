@@ -1,23 +1,25 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}List MHEP Versions{% endblock %}
+{% block title %}Version selector | {% endblock %}
 
 {% block content %}
-<div class="container">
+<style>
+    body { background-color: #EEECE5 }
+</style>
 
-  <div class="row">
-    <div class="col-sm-12">
-      <h1>Versions of My Home Energy Planner</h1>
+<div class="mx-auto bg-white p-4 rounded border" style="width: max-content">
+    <h1 class="mb-4 h2">Version selector</h1>
 
-      <ul>
-      {% for app in app_list %}
-        <li><a href="{{ app.index_url }}">{{ app.verbose_name }}</a></li>
-      {% endfor %}
-      </ul>
-    </div>
-  </div>
-
+    <ul class="version-list list-unstyled mb-0">
+        {% for app in app_list %}
+        <li>
+            <a href="{{ app.index_url }}">{{ app.name }}</a>
+            {% if app.release_date %}(released {{ app.release_date }}){%endif %}
+        </li>
+        {% endfor %}
+    </ul>
 </div>
+
 {% endblock content %}
 
