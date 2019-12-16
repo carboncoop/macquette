@@ -2133,7 +2133,7 @@ libraryHelper.prototype.systems_item_to_html = function (item, tag) {
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>System tag</td><td><input type="text" class="edit-system-tag item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="edit-system-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Default efficiency</td><td><input type="text" class="edit-system-efficiency editable-field" value="' + item.efficiency + '" /></td></tr>';
@@ -2275,7 +2275,7 @@ libraryHelper.prototype.draught_proofing_measures_item_to_html = function (item,
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>q50 (m<sup>3</sup>/hm<sup>2</sup>)</td><td><input type="text" class="item-q50" value="' + item.q50 + '" /></td></tr>';
@@ -2299,7 +2299,7 @@ libraryHelper.prototype.ventilation_systems_measures_item_to_html = function (it
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Ventilation type</td><td><select class="item-ventilation_type">';
@@ -2359,7 +2359,7 @@ libraryHelper.prototype.ventilation_systems_item_to_html = function (item, tag) 
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Ventilation type</td><td><select class="item-ventilation_type">';
@@ -2406,7 +2406,7 @@ libraryHelper.prototype.extract_ventilation_points_item_to_html = function (item
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     //out += '<tr><td>Location</td><td><input type="text" class="item-location" value="' + item.location + '" /></td></tr>';
@@ -2434,7 +2434,7 @@ libraryHelper.prototype.extract_ventilation_points_item_to_html = function (item
  item = {tag: '', name: 'name', number_of_intermittentfans_to_add: 1, description: '--', performance: '--', benefits: '--', cost: 0, who_by: '--', disruption: '--', associated_work: '--', key_risks: '--', notes: '--', maintenance: '--'};
  else if (tag != undefined)
  item.tag = tag;
- var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+ var out = '<table class="table"><tbody>';
  out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
  out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
  out += '<tr><td>Number of intermittent fans to add</td><td><input type="number" class="item-intermitent_fans" value="' + item.number_of_intermittentfans_to_add + '" /></td></tr>';
@@ -2457,7 +2457,7 @@ libraryHelper.prototype.intentional_vents_and_flues_item_to_html = function (ite
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';
@@ -2477,7 +2477,7 @@ libraryHelper.prototype.intentional_vents_and_flues_measures_item_to_html = func
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';
@@ -2509,7 +2509,7 @@ libraryHelper.prototype.water_usage_item_to_html = function (item, tag) {
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="water-efficiency-item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="water-efficiency-item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="water-efficiency-item-source" value="' + item.source + '" /></td></tr>';
@@ -2533,7 +2533,7 @@ libraryHelper.prototype.storage_type_item_to_html = function (item, tag) {
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Category </td><td><select class="item-category">';
@@ -2575,7 +2575,7 @@ libraryHelper.prototype.storage_type_measures_item_to_html = function (item, tag
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Category </td><td><select class="item-category">';
@@ -2628,7 +2628,7 @@ libraryHelper.prototype.appliances_and_cooking_item_to_html = function (item, ta
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" value="' + item.name + '" /></td></tr>';
     out += '<tr><td>Category</td><td><select class="item-category">';
@@ -2667,7 +2667,7 @@ libraryHelper.prototype.heating_control_item_to_html = function (item, tag) {
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Heating control type</td><td><select class="item-heating_control_type">';
@@ -2696,7 +2696,7 @@ libraryHelper.prototype.heating_systems_item_to_html = function (item, tag) {
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Category </td><td><select class="heating_systems item-category">';
@@ -2750,7 +2750,7 @@ libraryHelper.prototype.heating_systems_measures_item_to_html = function (item, 
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Category </td><td><select class="item-category">';
@@ -2809,7 +2809,7 @@ libraryHelper.prototype.pipework_insulation_item_to_html = function (item, tag) 
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Amount of pipework insulation</td><td><select class="item-pipework_insulation">';
@@ -2838,7 +2838,7 @@ libraryHelper.prototype.hot_water_control_type_item_to_html = function (item, ta
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Hot water storage control type</td><td><select class="item-control_type">';
@@ -2866,7 +2866,7 @@ libraryHelper.prototype.space_heating_control_type_item_to_html = function (item
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Space heating control type</td><td><input class="item-control_type" type="number" min="1" max="3" step="1" value="' + item.control_type + '" /></td>';
@@ -2891,7 +2891,7 @@ libraryHelper.prototype.clothes_drying_facilities_item_to_html = function (item,
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';
@@ -2916,7 +2916,7 @@ libraryHelper.prototype.generation_measures_item_to_html = function (item, tag) 
     } else if (tag != undefined) {
         item.tag = tag;
     }
-    var out = '<table class="table" style="margin:15px 0 0 25px"><tbody>';
+    var out = '<table class="table"><tbody>';
     out += '<tr><td>Tag</td><td><input type="text" class="item-tag" required value="' + item.tag + '"/></td></tr>';
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Description</td><td><textarea rows="4" cols="50" class="item-description">' + item.description + '</textarea></td></tr>';
