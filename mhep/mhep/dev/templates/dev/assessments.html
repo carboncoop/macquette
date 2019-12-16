@@ -196,7 +196,18 @@
     var orgid = null;
     var myusername = '{{ user.username|default:"anonymous" }}';
     var path = '{{ request.build_absolute_uri }}';
+
     var assessments = [];
+    var allusers = [];
+    var myorganisations = [];
+
+    function getOrganisationById(id) {
+        return myorganisations.find(e => e.id == id)
+    }
+
+    function getAssessmentById(id) {
+        return assessments.find(e => e.id == id)
+    }
 
 // -----------------------------------------------------------------------------------
 // 1) Load assessment lists
@@ -269,7 +280,8 @@
         var assessmentid = $(this).attr('data-assessment-id');
         var status = $(this).val();
         mhep_helper.set_status(assessmentid, status).then(() => {
-            assessments.find(a => a.id == assessmentid).status = status;
+            let assessment = getAssessmentById(assessmentid)
+            assessment.status = status;
             draw_assessments("#assessments", assessments);
         });
     });
@@ -365,24 +377,16 @@
 // ORGANISATIONS
 // ----------------------------------------------------------------------------
 
-    // These are in practice sparse arrays, index by element IDs
-    var myorganisations = {};
-    var allusers = {};
-
     function fetchOrganisations() {
         return mhep_helper.list_organisations().then(result => {
-            for (let org of result) {
-                myorganisations[org.id] = org;
-            }
+            myorganisations = result;
             return myorganisations;
         })
     }
 
     function fetchAllUsers() {
         return mhep_helper.list_users().then(result => {
-            for (let user of result) {
-                allusers[user.id] = user;
-            }
+            allusers = result;
             return allusers;
         })
     };
@@ -417,8 +421,9 @@
             error: handleServerError('listing assessments for organisation'),
             success: function (result) {
                 assessments = result;
-                draw_assessments("#assessments", assessments);
-                $("#assessments-title").html(myorganisations[orgid].name + " Assessments");
+                draw_assessments("#assessments", assessments)
+                const organisation = getOrganisationById(orgid);
+                $("#assessments-title").html(myorganisation.name + " Assessments");
             }
         });
     });
@@ -429,8 +434,7 @@
 
     function draw_organisation_list() {
         var out = "";
-        for (let z in myorganisations) {
-            let org = myorganisations[z]
+        for (let org of myorganisations) {
             let s = org.assessments === 1 ? "" : "s"
 
             out += `
@@ -447,6 +451,8 @@
     }
 
     function draw_organisation(orgid) {
+        const organisation = getOrganisationById(orgid)
+
         $("#organisation-list").hide();
         $("#org-buttons").show();
 
@@ -455,26 +461,25 @@
         var table = tableTemplate.clone();
         table.show();
 
-        $("#organisation-name").html(myorganisations[orgid].name);
+        $("#organisation-name").html(organisation.name);
 
         var rowTemplate = $('#organisation-member-template');
-        var members = myorganisations[orgid].members;
-        var permissions = myorganisations[orgid].permissions;
+        var permissions = organisation.permissions;
 
-        for (var z in members) {
+        for (let member of organisation.members) {
             var row = rowTemplate.clone()
             row.removeAttr('id');
 
-            row.find('[data-user-id=""]').attr('data-user-id', members[z].id);
+            row.find('[data-user-id=""]').attr('data-user-id', member.id);
             row.find('[data-org-id=""]').attr('data-org-id', orgid);
 
-            row.find('.member-name').html(members[z].name);
+            row.find('.member-name').html(member.name);
             row.find('.member-last-active').html(
-                new Date(members[z].last_login).toLocaleString()
+                new Date(member.last_login).toLocaleString()
             );
 
-            if (members[z].is_admin) row.find('.member-is-admin').show();
-            if (members[z].is_librarian) row.find('.member-is-librarian').show();
+            if (member.is_admin) row.find('.member-is-admin').show();
+            if (member.is_librarian) row.find('.member-is-librarian').show();
 
             if (permissions.can_promote_demote_librarians) {
                 var demoteLibrarianButton = row.find('.demote-librarian')
@@ -482,7 +487,7 @@
                 demoteLibrarianButton.click(handleClickDemoteLibrarian);
             }
 
-            if (permissions.can_add_remove_members && members[z].name != myusername) {
+            if (permissions.can_add_remove_members && member.name != myusername) {
                 var removeMemberButton = row.find('.remove-user')
                 removeMemberButton.show();
                 removeMemberButton.click(handleClickRemoveUser);
@@ -586,10 +591,10 @@
     };
 
     function populatePromoteLibrarianSelect(promoteLibrarianForm) {
-        var members = myorganisations[orgid].members;
+        var organisation = getOrganisationById(orgid);
+        var members = organisation.members;
         var select = promoteLibrarianForm.find("select");
-        for (var z in members) {
-            member = members[z];
+        for (let member of members) {
             if (!member.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = member.name;
@@ -600,10 +605,9 @@
     };
 
     function populateAddMemberSelect(addMemberForm) {
-        var users = allusers;
         var select = addMemberForm.find("select");
-        for (var z in users) {
-            user = users[z];
+
+        for (let user of allusers) {
             if (!user.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = user.name;
