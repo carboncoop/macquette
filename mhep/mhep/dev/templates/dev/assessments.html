@@ -195,7 +195,6 @@
     // if null, show personal assessments; otherwise show assessments with in given org
     var orgid = null;
     var current_user = '{{ user.username|default:"anonymous" }}';
-    var path = '{{ request.build_absolute_uri }}';
 
     var assessments = [];
     var users = [];
