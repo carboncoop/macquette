@@ -30,16 +30,18 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    <nav class="nav-main">
-        <h1 class="nav-main-heading">
-            MyHomeEnergyPlanner
-        </h1>
-        <div class="d-flex">
-            {% block extra_nav %}{% endblock %}
-            <a href="{% url VERSION|add:':index' %}">Assessments</a>
-            <a href="{% url 'logout' %}">Log out</a>
-        </div>
-    </nav>
+    <div class="nav-container">
+        <nav class="nav-main container_if_u_want_it">
+            <h1 class="nav-main-heading">
+                MyHomeEnergyPlanner
+            </h1>
+            <div class="d-flex">
+                {% block extra_nav %}{% endblock %}
+                <a href="{% url VERSION|add:':index' %}">Assessments</a>
+                <a href="{% url 'logout' %}">Log out</a>
+            </div>
+        </nav>
+    </div>
 
     {% for message in messages %}
     <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
@@ -50,7 +52,9 @@
     </div>
     {% endfor %}
 
-    {% block content %}{% endblock content %}
+    <div class="container_if_u_want_it">
+        {% block content %}{% endblock content %}
+    </div>
 
     {% include VERSION|add:"/svg/iconset.svg" %}
 </body>

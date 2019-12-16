@@ -222,7 +222,7 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
     def get_members(self, org):
         def userinfo(user):
             return {
-                "userid": f"{user.id}",
+                "id": f"{user.id}",
                 "name": user.username,
                 "last_login": user.last_login.isoformat()
                 if user.last_login

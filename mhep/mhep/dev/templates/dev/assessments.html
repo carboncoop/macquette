@@ -1,28 +1,9 @@
 {% extends VERSION|add:"/mhep_base.html" %}
-{% load static i18n %}
-
+{% load static %}
 
 {% block extra_head %}
-<link href='https://fonts.googleapis.com/css?family=Ubuntu:300' rel='stylesheet' type='text/css'>
-
 <style>
-    .cc {
-        font-weight: bold;
-        padding-right:20px;
-    }
-
-    .title {
-        padding: 10px 30px;
-        color:#888;
-        float:left;
-    }
-
-    .recent-activity-item {
-        padding:5px;
-        border-bottom: 1px solid #ccc;
-    }
-    .modal-backdrop
-    {
+    .modal-backdrop {
         opacity:0.3 !important;
     }
 
@@ -32,125 +13,162 @@
         /* must be half of the width, minus scrollbar on the left (30px) */
         margin-left: -280px;
     }
+
+    .container_if_u_want_it {
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    section {
+        padding: 30px;
+    }
+
+    section h2 {
+        font-size: 1.25rem;
+        color: black;
+    }
+
+    select {
+        width: 10rem;
+        margin-bottom: 0;
+    }
+
+    html, body { background-color: var(--brown-3); }
+    .table td { vertical-align: middle; }
+    a.underline, a:hover.underline { text-decoration: underline; }
+    thead {
+        background-color: var(--brown-2);
+    }
 </style>
 
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
 
 {% endblock %}
 
 {% block content %}
 
-<div style="max-width: 1120px; margin: 30px auto 45px; padding: 0 15px;">
+<section class="px-0">
+    <h1 class="ma-0" id="organisation-name">Welcome</h1>
+    <div id="org-buttons" class="mt-15" style="display: none">
+        <button id="close-organisation" class="btn">
+            <i class="icon-arrow-left"></i>
+            Back to all organisations
+        </button>
 
-    <div id="organisation" class="main-block" style="display:none">
-        <button id="back-myview" style="float:right; margin-top:5px; margin-right:5px" class="btn">Home</button>
-        <div style="background-color:rgba(215, 210, 201, 0.9); color:#897A67; padding:10px;">
+        <button id="show-members-button" class="btn">
+            <i class="icon-user"></i>
+            Show members
+        </button>
+    </div>
+</section>
 
-            <b>Organisation:</b>
-            <span id="organisation-name"></span>
-        </div>
-
+<section class="mb-30 bg-white" style="min-width: 450px; width: min-content;" id="organisation-list">
+    <div class="d-flex justify-content-between align-items-center mb-15">
+        <h2 class="mt-0 mb-0">Your Organisations</h2>
         <div>
-            <table id="organisation-members" class="table">
-                <tr id="organisation-member-template" class="organisation-member" style="display: none;">
-                    <td style="width: 50%;">
-                        <span class="member-name"></span>
-                        <span class="member-last-active">Last active: </span>
-                        <button class="remove-user demote-role" style="display: none;" data-user-id="" data-org-id="">Remove</button>
-                    </td>
-                    <td style="width: 25%;">
-                        <span class="member-is-librarian" style="display: none;" data-user-id="" data-org-id="">
-                            <b>Librarian</b>
-                            <button class="demote-librarian demote-role" style="display: none;" data-user-id="" data-org-id="">Demote</button>
-                        </span>
-                    </td>
-                    <td style="width: 25%;">
-                        <span class="member-is-admin" style="display: none;" data-user-id="" data-org-id="">
-                            <b>Admin</b>
-                        </span>
-                    </td>
-                </tr>
-            </table>
-
-            <div id="organisation-members-container"></div>
-
-            <hr style="margin-bottom: 1rem;" />
-
-            <form id="promote-librarian-form-template" style="display: none;">
-                <div style="display: flex; align-items: center;">
-                    <label id="promote-librarian-label-template" style="margin-right: 1rem;">
-                        Add a librarian:
-                    </label>
-                    <select name="user-id" id="promote-librarian-select-template" style="margin-right: 1rem;">
-                        <option value="">-- Select a member --</option>
-                    </select>
-                    <input type="submit" value="Add">
-                </div>
-            </form>
-
-            <div id="promote-librarian-form-container"></div>
-
-            <form id="add-member-form-template" style="display: none;">
-                <div style="display: flex; align-items: center;">
-                    <label id="add-member-label-template" style="margin-right: 1rem;">
-                        Add a member:
-                    </label>
-                    <select name="user-id" id="add-member-select-template" style="margin-right: 1rem;">
-                        <option value="">-- Select a user --</option>
-                    </select>
-                    <input type="submit" value="Add">
-                </div>
-            </form>
-
-            <div id="add-member-form-container"></div>
-
             {% if request.user.is_staff %}
-            <br>
-            <a id="organisation-add-member" href="">Edit organisation</a>
+            <a class="btn mb-0" href="{% url "admin:"|add:VERSION|add:"_organisation_add" %}">
+                <i class="icon-plus"></i> New Organisation
+            </a>
             {% endif %}
         </div>
     </div>
 
-    <div class="main-block">
-        <div style="background-color:rgba(215, 210, 201, 0.9); color:#897A67; padding:10px;"><b>My Organisations</b></div>
+    <div id="organisations"></div>
+</section>
+
+<section id="org-members" class="mb-30 bg-white" style="display:none; min-width: 50rem; width: min-content;">
+    <h2 class="mt-0 mb-15">Members</h2>
+
+    <table id="organisation-members" class="table" style="display: none; max-width: 50rem">
+        <thead>
+            <th>Username</th>
+            <th>Last active</th>
+            <th colspan="3">Roles</th>
+        </thead>
+
+        <tr id="organisation-member-template" style="display: none;">
+            <td class="member-name text-bold"></td>
+            <td class="member-last-active"></td>
+            <td style="width: 10rem">
+                <span class="member-is-librarian" style="display: none;" data-user-id="" data-org-id="">
+                    <b>Librarian</b>
+                    <button class="demote-librarian demote-role" style="display: none;" data-user-id="" data-org-id="">Demote</button>
+                </span>
+            </td>
+            <td style="width: 3rem">
+                <span class="member-is-admin" style="display: none;" data-user-id="" data-org-id="">
+                    <b>Admin</b>
+                </span>
+            </td>
+            <td style="width: 10rem">
+                <button class="remove-user demote-role" style="display: none;" data-user-id="" data-org-id="">Remove member</button>
+            </td>
+        </tr>
+    </table>
+
+    <div id="organisation-members-container"></div>
+
+    <form id="promote-librarian-form-template" style="display: none;">
+        <div class="d-flex align-items-center">
+            <label id="promote-librarian-label-template" style="margin-right: 1rem;">
+                Add a librarian:
+            </label>
+            <select name="user-id" id="promote-librarian-select-template" style="width: 12rem; margin-right: 1rem;">
+                <option value="">-- Select a member --</option>
+            </select>
+            <input class="btn" type="submit" value="Add">
+        </div>
+    </form>
+
+    <div id="promote-librarian-form-container"></div>
+
+    <form id="add-member-form-template" style="display: none;">
+        <div class="d-flex align-items-center">
+            <label id="add-member-label-template" style="margin-right: 1rem;">
+                Add a member:
+            </label>
+            <select name="user-id" id="add-member-select-template" style="width: 12rem; margin-right: 1rem;">
+                <option value="">-- Select a user --</option>
+            </select>
+            <input class="btn" type="submit" value="Add">
+        </div>
+    </form>
+
+    <div id="add-member-form-container"></div>
+
+    {% if request.user.is_staff %}
+    <a id="organisation-add-member" href="" class="underline">Edit organisation</a>
+    {% endif %}
+</section>
+
+<section class="assessments mb-45 bg-white">
+    <div class="d-flex justify-content-between align-items-center mb-15">
+        <h2 class="mt-0 mb-0" id="assessments-title">Your Assessments</h2>
         <div>
-            <div id="myorganisations"></div>
-            {% if request.user.is_staff %}
-            <br>
-            <a href="{% url "admin:"|add:VERSION|add:"_organisation_changelist" %}">Manage organisations</a>
-            {% endif %}
+            <button id="new-assessment" class="btn"><i class="icon-plus"></i> New Assessment</button>
         </div>
     </div>
-</div>
 
-<div style="max-width: 1120px; margin: 0 auto; padding: 0 15px" class="assessments">
-    <div>
-        <div class="main-block">
-            <button id="new-assessment" style="float:right; margin-top:5px; margin-right:5px" class="btn">New</button>
-            <div style="background-color:rgba(215, 210, 201, 0.9); color:#897A67; padding:10px;"><b><span id="assessments-title"></span></b></div>
-            <div style="padding:20px">
-                <br>
-                <table class="table">
-                    <tr>
-                        <th>Name</th>
-                        <th>Description</th>
-                        <th>Author</th>
-                        <th>Status <i class="icon-question-sign" title="Completed assessments are locked"></i></th>
-                        <th>Modified</th>
-                        <th style="width:40px"></th>
-                        <th style="width:30px"></th>
-                        <th style="width:30px"></th>
-                    </tr>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Author</th>
+                <th>Modified</th>
+                <th>Status <i class="icon-question-sign" title="Completed assessments are locked"></i></th>
+                <th>Actions</th>
+            </tr>
+        </thead>
 
-                    <tbody id="projects"></tbody>
+        <tbody id="assessments"></tbody>
+    </table>
 
-                </table>
-
-                <div id="noprojects" class="alert alert-warning" style="display:none">No projects have been created yet, click create new project to get started</div>
-            </div>
-        </div>
+    <div id="noassessments" class="alert alert-warning" style="display:none">
+        You don't have any assessments yet.  Click "New" to get started.
     </div>
-</div>
+</section>
 
 <div id="modal-assessment-create" class="modal hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
     <div class="modal-header">
@@ -158,14 +176,13 @@
         <h3>Create new assessment</h3>
     </div>
     <div class="modal-body">
-        <p><b>Add new assessment:</b></p>
         <p>
-            <span class="muted">Project name</span>
-            <br><input id="project-name-input" type="text" style="width:82%" />
+            <span class="muted">Name</span>
+            <br><input id="assessment-name-input" type="text" style="width:82%" />
         </p>
         <p>
-            <span class="muted">Project description</span>
-            <br><input id="project-description-input" type="text" style="width:82%" />
+            <span class="muted">Description</span>
+            <br><input id="assessment-description-input" type="text" style="width:82%" />
         </p>
     </div>
     <div class="modal-footer">
@@ -174,58 +191,31 @@
     </div>
 </div>
 
-<div id="myModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">WARNING deleting a project is permanent</h3>
-    </div>
-    <div class="modal-body">
-        <p>Are you sure you want to delete this project?</p>
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-        <button id="confirmdelete" class="btn btn-primary">Delete permanently</button>
-    </div>
-</div>
-
-<div id="modal-share-project" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-        <h3 id="myModalLabel">Share assessment: </h3>
-    </div>
-    <div class="modal-body">
-
-        <p>Shared with:</p>
-        <table class="table" id="shared-with-table">
-        </table>
-
-        <p>Enter user, or organisation name to share this assessment with:</p>
-        <input id="sharename" type="text" style="width:420px"/>
-    </div>
-    <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-        <button id="share-project" class="btn btn-primary">Share</button>
-    </div>
-</div>
-
 <script>
-    var viewmode = "personal";
-    var orgid = 0;
-    var myusername = '{{ user.username|default:"anonymous" }}';
-    $(".username").html(myusername);
-    var path = '{{ request.build_absolute_uri }}';
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-    var now = (new Date()).getTime() * 0.001;
+    // if null, show personal assessments; otherwise show assessments with in given org
+    var orgid = null;
+    var current_user = '{{ user.username|default:"anonymous" }}';
+
+    var assessments = [];
+    var users = [];
+    var organisations = [];
+
+    function getOrganisationById(id) {
+        return organisations.find(e => e.id == id)
+    }
+
+    function getAssessmentById(id) {
+        return assessments.find(e => e.id == id)
+    }
+
 // -----------------------------------------------------------------------------------
-// 1) Load project lists
+// 1) Load assessment lists
 // -----------------------------------------------------------------------------------
 
-    var projects = mhep_helper.getlist();
-    draw_projects("#projects", projects);
-
-    $("#assessments-title").html("My Assessments");
-
-    var libraries = {};
+    mhep_helper.list_assessments().then(result => {
+        assessments = result;
+        draw_assessments("#assessments", assessments);
+    });
 
 // -----------------------------------------------------------------------------------
 // Create new assessment
@@ -233,294 +223,262 @@
 
     $("#new-assessment").click(function () {
         $("#modal-assessment-create").modal("show");
+        $("#assessment-name-input").focus();
     });
-    $("#assessment-create").click(function () {
 
-        var name = $("#project-name-input").val();
-        var description = $("#project-description-input").val();
-        if (name == "") {
-            alert("Please enter a project name");
-        } else {
-          var callback = function (project) {
-            projects.push(project);
-            draw_projects("#projects", projects);
-            $("#noprojects").hide();
-          };
-          if (viewmode == "organisation" && orgid != 0) {
-            mhep_helper.create(name, description, orgid, callback);
-          }
-          else {
-            mhep_helper.create(name, description, null, callback);
-          }
-          $("#project-name-input").val("");
-          $("#project-description-input").val("");
-          $("#modal-assessment-create").modal("hide");
+    $('#modal-assessment-create').on('keypress', function (e) {
+        if (e.key == "Enter") {
+            $('#assessment-create').click();
         }
     });
+
+    $("#assessment-create").click(function () {
+        var name = $("#assessment-name-input").val();
+        var description = $("#assessment-description-input").val();
+
+        if (name == "") {
+            alert("Please enter an assessment name");
+            return;
+        }
+
+        mhep_helper.create(name, description, orgid, assessment => {
+            assessments.push(assessment);
+            draw_assessments("#assessments", assessments);
+            $("#noassessments").hide();
+        });
+
+        $("#modal-assessment-create").modal("hide");
+        $("#assessment-name-input").val("");
+        $("#assessment-description-input").val("");
+    });
+
 // -----------------------------------------------------------------------------------
 // Delete assessment
 // -----------------------------------------------------------------------------------
 
-    $(".assessments").on('click', '.delete-project', function () {
-        var projectid = $(this).attr('projectid');
-        var z = $(this).attr('z');
-        $('#myModal').modal('show');
-        $('#myModal').attr('the_id', projectid);
-        $('#myModal').attr('the_row', z);
-    });
-    $("#confirmdelete").click(function () {
-        var projectid = $('#myModal').attr('the_id');
-        var z = $('#myModal').attr('the_row');
-        if (mhep_helper.delete(projectid)) {
-            projects.splice(z, 1);
-            draw_projects("#projects", projects);
+    $(".assessments").on('click', '.delete-assessment', function () {
+        if (!window.confirm(
+            "Do you really want to delete this assessment?  This cannot be undone.")) {
+            return;
         }
 
-        $('#myModal').modal('hide');
-    });
-// -----------------------------------------------------------------------------------
-// Share assessment
-// -----------------------------------------------------------------------------------
+        const id = $(this).attr('data-assessment-id');
 
-    $(".assessments").on('click', '.share-project-openmodal', function () {
-        alert("Not currently supported.");
-        return;
-        /* TODO(PMF): disabled for port phase 1
-        var projectid = $(this).attr('projectid');
-        var z = $(this).attr('z');
-        $.ajax({
-          url: path + "assessment/getshared.json",
-          data: "id=" + projectid,
-          error: handleServerError('getting shared assessments'),
-          success: function (shared) {
-                var out = "";
-                for (var i in shared) {
-                    if (myusername != shared[i].username)
-                        out += "<tr><td>" + shared[i].username + "</td></tr>";
-                }
-                if (out == "")
-                    out = "<tr><td>This assessment is currently private</td></tr>";
-                $("#shared-with-table").html(out);
-        }});
-        $('#modal-share-project').modal('show');
-        $('#modal-share-project').attr('the_id', projectid);
-        $('#modal-share-project').attr('the_row', z);
-        console.log("Share project " + projectid);
-        */
+        mhep_helper.delete_assessment(id).then(() => {
+            let idx = assessments.findIndex(e => e.id == id)
+            assessments.splice(idx, 1);
+            draw_assessments("#assessments", assessments);
+        });
     });
-    $("#share-project").click(function () {
-        alert("Not currently supported.");
-        return;
-        /* TODO(PMF): disabled for port phase 1. Re-enable later.
 
-        var username = $("#sharename").val();
-        var projectid = $('#modal-share-project').attr('the_id');
-        $.ajax({
-          url: path + "assessment/share.json",
-          data: "id=" + projectid + "&username=" + username,
-          error: handleServerError('sharing assessment'),
-          success: function (data) {
-              console.log(data);
-              $.ajax({
-                  url: path + "assessment/getshared.json",
-                  data: "id=" + projectid,
-                  error: handleServerError('getting shared assessments'),
-                  success: function (shared) {
-                      var out = "";
-                      for (var i in shared) {
-                          if (myusername != shared[i].username)
-                              out += "<tr><td>" + shared[i].username + "</td></tr>";
-                      }
-                      if (out == "")
-                          out = "<tr><td>This assessment is currently private</td></tr>";
-                      $("#shared-with-table").html(out);
-                  }});
-          }});
-        */
-    });
 // -----------------------------------------------------------------------------------
 // Change assessment status
 // -----------------------------------------------------------------------------------
 
-    $(".assessments").on('change', '.project-status', function () {
-        var projectid = $(this).attr('projectid');
-        var z = $(this).attr('z');
+    $(".assessments").on('change', '.assessment-status', function () {
+        var assessmentid = $(this).attr('data-assessment-id');
         var status = $(this).val();
-        mhep_helper.set_status(projectid, status);
-        projects[z].status = status;
-        draw_projects("#projects", projects);
+        mhep_helper.set_status(assessmentid, status).then(() => {
+            let assessment = getAssessmentById(assessmentid)
+            assessment.status = status;
+            draw_assessments("#assessments", assessments);
+        });
     });
+
 // -----------------------------------------------------------------------------------
 // Draw assessment list
 // -----------------------------------------------------------------------------------
 
-    function draw_projects(element, projects)
+    function draw_assessments(element, assessments)
     {
-        var status_options = ["Complete", "In progress", "Test"];
-        var out = "";
-        for (s in status_options) {
-            // out += "<tr><th>"+status_options[s]+"</th><th></th><th></th><th></th><th></th><th></th><th></th></tr>";
-            for (z in projects)
-            {
-                if (status_options[s] == projects[z].status) {
-                    out += "<tr>";
-                    out += "<td>" + projects[z].name + "</td>";
-                    out += "<td style='font-style:italic; color:#888'>" + projects[z].description + "</td>";
-                    out += "<td>" + projects[z].author + "</td>";
-                    var color = "";
-                    if (projects[z].status == "Complete")
-                        color = " alert-success";
-                    if (projects[z].status == "In progress")
-                        color = " alert-info";
-                    if (projects[z].status == "Test")
-                        color = " alert-error";
-                    out += "<td><select class='project-status" + color + "' z=" + z + " projectid=" + projects[z].id + ">";
-                    for (o in status_options) {
-                        var selected = "";
-                        if (projects[z].status == status_options[o])
-                            selected = " selected"
-                        out += "<option " + selected + ">" + status_options[o] + "</option>";
-                    }
-                    out += "</select></td>";
-                    var t = new Date();
-                    var d = new Date(projects[z].mdate * 1000);
-                    if (t.getYear() == d.getYear()) {
-                        var mins = d.getMinutes();
-                        if (mins < 10)
-                            mins = "0" + mins;
-                        out += "<td>" + d.getHours() + ":" + mins + " " + d.getDate() + " " + months[d.getMonth()] + "</td>";
-                    } else {
-                        out += "<td>" + d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear() + "</td>";
-                    }
+        const status_options = ["In progress", "Complete", "Test"];
+        const status_colours = {
+            "In progress": "alert-info",
+            "Complete": "alert-success",
+            "Test": "alert-error"
+        }
+        const months = [
+            'Jan', 'Feb', 'Mar', 'Apr',
+            'May', 'Jun', 'Jul', 'Aug',
+            'Sep', 'Oct', 'Nov', 'Dec'
+        ];
 
+        const sortedAssessments = [...assessments].sort((a, b) => {
+            // Primarily sort by status (lowest first), then by ID (highest first)
+            if (a.status != b.status) {
+                let a_status_nr = status_options.indexOf(a.status)
+                let b_status_nr = status_options.indexOf(b.status)
 
-                    const assessmentURL = urlHelper.html.assessment(projects[z].id);
-                    out += '<td><a id="open-project-' + projects[z].id + '" href="' + assessmentURL + '"><span class="label label-info">Open <i class="icon-folder-open icon-white"></i></span></a></td>';
-                    out += '<td><span class="share-project-openmodal" projectid=' + projects[z].id + ' z=' + z + ' style="cursor:pointer"><span class="label label-info"><i class="icon-share icon-white"></i></span></td>';
-                    out += '<td><span class="delete-project" projectid=' + projects[z].id + ' z=' + z + ' style="cursor:pointer"><span class="label label-important"><i class="icon-trash icon-white"></i></span></td>';
-                    out += "</tr>";
-                }
+                return a_status_nr - b_status_nr;
+            } else {
+                return b.id - a.id;
+            }
+        })
+
+        const getDate = date => {
+            var t = new Date();
+            var d = new Date(date);
+            if (t.getYear() == d.getYear()) {
+                var mins = d.getMinutes();
+                if (mins < 10)
+                    mins = "0" + mins;
+                return `${d.getHours()}:${mins} ${d.getDate()} ${months[d.getMonth()]}`;
+            } else {
+                return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
             }
         }
 
+        const getOptions = selectedStatus => {
+            return status_options.map(status => {
+                let selected = status === selectedStatus ? "selected" : ""
+                return `<option ${selected}>${status}</option>`
+            }).join("")
+        }
+
+        let out = "";
+        for (let assessment of sortedAssessments) {
+            let statusColour = status_colours[assessment.status]
+            let assessmentURL = urlHelper.html.assessment(assessment.id);
+
+            out +=
+                `<tr>
+                    <td>${assessment.name}</td>
+                    <td style='color:#888'>${assessment.description}</td>
+                    <td>${assessment.author}</td>
+                    <td>${getDate(assessment.mdate * 1000)}</td>
+                    <td>
+                        <select class='assessment-status ${statusColour}'
+                                data-assessment-id="${assessment.id}">
+                            ${getOptions(assessment.status)}
+                        </select>
+                    </td>
+                    <td>
+                        <a class="btn" href="${assessmentURL}" target="_blank">
+                            <i class="icon-folder-open"></i> Open
+                        </a>
+
+                        <button class="btn delete-assessment"
+                                data-assessment-id="${assessment.id}">
+                            <i class="icon-trash"></i> Delete
+                        </button>
+                    </td>
+                </tr>`;
+        }
+
         $(element).html(out);
-        if (projects.length == 0)
-            $("#noprojects").show();
+        if (assessments.length == 0)
+            $("#noassessments").show();
         else
-            $("#noprojects").hide();
+            $("#noassessments").hide();
     }
-
-
 
 // ----------------------------------------------------------------------------
 // ORGANISATIONS
 // ----------------------------------------------------------------------------
-    var myorganisations = {};
-    var allusers = {};
 
     function fetchOrganisations() {
-        return new Promise((resolve, reject) => {
-            mhep_helper.list_organisations().then(result => {
-                if (result.length === 0) {
-                    no_organisations();
-                    return;
-                }
-
-                for (let org of result) {
-                    org.orgid = org.id;
-                    myorganisations[org.id] = org;
-                }
-
-                fetchAllUsers().then(result => {
-                    draw_organisation_list();
-                    resolve();
-                });
-            })
-        });
-    };
+        return mhep_helper.list_organisations().then(result => {
+            organisations = result;
+            return organisations;
+        })
+    }
 
     function fetchAllUsers() {
-        return new Promise((resolve, reject) => {
-            mhep_helper.list_users().then(result => {
-                for (let i = 0; i < result.length; i++) {
-                    var user = result[i];
-                    user.userid = user.id;
-                    allusers[user.id] = user;
-                }
-                draw_organisation_list();
-                resolve();
-            })
-        });
+        return mhep_helper.list_users().then(result => {
+            users = result;
+            return users;
+        })
     };
 
-    fetchOrganisations().then(result => {
-        $("body").on("click", ".org-item", function () {
-            orgid = $(this).attr("orgid");
-            draw_organisation(orgid);
-            $("#organisation-add-member").attr("href", urlHelper.admin.organisation(orgid));
-            $("#organisation").show();
-            viewmode = "organisation";
-            $.ajax({
-            url: urlHelper.api.organisationAssessments(orgid),
-            error: handleServerError('listing assessments for organisation'),
-            success: function (result) {
-                projects = result;
-                draw_projects("#projects", projects);
-                $("#assessments-title").html(myorganisations[orgid].name + " Assessments");
-                $("#myview").hide();
-            },
-            });
-        });
-    });
+    function fetchAndDrawOrganisationList() {
+        let waitFor = [ fetchOrganisations(), fetchAllUsers() ]
 
-    function no_organisations() {
-        $("#myorganisations").html("<p class='pa-15'>You are in no organisations.</p>");
-    }
+        Promise.all(waitFor).then(_ => {
+            if (organisations.length === 0) {
+                no_organisations();
+            } else {
+                draw_organisation_list();
+            }
+        })
+    };
 
-    function draw_organisation_list() {
-        var out = "";
-        for (var z in myorganisations) {
-            out += "<div class='org-item recent-activity-item' style='cursor:pointer' orgid=" + myorganisations[z].orgid + " >";
-            out += "<b>" + myorganisations[z].name + "</b><br>" + myorganisations[z].assessments + " Assessments";
-            out += "</div>";
-        }
-        $("#myorganisations").html(out);
-    }
-
-    function fetchAndRedrawOrganisation(orgid) {
+    function fetchAndDrawOrganisation(orgid) {
         fetchOrganisations().then(result => {
             draw_organisation(orgid);
         });
     }
 
+    fetchAndDrawOrganisationList()
+
+    $("body").on("click", ".view-organisation", function () {
+        orgid = $(this).attr("data-id");
+        draw_organisation(orgid);
+        $("#organisation-add-member").attr("href", urlHelper.admin.organisation(orgid));
+        $("#show-members-button").show();
+        $.ajax({
+            url: urlHelper.api.organisationAssessments(orgid),
+            error: handleServerError('listing assessments for organisation'),
+            success: function (result) {
+                assessments = result;
+                draw_assessments("#assessments", assessments)
+                const organisation = getOrganisationById(orgid);
+                $("#assessments-title").html(myorganisation.name + " Assessments");
+            }
+        });
+    });
+
+    function no_organisations() {
+        $("#organisations").html("<p>You are in no organisations.</p>");
+    }
+
+    function draw_organisation_list() {
+        var out = "";
+        for (let org of organisations) {
+            let s = org.assessments === 1 ? "" : "s"
+
+            out += `
+            <div class="d-flex justify-content-between align-items-center mb-15" style="width: 30rem">
+                <a class='view-organisation font-bold clickable underline' data-id='${org.id}'>
+                    ${org.name}
+                </a>
+                <span>
+                    ${org.assessments} assessment${s}
+                </span>
+            </div>`;
+        }
+        $("#organisations").html(out);
+    }
+
     function draw_organisation(orgid) {
+        const organisation = getOrganisationById(orgid)
+
+        $("#organisation-list").hide();
+        $("#org-buttons").show();
 
         var tableTemplate = $("#organisation-members");
 
         var table = tableTemplate.clone();
         table.show();
 
-        $("#organisation-name").html(myorganisations[orgid].name);
+        $("#organisation-name").html(organisation.name);
 
         var rowTemplate = $('#organisation-member-template');
-        var members = myorganisations[orgid].members;
-        var permissions = myorganisations[orgid].permissions;
+        var permissions = organisation.permissions;
 
-        for (var z in members) {
+        for (let member of organisation.members) {
             var row = rowTemplate.clone()
             row.removeAttr('id');
 
-            row.find('[data-user-id=""]').attr('data-user-id', members[z].userid);
+            row.find('[data-user-id=""]').attr('data-user-id', member.id);
             row.find('[data-org-id=""]').attr('data-org-id', orgid);
 
-            row.find('.member-name').html(members[z].name);
+            row.find('.member-name').html(member.name);
             row.find('.member-last-active').html(
-                "Last active: " + new Date(members[z].last_login).toLocaleString()
+                new Date(member.last_login).toLocaleString()
             );
 
-            if (members[z].is_admin) row.find('.member-is-admin').show();
-            if (members[z].is_librarian) row.find('.member-is-librarian').show();
-
+            if (member.is_admin) row.find('.member-is-admin').show();
+            if (member.is_librarian) row.find('.member-is-librarian').show();
 
             if (permissions.can_promote_demote_librarians) {
                 var demoteLibrarianButton = row.find('.demote-librarian')
@@ -528,7 +486,7 @@
                 demoteLibrarianButton.click(handleClickDemoteLibrarian);
             }
 
-            if (permissions.can_add_remove_members && members[z].name != myusername) {
+            if (permissions.can_add_remove_members && member.name != current_user) {
                 var removeMemberButton = row.find('.remove-user')
                 removeMemberButton.show();
                 removeMemberButton.click(handleClickRemoveUser);
@@ -557,6 +515,8 @@
             promoteLibrarianForm.show();
 
             $("#promote-librarian-form-container").html(promoteLibrarianForm);
+        } else {
+            $("#promote-librarian-form-container").html("");
         }
 
         if (permissions.can_add_remove_members) {
@@ -576,6 +536,8 @@
             addMemberForm.show();
 
             $("#add-member-form-container").html(addMemberForm);
+        } else {
+            $("#add-member-form-container").html("");
         }
     }
 
@@ -586,7 +548,7 @@
         var orgid = $(this).attr('data-org-id');
         var userid = $(this).attr('data-user-id');
         mhep_helper.demote_user_as_librarian(orgid, userid).then(result => {
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -599,7 +561,7 @@
         mhep_helper.promote_user_as_librarian(orgid, userid).then(result => {
             submitButton.attr("disabled", false);
             submitButton.val("Add");
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -610,7 +572,7 @@
         var orgid = $(this).attr('data-org-id');
         var userid = $(this).attr('data-user-id');
         mhep_helper.remove_member(orgid, userid).then(result => {
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
@@ -623,58 +585,56 @@
         mhep_helper.add_member(orgid, userid).then(result => {
             submitButton.attr("disabled", false);
             submitButton.val("Add");
-            fetchAndRedrawOrganisation(orgid);
+            fetchAndDrawOrganisation(orgid);
         });
     };
 
     function populatePromoteLibrarianSelect(promoteLibrarianForm) {
-        var members = myorganisations[orgid].members;
+        var organisation = getOrganisationById(orgid);
+        var members = organisation.members;
         var select = promoteLibrarianForm.find("select");
-        for (var z in members) {
-            member = members[z];
+        for (let member of members) {
             if (!member.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = member.name;
-                option.value = member.userid;
+                option.value = member.id;
                 select.append(option);
             }
         };
     };
 
     function populateAddMemberSelect(addMemberForm) {
-        var users = allusers;
         var select = addMemberForm.find("select");
-        for (var z in users) {
-            user = users[z];
+
+        for (let user of users) {
             if (!user.is_librarian) {
                 var option = document.createElement("option");
                 option.textContent = user.name;
-                option.value = user.userid;
+                option.value = user.id;
                 select.append(option);
             }
         };
     };
 
-    $("#back-myview").click(function () {
-        var viewmode = "personal";
-        var orgid = 0;
-        $("#organisation").hide();
+    $("#close-organisation").click(function () {
+        orgid = null;
 
-        projects = mhep_helper.getlist();
-        draw_projects("#projects", projects);
-        $("#assessments-title").html("My Assessments");
-        $("#myview").show();
+        $("#organisation-name").html("Welcome");
+        $("#org-buttons").hide();
+        $("#organisation-list").show();
+        $("#org-members").hide();
+
+        mhep_helper.list_assessments().then(result => {
+            assessments = result;
+            $("#assessments-title").html("Your Assessments");
+            draw_assessments("#assessments", assessments);
+        });
     });
 
-
-// -------------------------------------------------------
-// Other
-// -------------------------------------------------------
-  $('#modal-assessment-create').on('keypress', function (e) {
-        if (e.which == 13) {
-            $('#assessment-create').click();
-        }
-    });
+    $("#show-members-button").click(function() {
+        $("#org-members").show();
+        $("#show-members-button").hide();
+    })
 
 </script>
 {% endblock %}

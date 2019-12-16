@@ -1,21 +1,18 @@
 var mhep_helper = {
-    apikey: "",
-    'getlist': function ()
+    'list_assessments': function ()
     {
-        var result = [];
-        $.ajax({
-            url: urlHelper.api.assessments(),
-            dataType: 'json',
-            async: false,
-            error: handleServerError('listing assessments'),
-            success: function (data) {
-                result = data;
-            },
-        });
-        if (result == "") {
-            result = [];
-        }
-        return result;
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: urlHelper.api.assessments(),
+                success: function (data) {
+                    resolve(data);
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    handleServerError("listing assessments")(jqXHR, textStatus, errorThrown);
+                    reject(errorThrown);
+                }
+            });
+        })
     },
     'get': function (id)
     {
@@ -86,31 +83,39 @@ var mhep_helper = {
         });
         return result;
     },
-    'delete': function (id) {
-        var result = false;
-        $.ajax({
-            type: 'DELETE',
-            url: urlHelper.api.assessment(id),
-            async: false,
-            error: handleServerError('deleting assessment'),
-            success: function () {
-                result = true;
-            },
+    'delete_assessment': function (id) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: urlHelper.api.assessment(id),
+                type: "DELETE",
+                error: function(jqXHR, textStatus, errorThrown) {
+                    handleServerError('deleting assessment')(jqXHR, textStatus, errorThrown);
+                    reject(errorThrown);
+                },
+                success: function () {
+                    resolve();
+                },
+            });
         });
-        return result;
     },
     'set_status': function (id, status)
     {
-        $.ajax({type: 'PATCH',
-            url: urlHelper.api.assessment(id),
-            data: JSON.stringify({'status': status}),
-            dataType: "json",
-            contentType: "application/json;charset=utf-8",
-            async: false,
-            error: handleServerError('setting assessment status'),
-            success: function (data) {
-            },
-        });
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'PATCH',
+                url: urlHelper.api.assessment(id),
+                dataType: 'json',
+                contentType: "application/json;charset=utf-8",
+                data: JSON.stringify({'status': status}),
+                success: function () {
+                    resolve();
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    handleServerError("setting assessment status")(jqXHR, textStatus, errorThrown);
+                    reject(errorThrown);
+                }
+            });
+        })
     },
     'set_name_and_description': function (id, name, description)
     {
@@ -147,6 +152,12 @@ var mhep_helper = {
                     resolve(data);
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
+                    // This means we can't do this because we're not an admin in any
+                    // groups.  Just resolve to the empty list.
+                    if (jqXHR.status == 403) {
+                        return resolve([]);
+                    }
+
                     handleServerError("listing users")(jqXHR, textStatus, errorThrown);
                     reject(errorThrown);
                 }

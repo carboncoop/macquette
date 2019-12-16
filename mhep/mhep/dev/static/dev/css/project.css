@@ -2,6 +2,7 @@
     --app-color: #ff2712;;
 
     --brown-1: #897A67;
+    --brown-2: rgba(215, 210, 201, 0.9);
     --brown-3: #EEECE5;
     --brown-4: rgb(242, 242, 242);
 }
@@ -80,15 +81,6 @@ a:hover {
 .side-block {
     background-color: white;
     border-bottom: 1px solid #edeae6;
-}
-
-.main-block {
-    width:100%;
-    height: auto;
-    text-align: left;
-    background-color:#fff;
-
-    margin-top:10px;
 }
 
 .scenario-nav {
@@ -224,8 +216,6 @@ body .modal {
 
 .text-warning { color: red; }
 
-.bg-lighter { background-color: #ac9d9344; }
-
 
 .d-i { display: inline; }
 .d-flex { display: flex; }
@@ -326,6 +316,8 @@ body .modal {
     height: 1.2rem !important;
 }
 
+.bg-white { background-color: white; }
+.bg-lighter { background-color: #ac9d9344; }
 .bg-red { background-color: #ff2712; }
 .bg-pale-green { background-color: #beeebe; }
 .bg-pale-blue { background-color: #ddeeff; }
@@ -363,16 +355,6 @@ body .modal {
   color: rgba(99,86,71,0.8);
 }
 
-.organisation-member {
-  padding: 8px 4px;
-  border-bottom: 1px solid #ccc;
-}
-
-.member-name {
-  font-weight: bold;
-  display: block;
-}
-
 .member-last-active {
   color: #777;
 }
@@ -385,21 +367,23 @@ button.demote-role {
 
 /**** NAVIGATION ****/
 
+.nav-container {
+    position: sticky;
+    top: 0;
+
+    width: 100%;
+    box-sizing: border-box;
+    background-color: var(--brown-4);
+    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 10px 0px;
+    z-index: 9999;
+}
+
 .nav-main {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 0 15px;
-
-    position: sticky;
-    top: 0;
-
-    width: 100%;
     height: 40px;
-    box-sizing: border-box;
-    background-color: var(--brown-4);
-    box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 10px 0px;
-    z-index: 9999;
 }
 
 .nav-main a {
