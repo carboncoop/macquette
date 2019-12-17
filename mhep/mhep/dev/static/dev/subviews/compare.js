@@ -187,7 +187,7 @@ function compareCarbonCoop(scenario) {
     //Fabric
     var Fabric = compareFabric(scenario);
     if (Fabric.changed === true) {
-        out += '<h3>Fabric</h3><p>Changes to Floor\'s, Wall\'s, Windows and Roof elements</p>\n\
+        out += '<h3>Fabric</h3><p>Changes to floors, walls, windows and roof elements</p>\n\
         <table class="table table-striped"><tr><th>Before</th><th>W/K</th><th>After</th><th>W/K</th><th>Change</th></tr>'
                 + Fabric.html + '</table></br>';
     }
@@ -535,7 +535,7 @@ function compareFabric(scenario) {
             out += '</i></td>';
             out += "<td style='padding-left:3px;padding-right:5px'>" + (element_scenario.uvalue * element_scenario.netarea).toFixed(2) + ' W/K</td>';
             out += '<td>';
-            out += "<span style='color:#aa0000'>+" + element_scenario.uvalue * element_scenario.netarea + ' W/K</span></td>';
+            out += "<span style='color:#aa0000'>+" + (element_scenario.uvalue * element_scenario.netarea).toFixed(2) + ' W/K</span></td>';
             out += '</tr>';
         }
     }
@@ -1159,46 +1159,48 @@ function getMeasuresCompleteTables(scenario) {
 }
 
 function measureForCompleteTable(measure) {
-    var html = "<table class='complete-measures-table'>";
-    html += '<tr><td style="width:13%"><strong>Measure: </strong></td><td colspan=3>' + measure.name + '</td></tr>';
+    let location = 'Whole house';
     if (typeof measure.location != 'undefined') {
-        var location = measure.location.replace(/,br/g, ', '); // for measures applied in bulk to fabric elements the location has the form of: W9,brW10,brW21,brD3,brW4,brW5,brW6a,brW16 , and we dont want that
+        // for measures applied in bulk to fabric elements the location has the form of:
+        // W9,brW10,brW21,brD3,brW4,brW5,brW6a,brW16 , and we dont want that
+        location = measure.location.replace(/,br/g, ', ');
         if (location[location.length - 2] == ',' && location[location.length - 1] == ' ') {
             location = location.substring(0, location.length - 2);
         }
-        html += '<tr><td><strong>Label/location: </strong></td><td colspan=3>' + location + '</td></tr>';
-    } else {
-        html += '<tr><td><strong>Label/location: </strong></td><td colspan=3> Whole house</td></tr>';
     }
-    html += '<tr><td><strong>Description: </strong></td><td colspan=3>' + measure.description + '</td></tr>';
-    html += '<tr><td><strong>Associated work: </strong></td><td colspan=3>' + measure.associated_work + '</td></tr>';
-    if (measure.maintenance != 'undefined') {
-        html += '<tr><td><strong>Maintenance: </strong></td><td colspan=3>' + measure.maintenance + '</td></tr>';
-    } else {
-        html += '<tr><td><strong>Maintenance: </strong></td><td colspan=3> N/A</td></tr>';
-    }
-    html += '<tr><td><strong>Special and other considerations: </strong></td><td colspan=3>' + measure.notes + '</td></tr>';
-    html += '<tr><td><strong>Who by: </strong></td><td style="width:35%">' + measure.who_by + '</td>';
-    html += '<td style="width:13%"><strong>Key risks: </strong></td><td>' + measure.key_risks + '</td></tr>';
-    html += '<tr><td><strong>Benefits: </strong></td><td>' + measure.benefits + '</td>';
-    if (measure.disruption != undefined) {
-        html += '<td><strong>Dirt and disruption: </strong></td><td>' + measure.disruption.replace('MEDIUMHIGH', 'MEDIUM / HIGH') + '</td></tr>';
-    } else {
-        html += '<td><strong>Dirt and disruption: </strong></td><td></td></tr>';
-    }
-    if (measure.performance == undefined) {
-        var perf = '';
-    } else {
-        perf = format_performance_string(measure.performance);
-    } // We have realized that some units were inputted wrong in the library
-    html += '<tr><td><strong>Performance target: </strong></td><td style="width:35%">' + perf + '</td>';
-    html += '<td colspan=2><table  style="width:100%">';
-    html += measure.min_cost == undefined ? '' : '<tr><td><strong>Minimum cost</strong></td><td colspan=3>' + measure.min_cost + '</td></tr>';
-    html += '<tr><td style="width:25%"><strong>Cost (£/unit): </strong></td><td>' + measure.cost + '</td><td style="width:30%"><strong>Units: </strong></td><td>' + measure.cost_units + '</td></tr>';
-    html += '<tr><td><strong>Quantity (units): </strong></td><td>' + (1.0 * measure.quantity).toFixed(2) + '</td><td><strong>Total cost (£): </strong></td><td>' + (1.0 * measure.cost_total).toFixed(2) + '</td></tr></table></td></tr>';
-    html += '</table>';
 
-    return html;
+    let maintenance = measure.maintenance != 'undefined' ? measure.maintenance : 'N/A';
+    let disruption = measure.disruption != undefined ? measure.disruption.replace('MEDIUMHIGH', 'MEDIUM / HIGH') : 'N/A';
+    let performance = measure.performance == undefined ? '' : format_performance_string(measure.performance);
+    let quantity = (1.0 * measure.quantity).toFixed(2);
+    let totalCost = (1.0 * measure.cost_total).toFixed(2);
+
+    let min_cost =
+        measure.min_cost != undefined
+            ? `<tr><th>Minimum cost</th>         <td>${measure.min_cost}</td></tr>`
+            : '';
+
+    return `
+        <div class="complete-measures-wrapper">
+            <table class='complete-measures-table break-inside-avoid'>
+                <tr><th>Measure:</th>              <td>${measure.name}</td></tr>
+                <tr><th>Label/location:</th>       <td>${location}</td></tr>
+                <tr><th>Description:</th>          <td>${measure.description}</td></tr>
+                <tr><th>Associated work:</th>      <td>${measure.associated_work}</td></tr>
+                <tr><th>Maintenance:</th>          <td>${maintenance}</td></tr>
+                <tr><th colspan="2">Special and other considerations:</th></tr>
+                <tr><td></td>                      <td>${measure.notes}</td></tr>
+                <tr><th>Who by:</th>               <td>${measure.who_by}</td></tr>
+                <tr><th>Key risks:</th>            <td>${measure.key_risks}</td></tr>
+                <tr><th>Dirt and disruption:</th>  <td>${disruption}</td></tr>
+                <tr><th>Benefits:</th>             <td>${measure.benefits}</td></tr>
+                <tr><th>Performance target:</th>   <td>${performance}</td></tr>
+                <tr><th>Cost per unit</th>         <td>£${measure.cost} per ${measure.cost_units} × ${quantity} ${measure.cost_units}</td></tr>
+                ${min_cost}
+                <tr><th>Total cost</th>            <td>£${totalCost}</td></tr>
+            </table>
+        </div>
+    `;
 }
 
 function measuresByIdForCompleteTable(measures_by_id) {

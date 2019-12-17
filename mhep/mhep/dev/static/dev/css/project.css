@@ -211,7 +211,7 @@ body .modal {
 .text-nowrap { white-space: nowrap; }
 .text-right { text-align: right !important; }
 
-.text-normal { font-weight: normal; font-style: normal; }
+.text-normal { font-weight: normal !important; font-style: normal !important; }
 .text-bold { font-weight: bold; }
 .text-italic { font-style: italic; }
 
