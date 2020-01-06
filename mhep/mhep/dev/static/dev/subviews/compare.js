@@ -167,68 +167,68 @@ function compareCarbonCoop(scenario) {
     ];
     var BDD = comparePropertiesInArray(scenario, properties_to_check);
     if (BDD.changed === true) {
-        out += '<h4>Basic dwelling data</h4><table class="table table-striped">' + BDD.html + '</table><br />';
+        out += '<h4>Basic dwelling data</h4><table class="table table-striped">' + BDD.html + '</table>';
     }
     // Ventilation
     var Vent = compareVentilation(scenario);
     if (Vent.changed === true) {
-        out += '<h4>Ventilation</h4><table class="table table-striped">' + Vent.html + '</table></br>';
+        out += '<h4>Ventilation</h4><table class="table table-striped">' + Vent.html + '</table>';
     }
     // Infiltration
     var Inf = compareInfiltration(scenario);
     if (Inf.changed === true) {
-        out += '<h4>Infiltration</h4><table class="table table-striped">' + Inf.html + '</table></br>';
+        out += '<h4>Infiltration</h4><table class="table table-striped">' + Inf.html + '</table>';
     }
     // Clothes drying facilities
     var CDF = compareClothesDryingFacilities(scenario);
     if (CDF.changed === true) {
-        out += '<h4>Clothes drying facilities</h4><table class="table table-striped">' + CDF.html + '</table></br>';
+        out += '<h4>Clothes drying facilities</h4><table class="table table-striped">' + CDF.html + '</table>';
     }
     //Fabric
     var Fabric = compareFabric(scenario);
     if (Fabric.changed === true) {
         out += '<h4>Fabric</h4><p>Changes to floors, walls, windows and roof elements</p>\n\
         <table class="table table-striped"><tr><th>Before</th><th>W/K</th><th>After</th><th>W/K</th><th>Change</th></tr>'
-                + Fabric.html + '</table></br>';
+                + Fabric.html + '</table>';
     }
     // Lighting - SAP
     var Lighting = compareLighting(scenario);
     if (Lighting.changed === true) {
-        out += '<h4>Lighting</h4><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table></br>';
+        out += '<h4>Lighting</h4><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table>';
     }
     // Heating
     var Heating = compareHeating(scenario);
     if (Heating.changed === true) {
-        out += '<h4>Heating</h4><table class="table table-striped">' + Heating.html + '</table></br>';
+        out += '<h4>Heating</h4><table class="table table-striped">' + Heating.html + '</table>';
     }
     // Solar hot water
     if (project[scenario].use_SHW == true) {
         var SHW = compareSolarHotWater(scenario);
         if (SHW.changed === true) {
-            out += '<h4>Solar hot water</h4><table class="table table-striped">' + SHW.html + '</table></br>';
+            out += '<h4>Solar hot water</h4><table class="table table-striped">' + SHW.html + '</table>';
         }
     }
     // Generation
     var GEN = compareGeneration(scenario);
     if (GEN.changed === true) {
-        out += '<h4>Generation</h4><table class="table table-striped">' + GEN.html + '</table></br>';
+        out += '<h4>Generation</h4><table class="table table-striped">' + GEN.html + '</table>';
     }
     // Energy requirements
     var ER = compareEnergyRequirements(scenario);
     if (ER.changed === true) {
-        out += '<h4>Energy requirements</h4><table class="table table-striped">' + ER.html + '</table></br>';
+        out += '<h4>Energy requirements</h4><table class="table table-striped">' + ER.html + '</table>';
     }
     // Fuel requirements
     var FR = compareFuelRequirements(scenario);
     if (FR.changed === true) {
-        out += '<h4>Fuel requirements</h4><table class="table table-striped">' + FR.html + '</table></br>';
+        out += '<h4>Fuel requirements</h4><table class="table table-striped">' + FR.html + '</table>';
     }
     // Totals
     out += '<h4>Totals</h4><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
     out += '<tr><td>Annual cost</td><td><i>£' + project.master.total_cost.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_cost.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>Total income</td><td><i>£' + project.master.total_income.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_income.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>SAP rating</td><td><i>' + project.master.SAP.rating.toFixed(0) + '</i></td><td><i>' + project[scenario].SAP.rating.toFixed(0) + '</i></td></tr>';
-    out += '</table></br>';
+    out += '</table>';
     return out;
 }
 
