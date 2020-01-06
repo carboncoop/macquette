@@ -76,6 +76,21 @@ var mhep_helper = {
         });
         return result;
     },
+    'duplicate_assessment': function (id) {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: urlHelper.api.duplicateAssessment(id),
+                type: 'POST',
+                error: function(jqXHR, textStatus, errorThrown) {
+                    handleServerError('duplicating assessment')(jqXHR, textStatus, errorThrown);
+                    reject(errorThrown);
+                },
+                success: function (data) {
+                    resolve(data);
+                },
+            });
+        });
+    },
     'delete_assessment': function (id) {
         return new Promise((resolve, reject) => {
             $.ajax({

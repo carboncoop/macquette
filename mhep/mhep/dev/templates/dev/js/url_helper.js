@@ -18,6 +18,11 @@ const urlHelper = function() {
                 return dummyURL.replace(/12345/, parseInt(assessmentID));
             },
 
+            duplicateAssessment: function(assessmentID) {
+                const dummyURL = '{% url VERSION|add:":duplicate-assessment" "12345" %}';
+                return dummyURL.replace(/12345/, parseInt(assessmentID));
+            },
+
             uploadImage: function(assessmentID) {
                 const dummyURL = '{% url VERSION|add:":upload-image-to-assessment" "12345" %}';
                 return dummyURL.replace(/12345/, parseInt(assessmentID));

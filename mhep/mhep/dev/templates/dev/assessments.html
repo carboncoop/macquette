@@ -3,6 +3,8 @@
 
 {% block extra_head %}
 <style>
+    .icon { width: 1em; height: 1em; }
+
     .modal-backdrop {
         opacity:0.3 !important;
     }
@@ -29,7 +31,7 @@
     }
 
     select {
-        width: 10rem;
+        width: 8rem;
         margin-bottom: 0;
     }
 
@@ -150,13 +152,13 @@
         </div>
     </div>
 
-    <table class="table">
+    <table id="assessment-table" class="table">
         <thead>
             <tr>
-                <th>Name</th>
+                <th width="15%">Name</th>
                 <th>Description</th>
                 <th>Author</th>
-                <th>Modified</th>
+                <th width="10%">Modified</th>
                 <th>Status <i class="icon-question-sign" title="Completed assessments are locked"></i></th>
                 <th>Actions</th>
             </tr>
@@ -165,7 +167,7 @@
         <tbody id="assessments"></tbody>
     </table>
 
-    <div id="noassessments" class="alert alert-warning" style="display:none">
+    <div id="noassessments" style="display:none">
         You don't have any assessments yet.  Click "New" to get started.
     </div>
 </section>
@@ -250,6 +252,24 @@
         $("#modal-assessment-create").modal("hide");
         $("#assessment-name-input").val("");
         $("#assessment-description-input").val("");
+    });
+
+// -----------------------------------------------------------------------------------
+// Duplicate assessment
+// -----------------------------------------------------------------------------------
+
+    $(".assessments").on('click', '.duplicate-assessment', function () {
+        if (!window.confirm(
+            "Do you really want to duplicate this assessment?  This will not duplicate images.")) {
+            return;
+        }
+
+        const id = $(this).attr('data-assessment-id');
+
+        mhep_helper.duplicate_assessment(id).then(data => {
+            assessments.push(data)
+            draw_assessments("#assessments", assessments);
+        });
     });
 
 // -----------------------------------------------------------------------------------
@@ -342,10 +362,16 @@
 
             out +=
                 `<tr>
-                    <td>${assessment.name}</td>
-                    <td style='color:#888'>${assessment.description}</td>
-                    <td>${assessment.author}</td>
-                    <td>${getDate(assessment.mdate * 1000)}</td>
+                    <td>
+                        <a href="${assessmentURL}" target="_blank" class="underline d-b">
+                            ${assessment.name}</td>
+                        </a>
+                    </td>
+                    <td>
+                        ${assessment.description}
+                    </td>
+                    <td style='color:#888'>${assessment.author}</td>
+                    <td style='color:#888'>${getDate(assessment.mdate * 1000)}</td>
                     <td>
                         <select class='assessment-status ${statusColour}'
                                 data-assessment-id="${assessment.id}">
@@ -353,23 +379,33 @@
                         </select>
                     </td>
                     <td>
-                        <a class="btn" href="${assessmentURL}" target="_blank">
-                            <i class="icon-folder-open"></i> Open
-                        </a>
+                        <div style="display: flex">
+                            <button class="btn d-inline-flex align-items-center mr-7 duplicate-assessment"
+                                    title="Duplicate"
+                                    data-assessment-id="${assessment.id}">
+                                <svg class="icon mr-1">
+                                    <use xlink:href="#iconset-duplicate" />
+                                </svg>
+                            </button>
 
-                        <button class="btn delete-assessment"
-                                data-assessment-id="${assessment.id}">
-                            <i class="icon-trash"></i> Delete
-                        </button>
+                            <button class="btn delete-assessment"
+                                    title="Delete"
+                                    data-assessment-id="${assessment.id}">
+                                <i class="icon-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 </tr>`;
         }
 
         $(element).html(out);
-        if (assessments.length == 0)
+        if (assessments.length == 0) {
             $("#noassessments").show();
-        else
+            $("#assessment-table").hide();
+        } else {
+            $("#assessment-table").show();
             $("#noassessments").hide();
+        }
     }
 
 // ----------------------------------------------------------------------------

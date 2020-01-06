@@ -1,3 +1,4 @@
+from .assessments import DuplicateAssessment  # noqa
 from .assessments import ListCreateAssessments  # noqa
 from .assessments import RetrieveUpdateDestroyAssessment  # noqa
 from .assessments import SetFeaturedImage  # noqa
