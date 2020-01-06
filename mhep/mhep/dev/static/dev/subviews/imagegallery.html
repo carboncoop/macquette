@@ -1,25 +1,28 @@
 <style>
-    .gallery-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
-        grid-column-gap: 1.75rem;
-        grid-row-gap: 1.75rem;
-    }
     .gallery-card {
         border: 1px solid #CCC7B4;
         background: #444;
         display: flex;
-        flex-direction: column;
         justify-content: space-between;
+        margin-bottom: 1.75rem;
+        max-width: 800px;
     }
     .gallery-head {
         display: flex;
-        flex-direction: column;
-        height: 100%;
+        flex-direction: row;
+        width: 100%;
         justify-content: center;
         align-items: center;
+        max-width: 300px;
+        max-height: 300px;
+    }
+    .gallery-head img {
+        object-fit: scale-down;
+        max-height: 100%;
+        max-width: 100%;
     }
     .gallery-content {
+        flex: 1;
         padding: 1rem;
         background-color: #EEECE5;
     }
@@ -39,7 +42,7 @@
         transform: scale(1.5);
     }
     .gallery-editor {
-        width: 190px;
+        width: 100%;
         margin-bottom: 0 !important;
     }
     .text-muted {
@@ -53,7 +56,7 @@
     <h4>Upload images</h4>
     <input type="file" multiple accept="image/*" class="gallery-files">
     <button class="btn gallery-upload">Upload</button>
-    <p>Max. size: 1MB</p>
+    <p>Maximum size: 10MB</p>
     <div id="upload_result" style="margin: 0 0 25px 25px"></div>
 
     <div class="gallery-list"></div>
