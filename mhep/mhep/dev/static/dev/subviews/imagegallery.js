@@ -125,9 +125,7 @@ class ImageGallery {
             </button>
 
             <div id="delete_result" style="margin: 0 0 25px 25px"></div>
-            <div class="gallery-grid">
-                ${galleryItems}
-            </div>
+            ${galleryItems}
         `;
     }
 
@@ -136,31 +134,44 @@ class ImageGallery {
         const starClasses = this.isFeatured(id) ? 'icon-star' : 'icon-star-empty';
         const isSelected = this.isSelected(id) ? 'checked' : '';
 
+        let noteDisplay = note.replace(/</gi, '&lt;').replace(/\n/gi, '<br>');
+
         const noteHTML = this.isEditing(id)
-            ? `<input class="gallery-editor" type="text" name='${id}' value="${note}">`
+            ? `<textarea rows="6" class="gallery-editor" name='${id}'>${note}</textarea>`
             : (note
-                ? `<span>${note}</span>`
+                ? `<span>${noteDisplay}</span>`
                 : "<span class='text-muted'>no note</span>");
 
-        const buttonHTML = this.isEditing(id)
-            ? "<button class='btn gallery-save-note'>Save note</button>"
-            : `<button class="btn gallery-edit" data-id="${id}">Edit note</button>`;
+        if (this.isEditing(id)) {
+            var buttonHTML = `
+                <button class='btn btn-primary gallery-save-note'>Save note</button>
+                <button class='btn gallery-cancel-note'>Cancel</button>`;
+        } else {
+            var buttonHTML = `
+                <i style='cursor:pointer' class='gallery-feature ${starClasses} mr-7' data-id='${id} title='Feature this image'></i>
+                <button class="btn btn--icon gallery-edit" data-id="${id}">
+                    <svg><use xlink:href="#iconset-edit" /></svg>
+                    Edit note
+                </button>
+                <button class="btn btn--icon gallery-delete" data-id="${id}">
+                    <svg><use xlink:href="#iconset-trash" /></svg>
+                    Delete
+                </button>`;
+        }
 
         return `
             <div class="gallery-card ${cardClasses}">
                 <a class="gallery-head" href='${url}' target="_blank" rel="noopener">
                    <img src="${thumbnail_url}" width="${thumbnail_width}" height="${thumbnail_height}">
                 </a>
-                <div class="gallery-content">
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 1rem">
+                <div class="gallery-content d-flex justify-content-between" style="flex-direction: column;">
+                    <div class="d-flex justify-content-between" style="margin-bottom: 1rem">
                         ${noteHTML}
-                        <i style='cursor:pointer' class='gallery-feature ${starClasses}' data-id='${id} title='Feature this image'></i>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between">
+                    <div class="d-flex justify-content-between">
                         <span>
                             ${buttonHTML}
-                            <button class="btn gallery-delete" data-id="${id}">Delete</button>
                         </span>
                         <input type='checkbox' class="gallery-checkbox" name="${id}" ${isSelected}>
                     </div>
@@ -207,12 +218,15 @@ class ImageGallery {
 
         $(this.root).on('click', '.gallery-save-note', saveNote);
         $(this.root).on('keydown', '.gallery-editor', evt => {
-            if (evt.key === 'Enter') {
-                saveNote();
-            } else if (evt.key === 'Esc' || evt.key === 'Escape') {
+            if (evt.key === 'Esc' || evt.key === 'Escape') {
                 this.stopEditing();
                 this.view();
             }
+        });
+
+        $(this.root).on('click', '.gallery-cancel-note', evt => {
+            this.stopEditing();
+            this.view();
         });
 
         $(this.root).on('click', '.gallery-delete', evt => {
