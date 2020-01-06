@@ -6,7 +6,7 @@ function compare_initUI() {
     // Comparison tables
     for (var scenario in project) {
         if (scenario != 'master') {
-            $('#compare').append('<h3 style="margin-top:25px">Master/' + scenario + ' Comparison table</h3>');
+            $('#compare').append('<h3 style="margin-top:25px">Master/' + scenario + ' Comparison table</h4>');
             $('#compare').append('<hr />');
             $('#compare').append('<div id="comparison-' + scenario + '" style="margin-left:25px">');
             $('#comparison-' + scenario).html(compareCarbonCoop(scenario));
@@ -16,7 +16,7 @@ function compare_initUI() {
     // Summary of measures
     for (var scenario in project) {
         if (scenario != 'master') {
-            $('#summary-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - summary of measures</h3>');
+            $('#summary-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - summary of measures</h4>');
             $('#summary-measures').append('<hr />');
             $('#summary-measures').append('<div id="summary-measures-' + scenario + '" style="margin-left:25px">');
             $('#summary-measures-' + scenario).append(getMeasuresSummaryTable(scenario));
@@ -27,7 +27,7 @@ function compare_initUI() {
     // Complete measures tables
     for (var scenario in project) {
         if (scenario != 'master') {
-            $('#complete-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - comple list of measures</h3>');
+            $('#complete-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - comple list of measures</h4>');
             $('#complete-measures').append('<hr />');
             $('#complete-measures').append('<div id="complete-measures-' + scenario + '" style="margin-left:25px">');
             $('#complete-measures-' + scenario).append(getMeasuresCompleteTables(scenario));
@@ -167,64 +167,64 @@ function compareCarbonCoop(scenario) {
     ];
     var BDD = comparePropertiesInArray(scenario, properties_to_check);
     if (BDD.changed === true) {
-        out += '<h3>Basic dwelling data</h3><table class="table table-striped">' + BDD.html + '</table><br />';
+        out += '<h4>Basic dwelling data</h4><table class="table table-striped">' + BDD.html + '</table><br />';
     }
     // Ventilation
     var Vent = compareVentilation(scenario);
     if (Vent.changed === true) {
-        out += '<h3>Ventilation</h3><table class="table table-striped">' + Vent.html + '</table></br>';
+        out += '<h4>Ventilation</h4><table class="table table-striped">' + Vent.html + '</table></br>';
     }
     // Infiltration
     var Inf = compareInfiltration(scenario);
     if (Inf.changed === true) {
-        out += '<h3>Infiltration</h3><table class="table table-striped">' + Inf.html + '</table></br>';
+        out += '<h4>Infiltration</h4><table class="table table-striped">' + Inf.html + '</table></br>';
     }
     // Clothes drying facilities
     var CDF = compareClothesDryingFacilities(scenario);
     if (CDF.changed === true) {
-        out += '<h3>Clothes drying facilities</h3><table class="table table-striped">' + CDF.html + '</table></br>';
+        out += '<h4>Clothes drying facilities</h4><table class="table table-striped">' + CDF.html + '</table></br>';
     }
     //Fabric
     var Fabric = compareFabric(scenario);
     if (Fabric.changed === true) {
-        out += '<h3>Fabric</h3><p>Changes to floors, walls, windows and roof elements</p>\n\
+        out += '<h4>Fabric</h4><p>Changes to floors, walls, windows and roof elements</p>\n\
         <table class="table table-striped"><tr><th>Before</th><th>W/K</th><th>After</th><th>W/K</th><th>Change</th></tr>'
                 + Fabric.html + '</table></br>';
     }
     // Lighting - SAP
     var Lighting = compareLighting(scenario);
     if (Lighting.changed === true) {
-        out += '<h3>Lighting</h3><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table></br>';
+        out += '<h4>Lighting</h4><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table></br>';
     }
     // Heating
     var Heating = compareHeating(scenario);
     if (Heating.changed === true) {
-        out += '<h3>Heating</h3><table class="table table-striped">' + Heating.html + '</table></br>';
+        out += '<h4>Heating</h4><table class="table table-striped">' + Heating.html + '</table></br>';
     }
     // Solar hot water
     if (project[scenario].use_SHW == true) {
         var SHW = compareSolarHotWater(scenario);
         if (SHW.changed === true) {
-            out += '<h3>Solar hot water</h3><table class="table table-striped">' + SHW.html + '</table></br>';
+            out += '<h4>Solar hot water</h4><table class="table table-striped">' + SHW.html + '</table></br>';
         }
     }
     // Generation
     var GEN = compareGeneration(scenario);
     if (GEN.changed === true) {
-        out += '<h3>Generation</h3><table class="table table-striped">' + GEN.html + '</table></br>';
+        out += '<h4>Generation</h4><table class="table table-striped">' + GEN.html + '</table></br>';
     }
     // Energy requirements
     var ER = compareEnergyRequirements(scenario);
     if (ER.changed === true) {
-        out += '<h3>Energy requirements</h3><table class="table table-striped">' + ER.html + '</table></br>';
+        out += '<h4>Energy requirements</h4><table class="table table-striped">' + ER.html + '</table></br>';
     }
     // Fuel requirements
     var FR = compareFuelRequirements(scenario);
     if (FR.changed === true) {
-        out += '<h3>Fuel requirements</h3><table class="table table-striped">' + FR.html + '</table></br>';
+        out += '<h4>Fuel requirements</h4><table class="table table-striped">' + FR.html + '</table></br>';
     }
     // Totals
-    out += '<h3>Totals</h3><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
+    out += '<h4>Totals</h4><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
     out += '<tr><td>Annual cost</td><td><i>£' + project.master.total_cost.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_cost.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>Total income</td><td><i>£' + project.master.total_income.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_income.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>SAP rating</td><td><i>' + project.master.SAP.rating.toFixed(0) + '</i></td><td><i>' + project[scenario].SAP.rating.toFixed(0) + '</i></td></tr>';
