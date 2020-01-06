@@ -377,7 +377,7 @@ button.demote-role {
     box-sizing: border-box;
     background-color: var(--brown-4);
     box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 10px 0px;
-    z-index: 9999;
+    z-index: 1000;
 }
 
 .nav-main {
