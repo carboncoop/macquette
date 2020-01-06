@@ -1,0 +1,162 @@
+
+<div id="openFUVC-modal" style="" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="openFUVC-modal-label" aria-hidden="true"data-backdrop="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h1 id="openFUVC-modal-label">Floor U-value calculator</h1>
+    </div>
+    <div class="modal-body">
+        <form id="openFUVC-form">
+            <div class="left">
+                <h2>Assumptions</h2>
+                <table class="table">
+                    <tr class="all"><td>Rsi: Internal surface resistance (heat flow downwards) </td><td>0.17 m<sup>2</sup>.K/W</td></tr>
+                    <tr class="suspended_floor heated_basement"><td>Rsi: Internal surface resistance (heat flow horizontal) </td><td>0.13 m<sup>2</sup>.K/W</td></tr>
+                    <!--<tr class="all"><td>Rsi: Internal surface resistance (heat flow upwards) </td><td>0.1 m<sup>2</sup>.K/W</td></tr>-->
+                    <tr class="all"><td>Rse: External Surface Resistance (e.g. to subfloor)</td><td>0.04 m<sup>2</sup>.K/W</td></tr>
+                    <tr class="all"><td>Rse: Thermal Resistance of below ground Exterior Surface (where immediately touching ground)</td><td>0.00 m<sup>2</sup>K/W</td></tr>
+                    <tr class="suspended_floor"><td>Air density</td><td>1.23 kg/m3</td></tr>
+                    <tr class="suspended_floor"><td>Air heat capacity</td><td>1000 J/(kg·K)</td></tr>
+                </table>
+            </div>
+            <div class="middle">            
+                <h2>Context</h2>
+                <table class="table inputs">
+                    <tr id="type-of-floor" class="all">
+                        <td>Type of floor <i class="icon-question-sign" title="For unheated basements select suspended floors"></i></td>
+                        <td><select>
+                                <option value="suspended_floor">Suspended floor</option>
+                                <option value="slab_on_ground">Slab-on-ground</option>
+                                <option value="heated_basement">Heated basement</option>
+                                <option value="exposed_floor_above_GL">Exposed floor above ground level</option>
+                            </select></td>
+                    </tr>
+
+                    <tr id="area" class="suspended_floor heated_basement slab_on_ground"><td>Area</td><td><input class='w75' type="number" step="0.01" min="0.01" required></input> m<sup>2</sup> <span style='margin-left:15px'>Characteristic dimension (B'): <span id="characteristic-dimension"></span></td></tr>
+
+                    <tr id="perimeter" class="suspended_floor heated_basement slab_on_ground"><td>Perimeter</td><td><input class='w75' type="number" step="0.01" min="0.01" required></input>  m</td></tr>
+
+                    <tr id="thermal_conductivity_ug" class="suspended_floor heated_basement slab_on_ground">
+                        <td>Ground (W/m.K)</td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                            </select></td>
+                    </tr>
+
+                    <tr id="wall_thickness" class="suspended_floor heated_basement slab_on_ground"><td>Thickness of external walls</td><td><input class='w75' type="number" step="0.01" min="0.01" required></input> m</td></tr>
+
+                    <tr id="height" class="suspended_floor"><td>Height above external floor level <i class="icon-question-sign" title="If unknown/uncertain enter 0.3 m" /></td><td><input class='w75' type="number" step="0.01" min="0.01" required></input> m</td></tr>
+
+                    <tr id="wall_uvalue" class="heated_basement suspended_floor">
+                        <td><span class="heated_basement">U-value of basement walls (W/m<sup>2</sup>.K)</span><span class="suspended_floor">U-value of walls of underfloor space above the ground level</span></td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                                <option class='other' value='1.7'>Other</option>
+                            </select>
+                            <p class="other">Thermal transmittance <input class='w75' type='number' min='0.001' step='0.001' value='1.7' /> W/m<sup>2</sup>.K</p>
+                        </td>
+                    </tr>
+
+                    <tr id="ventilation_type" class="suspended_floor">
+                        <td>Type of ventilation of the underfloor space</td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr id="area_ventilation_openings" class="indent suspended_floor"><td>Ventilation openings per m exposed perimeter</td><td><input class='w75' type="number" step="0.001" min="0.001" value='' /> m<sup>2</sup>/m</td></tr>
+                    <tr id="wind_shielding_factor" class="indent suspended_floor">
+                        <td>Wind shielding factor</td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                            </select>
+                        </td>
+                    </tr>
+                    <tr id="ventilation_rate" class="indent suspended_floor"><td>Ventilation rate</td><td><input class='w75' type="number" step="0.01" min="0.01" value='' /> m<sup>3</sup>/s</td></tr>
+                    <tr id="internal_temperature_annual_average" class="indent indent suspended_floor"><td>Annual average internal temperature</td><td><input class='w75' type="number" step="0.01" min="0.01" value='' /><sup>o</sup>C </td></tr>
+                    <tr id="ventilation_rate_unheated_basement" class="indent suspended_floor"><td>Ventilation rate <i class="icon-question-sign" title="If not known, use 0.3 - BS EN ISO 13370:2007 (section 9.4)" /></td><td><input class='w75' type="number" step="0.01" min="0.01" value='' /> air changes per hour</td></tr>
+                    <tr id="basement_volume" class="indent suspended_floor"><td>Basement volume</td><td><input class='w75' type="number" step="0.01" min="0.01" value='' /> m<sup>3</sup></td></tr>
+
+                    <tr id="depth_of_basement_floor" class="heated_basement suspended_floor"><td>Depth of basement floor below ground level</td><td><input class='w75' type="number" step="0.01" min="0.01" value=''></input> m</td></tr>
+
+                    <tr id="base_insulation_thermal_conductivity" class="slab_on_ground heated_basement suspended_floor">
+                        <td>Base insulation type (W/m.K)    </td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                                <option class='other' value='0.04'>Other</option>
+                            </select>
+                            <p class="other">Thermal conductivity <input class='w75' type='number' min='0.001' step='0.001' value='0.04' /> W/m.K</p>
+                        </td>
+                    </tr>
+                    <tr id="base_insulation_thickness" class="indent slab_on_ground heated_basement suspended_floor"><td>Base insulation thickness</td><td><input class='w75' type="number" step="0.001" min="0.01" value=''></input> m</td></tr>
+
+                    <tr id="edge_insulation_underfloor_space" class="slab_on_ground suspended_floor">
+                        <td>Edge insulation</td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                            </select> </td>
+                    </tr>
+                    <tr id="edge_insulation_thermal_conductivity" class="indent slab_on_ground suspended_floor">
+                        <td>Edge insulation type (W/m.K)</td>
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                                <option class='other' value='0.04'>Other</option>
+                            </select>
+                            <p class="other">Thermal conductivity <input class='w75' type='number' min='0.001' step='0.001' value='0.04' /> W/m.K</p>
+                        </td>
+                    </tr>
+                    <tr id="edge_insulation_thickness" class="indent slab_on_ground suspended_floor"><td>Edge insulation thickness</td><td><input class='w75' type="number" step="0.01" min="0.01" value=''></input> m</td></tr>
+                    <tr id="edge_insulation_length" class="indent slab_on_ground suspended_floor"><td>Edge insulation length/depth</td><td><input class='w75' type="number" step="0.01" min="0.01" value=''></input> m</td></tr>
+                    <tr id="climate-data" class="suspended_floor">
+                        <td>Climate data</td>
+                        <td>Region <select id="regions">
+                                <option class='manually' value='manually'>Input manually</option>
+                                <!-- Options added by openFUCV-ui-helper --></select>
+                            <table>
+                                <tr id="wind_speed_annual_average"><td>Annual average wind speed</td><td><input class="w75" type="number" min="0" step="0.1" /> m/s</td></tr>
+                                <tr id="external_temperature_annual_average"><td>Annual average external temperature </td><td><input class="w75" type="number" min="0" step="0.1" /> <sup>o</sup>C</td></tr>                            
+                            </table>
+                        </td>
+                    </tr>
+                    <tr id="unheated_space_thermal_resistance" class="exposed_floor_above_GL">
+                        <td>Type of exposed floor (m<sup>2</sup>.K/W)</td>                       
+                        <td><select>
+                                <!-- Options added by openFUCV-ui-helper -->
+                            </select> </td>
+                    </tr>
+                </table>
+                <table id="floor-deck" class='table suspended_floor exposed_floor_above_GL'>
+                    <tr><td colspan="4">U-value of floor deck</td><td><button class="btn" id="add-layer">Add layer</button></td><td></td><td></td></tr>
+                    <tr><td>Layer</td><td>Thickness (m)</td><td>Material 1 (W/m.K)</td><td>Material 2 (W/m.K)</td><td>Length material 2 (m)</td><td>Spacing (m)</td><td></td></tr>
+                </table>
+                <table style="display: none">
+                <tr class="layer" layer="template">
+                    <td class="layer-number"></td>
+                    <td><input class="thickness w75" type="number" min="0.01" step="0.01"></td>
+                    <td>
+                        <select class="material1">
+                            <!-- Options added by openFUCV-ui-helper -->
+                            <optgroup label="Other"><option class='other' value='0.13'>Other</option></optgroup>
+                        </select>
+                        <p class="other">Thermal conductivity <input class='w75' type='number' min='0.001' step='0.001' value='0.13' /> W/m.K</p>
+                    </td>
+                    <td>
+                        <select class="material2">
+                            <!-- Options added by openFUCV-ui-helper -->
+                            <option value="none">None</option>
+                            <option class='other' value='0.13'>Other</option>
+                        </select>
+                        <p class="other">Thermal conductivity <input class='w75' type='number' min='0.001' step='0.001' value='0.13' /> W/m.K</p>
+                    </td>
+                    <td><input class="length-material2 w75" type="number" min="0" step="0.001" ></td>
+                    <td><input class="spacing w75" type="number" min="0.01" step="0.01" ></td>
+                    <td class="actions"></td>
+                </tr>
+                </table>
+            </div>
+        </form>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button id="openFUVC-calculate" class="btn btn-primary">Calculate</button>
+    </div>
+</div>

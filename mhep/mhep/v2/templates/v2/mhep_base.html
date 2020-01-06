@@ -1,0 +1,64 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <title>{% block title %}My Home Energy Planner{% endblock title %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link href="{% static VERSION|add:'/css/bootstrap.css' %}" rel="stylesheet">
+    <link href="{% static VERSION|add:'/css/bootstrap-responsive.min.css' %}" rel="stylesheet">
+    <link href="{% static VERSION|add:'/css/project.css' %}" rel="stylesheet">
+
+    {# Load Sentry first #}
+    {% if settings.sentry_url %}
+    <script
+        src="https://browser.sentry-cdn.com/5.10.2/bundle.min.js"
+        integrity="sha384-ssBfXiBvlVC7bdA/VX03S88B5MwXQWdnpJRbUYFPgswlOBwETwTp6F3SMUNpo9M9"
+        crossorigin="anonymous"></script>
+    <script>Sentry.init({ dsn: "{{ settings.sentry_url }}" });</script>
+    {% endif %}
+
+    <script src="{% static VERSION|add:'/js/jquery-1.11.3.min.js' %}"></script>
+    <script>
+        'use strict';
+        {% include VERSION|add:"/js/handle_server_error.js" %}
+        {% include VERSION|add:"/js/add_csrf_token_to_ajax.js" %}
+        {% include VERSION|add:"/js/url_helper.js" %}
+    </script>
+    <script src="{% static VERSION|add:'/js/bootstrap.min.js' %}"></script>
+
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <div class="nav-container">
+        <nav class="nav-main container_if_u_want_it">
+            <h1 class="nav-main-heading">
+                MyHomeEnergyPlanner
+            </h1>
+            <div class="d-flex">
+                {% block extra_nav %}{% endblock %}
+                <a href="{% url VERSION|add:':index' %}">Assessments</a>
+                <a href="{% url 'versions:list-versions' %}">Versions</a>
+                <a href="{% url 'logout' %}">Log out</a>
+            </div>
+        </nav>
+    </div>
+
+    {% for message in messages %}
+    <div class="alert {% if message.tags %}alert-{{ message.tags }}{% endif %}">
+        {{ message }}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    {% endfor %}
+
+    <div class="container_if_u_want_it">
+        {% block content %}{% endblock content %}
+    </div>
+
+    {% include VERSION|add:"/svg/iconset.svg" %}
+</body>
+</html>

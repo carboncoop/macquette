@@ -96,6 +96,7 @@ THIRD_PARTY_APPS = ["corsheaders", "crispy_forms", "social_django", "rest_framew
 LOCAL_APPS = [
     "mhep.users.apps.UsersConfig",
     # Your stuff: custom apps go here
+    "mhep.v2.apps.AssessmentsConfig",
     "mhep.dev.apps.AssessmentsConfig",
     "mhep.v1.apps.AssessmentsConfig",
 ]

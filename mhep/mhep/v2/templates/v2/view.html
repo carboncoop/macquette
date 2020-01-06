@@ -1,0 +1,824 @@
+{% extends VERSION|add:"/mhep_base.html" %}
+{% load static i18n %}
+
+{% block extra_head %}
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
+<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/report-helper.js' %}"></script>
+
+
+<link rel="stylesheet" href="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
+<script src="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+
+<!-- open floor uvalue calculator -->
+<script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
+<script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC-ui-helper.js' %}"></script>
+<link rel="stylesheet" href="{% static VERSION|add:'/js/openFUVC/openFUVC.css' %}">
+
+<style>
+    .cc {
+        color: var(--app-color);
+        font-weight: bold;
+        padding-right:20px;
+
+    }
+
+    .title {
+        padding: 10px 30px;
+        color:#888;
+        float:left;
+    }
+
+    .modal-backdrop
+    {
+        opacity:0.3 !important;
+    }
+    body .modal {
+        /* new custom width */
+        width: 560px;
+        /* must be half of the width, minus scrollbar on the left (30px) */
+        margin-left: -280px;
+    }
+
+</style>
+
+{% endblock %}
+
+
+{% block extra_nav %}
+    <a id="undo">
+        <svg style="width: 1rem; height: 1rem"><use xlink:href="#iconset-undo" /></svg>
+    </a>
+    <a id="redo">
+        <svg style="width: 1rem; height: 1rem; transform: scaleX(-1);"><use xlink:href="#iconset-undo" /></svg>
+    </a>
+{% endblock %}
+
+
+{% block content %}
+
+<div id="openbem">
+    <div id="sidebar">
+        <div class="side-block" style="background-color: #EEECE5 !important; padding: 15px;">
+            <button id="edit-project-name-and-description" style="float:right">
+                <i class="icon-edit"></i>
+            </button>
+            <p style="margin-bottom: 0">
+                <b><span id="project-title"></span></b><br>
+                <span id="project-description"></span><br>
+                Author: <span id="project-author"></span>
+            </p>
+        </div>
+
+        <div class="side-block">
+            <div class="side-section">
+                <div class="side-section--header">Input</div>
+
+                <ul>
+                    <li><a class="project-menu-item" href="#master/householdquestionnaire">Household Questionnaire</a></li>
+                    <li><a class="project-menu-item" href="#master/commentary">Commentary</a></li>
+                    <li><a class="project-menu-item" href="#master/currentenergy">Current Energy</a></li>
+                    <li><a class="project-menu-item" href="#master/imagegallery">Image gallery</a></li>
+                </ul>
+            </div>
+
+            <div class="side-section">
+                <div class="side-section--header">Output</div>
+
+                <ul>
+                    <li><a class="project-menu-item" href="#master/compare">Compare Scenarios</a></li>
+                    <li><a class="project-menu-item" href="#master/report">Reports</a></li>
+                </ul>
+            </div>
+
+            <div class="side-section">
+                <div class="side-section--header">Tools & Settings</div>
+
+                <ul>
+                    <li><a class="project-menu-item" href="#master/export">Import/Export</a></li>
+                    <li><a class="project-menu-item" href="#master/librariesmanager">Libraries manager</a></li>
+                    <li><a class="project-menu-item" href="#master/fuelsmanager">Fuels manager</a></li>
+                </ul>
+            </div>
+
+            <div class="side-section">
+                <div class="side-section--header">Scenarios</div>
+            </div>
+
+        </div>
+
+        <div id="scenario-list"></div>
+
+        <div class="side-block">
+            <div id="create-new" class="block-header block-header--clickable" style="display: flex">
+                <i class="icon-plus" style="margin-right: 0.25rem"></i> Create new scenario
+            </div>
+        </div>
+
+        <div class="side-block">
+            <div class="side-section">
+                <div class="side-section--header">Documentation</div>
+
+                <ul>
+                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/MyHomeEnergyPlanner">User guide</a></li>
+                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/ElementLibrary">A Fabric elements Library</a></li>
+                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/readme">Building Energy Modelling</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div id="wrapper" class="pa-30">
+        <div class="d-flex justify-content-between align-items-center pb-30">
+            <h2 class="scenario-name ma-0">Scenario X</h2>
+            <button class="btn house_graphic">Show house graphic</button>
+        </div>
+        <div id="topgraphic" class="overview pb-30"></div>
+        <div id="bound">
+            <div id="content">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modal-edit-project-name-and-description" class="modal modal-sm hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Edit project name and description</h3>
+    </div>
+    <div class="modal-body">
+        <p>
+            <span class="muted">Project name</span>
+            <br><input id="project-name-input" type="text" style="width:90%" />
+        </p>
+        <p>
+            <span class="muted">Project description</span>
+            <br><input id="project-description-input" type="text" style="width:90%" />
+        </p>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button id="assessment-update-name-and-description" class="btn btn-primary">Done</button>
+    </div>
+</div>
+
+<div id="modal-error-submitting-data" class="modal alert-danger hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <h3>You have been logged out!</h3>
+    </div>
+    <div class="modal-body">
+        <p>The last change hasn't been saved.</p>
+        <p>You will be redirected to the login page.</p>
+    </div>
+    <div class="modal-footer">
+        <button id="modal-error-submitting-data-done" class="btn btn-danger">Done</button>
+    </div>
+</div>
+<div id="modal-assessment-locked" class="modal alert-danger hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <h3>The assessment is locked!</h3>
+    </div>
+    <div class="modal-body">
+        <p>Your changes won't be saved.</p>
+        <p>To unlock the assessment change the status from "Complete" to "In progress".</p>
+    </div>
+    <div class="modal-footer">
+        <button id="modal-assessment-locked-done" data-dismiss="modal" class="btn btn-danger">Done</button>
+    </div>
+</div>
+
+<div id="modal-delete-scenario" class="modal alert-danger hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <h3>Delete scenario</h3>
+    </div>
+    <div class="modal-body">
+        Are you sure you want to delete this scenario?
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button id="delete-scenario-confirm" class="btn btn-primary">Delete</button>
+    </div>
+</div>
+
+
+<div id="modal-create-scenario" class="modal modal-sm hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3>Which scenario do you want to duplicate?</h3>
+    </div>
+    <div class="modal-body">
+        <select id="select-scenario"></select>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button id="modal-create-scenario-done" class="btn btn-primary">Done</button>
+    </div>
+</div>
+
+<div id="modal-scenario-locked" class="modal alert-warning hide" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <h3>This scenario is locked!</h3>
+    </div>
+    <div class="modal-body">
+        <p>You cannot modify it.</p>
+    </div>
+    <div class="modal-footer">
+        <p data-dismiss="modal" aria-hidden="true" class="btn btn-warning">Ok</p>
+    </div>
+</div>
+
+</body>
+</html>
+
+
+<script>
+
+    //$('#openBem-model').load("https://cdn.jsdelivr.net/gh/carboncoop/openBEM@10.1.0/openBEM.js");
+    /*$.holdReady(true);
+     $.getScript("https://cdn.jsdelivr.net/gh/carboncoop/openBEM@10.1.0/openBEM.js", function () {
+     $.holdReady(false);
+     });*/
+
+    //************
+    // Variables
+    //************
+    var changelog = "";
+    var selected_library = -1;
+    var selected_library_tag = "Wall";
+    var printmode = false;
+    var page = undefined;
+    var locked = {{ locked_javascript }}; // populated via Django template
+    scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
+    var data = {};
+
+    var path = '{{ request.build_absolute_uri }}';
+    var jspath = path; // TODO: remove this, and all uses of it
+
+    var keys = {};
+
+    //*******************
+    // Load top graphic
+    //*******************
+    load_view("#topgraphic", 'topgraphic');
+
+    //*********************
+    // Initialize project
+    //********************
+
+    var projectid = {{ assessment.id }}; // populated via Django template
+
+    var p = mhep_helper.get(projectid);
+
+    $("#project-title").html(p.name);
+    $("#project-description").html(p.description);
+    $("#project-author").html(p.author);
+
+    if (p.data == false || p.data == null || Object.keys(p.data).length == 0)
+        p.data = {'master': {}};
+    var project = p.data;
+
+    //********************************
+    // Initialize undo functionality
+    //*******************************
+    var historical = [];
+    var historical_index; // pointer for the historical array, pointing the current version of project
+    historical.unshift(JSON.stringify(project));
+    historical_index = 0;
+
+    refresh_undo_redo_buttons();
+
+    //*******************************************************************
+    // Initialize fuels: ensure all the scenarios have the same fuels
+    //*******************************************************************
+    if (project.master.fuels == undefined)
+        project.master.fuels = JSON.parse(JSON.stringify(datasets.fuels));
+
+    for (s in project)
+        project[s].fuels = project.master.fuels;
+
+    //******************************
+    // Calculate scenarios
+    //******************************
+    for (s in project) {
+        project[s] = calc.run(project[s]);
+    }
+
+    //**********************************************
+    // Fetch from hash the view to load and load it
+    //**********************************************
+    load_page_from_hash();
+
+    //************************
+    // Side Menus
+    //************************
+    redraw_scenario_menu();
+    toggle_scenario_menu(scenario);
+
+    //*****************
+    // Top graphic
+    //*****************
+    $("#topgraphic").show();
+    $("#rating").hide();
+    $(".house_graphic").html("Hide house graphic");
+
+    //****************
+    // Sidebar
+    //****************
+    var max_wrapper_width = 1150;
+    var sidebar_enabled = true;
+    var sidebar_visible = true;
+    sidebar_resize();
+
+    //*********************
+    // Assessment locked?
+    //*********************
+    if (locked === true) {
+        setTimeout(function () {
+            $('#modal-assessment-locked').modal('show');
+        }, 1);
+    }
+
+
+
+    //**********
+    // Events
+    //**********
+    $("#openbem").on('click', '.lock', function () {
+        const id = this.dataset.scenario
+        project[id].locked = !project[id].locked
+
+        if (project[id].locked) {
+            $('.if-not-locked').hide();
+        } else {
+            $('.if-not-locked').show();
+        }
+
+        redraw_scenario_menu();
+
+        // Disable measures if master
+        show_hide_if_master();
+
+        update(false, false);
+    });
+    $("#openbem").on("change", '[key]', function () {
+        if (data.locked == true && page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary')
+            $('#modal-scenario-locked').modal('show');
+        else {
+            var key = $(this).attr('key');
+            var val = $(this).val();
+            var input_type = $(this).attr('type');
+            if (input_type == 'checkbox')
+                val = $(this)[0].checked;
+            if (input_type == 'textarea')
+                val = $(this).html();
+
+            if (!isNaN(val) && val != "")
+                val *= 1;
+
+            if (key == 'data.use_SHW')
+                data.water_heating.solar_water_heating = !data.use_SHW; // I don't know why but only works properly coping the negative
+            var lastval = varset(key, val);
+
+            $("#openbem").trigger("onKeyChange", {key: key, value: val});
+
+            console.log(key + " changed from " + lastval + " to " + val);
+            changelog += key + " changed from " + lastval + " to " + val + "<br>";
+
+            if (key == 'data.scenario_name') {
+              redraw_scenario_menu();
+            }
+        }
+        update(false, false);
+    });
+    $(window).on('hashchange', function () {
+        load_page_from_hash();
+    });
+    $(".house_graphic").click(function () {
+        if ($(".house_graphic").html() == "Show house graphic") {
+            $(".overview").show();
+            $("#rating").hide();
+            $(".house_graphic").html("Hide house graphic");
+        }
+        else {
+            $(".overview").hide();
+            $("#rating").show();
+            $(".house_graphic").html("Show house graphic");
+        }
+    });
+    // Scenarios interactions
+    $("#openbem").on('click', ".scenario-nav", function () {
+        $(window).scrollTop(650);
+    });
+    $("#openbem").on('click', ".scenario-block .block-header", function () {
+        const project_id = this.closest("[scenario]").getAttribute('scenario');
+
+        if (project_id !== scenario) {
+            window.location = '#' + project_id + '/' + page;
+            $(window).scrollTop(0);
+        }
+
+        toggle_scenario_menu(project_id);
+    });
+    $('#openbem').on('click', '.project-menu-item', function () {
+        $('.scenario-block[scenario=master] .block-header').click();
+        toggle_scenario_menu(null);
+        $(window).scrollTop(0);
+    });
+    // Scenarios management
+    $("#openbem").on('click', "#create-new", function () {
+        // Reset select
+        $('#select-scenario').html("");
+
+        // Fill up the select
+        for (z in project)
+            $('#select-scenario').append("<option value='" + z + "'>" + z + "</option>");
+
+        $('#modal-create-scenario').modal('show');
+    });
+    $("#modal-create-scenario").on('click', '#modal-create-scenario-done', function () {
+        var n = 0;
+        for (z in project) {
+            var scenario_number = z.slice(8);
+            if (z != 'master' && n != scenario_number) // if for a reason a scenario was deleted, when we create a new one it takes its position. Example: we have master, scenario1 and scenario2. We delete scenario1. We create a new one that becomes scenario1
+                break;
+            n++;
+        }
+        var s = "scenario" + n;
+        project[s] = JSON.parse(JSON.stringify(project[$('#select-scenario').val()]));
+        project[s].locked = false;
+        project[s].creation_hash = generate_hash(JSON.stringify(project[s]));
+        project[s].measures = {};
+        project[s].fabric.measures = {};
+        project[s].fabric.elements.forEach(function (element) {
+            if (element.cost_total != undefined)
+                delete element.cost_total;
+        });
+        project[s].created_from = $('#select-scenario').val();
+
+        //sort project alphabetically
+        temp_project = {};
+        Object.keys(project)
+                .sort()
+                .forEach(function (v, i) {
+                    temp_project[v] = project[v];
+                });
+        project = JSON.parse(JSON.stringify(temp_project));
+
+        $(".menu-content").hide();
+        redraw_scenario_menu();
+        $('#modal-create-scenario').modal('hide');
+
+        scenario = s;
+        page = 'context';
+        update();
+        $(".scenario-block[scenario=" + s + "] .block-header").click();
+        $(window).scrollTop(0);
+    });
+    $("#openbem").on('click', ".delete-scenario-launch", function () {
+        const id = this.dataset.scenario
+
+        if (id != "master") {
+            $("#modal-delete-scenario").modal("show");
+            $("#modal-delete-scenario").attr("scenario", id);
+        }
+    });
+    $("#delete-scenario-confirm").click(function () {
+        var s = $("#modal-delete-scenario").attr('scenario');
+
+        if (s != "master")
+            delete project[s];
+        $(`.scenario-block[scenario=${s}] .block-header`).hide();
+        scenario = 'master';
+        page = "context"
+
+        update();
+        $("#modal-delete-scenario").modal("hide");
+        $(".scenario-block[scenario=master] .block-header").click();
+        $(window).scrollTop(0);
+
+    });
+    // Project's name and description management
+    $("#edit-project-name-and-description").on('click', function () {
+        $("#project-name-input").val(p.name);
+        $("#project-description-input").val(p.description);
+        $("#modal-edit-project-name-and-description").modal("show");
+    });
+    $('#assessment-update-name-and-description').on('click', function () {
+        p.name = $("#project-name-input").val();
+        p.description = $('#project-description-input').val();
+        $("#project-title").html(p.name);
+        $("#project-description").html(p.description);
+        $("#modal-edit-project-name-and-description").modal("hide");
+        mhep_helper.set_name_and_description(projectid, p.name, p.description);
+    });
+    $("#modal-error-submitting-data-done").on('click', function () {
+        location.reload();
+    });
+    // Do/undo
+    $('body').on('click', '#undo', function () {
+        if (historical_index < historical.length - 1) {
+            historical_index++;
+            project = JSON.parse(historical[historical_index]);
+            update(true);
+        }
+
+        refresh_undo_redo_buttons();
+    });
+    $('body').on('click', '#redo', function () {
+        if (historical_index > 0) {
+            historical_index--;
+            project = JSON.parse(historical[historical_index]);
+            update(true);
+        }
+
+        refresh_undo_redo_buttons();
+    });
+    // Side menu
+    $(window).resize(function () {
+        draw_openbem_graphics('#topgraphic');
+        sidebar_resize();
+    });
+
+
+    //*************
+    // Functions
+    //*************
+    function update(undo_redo = false, reload_menu = false) {
+        // We need to calculate the periods of heating off here because if we try to do it in household.js it happens after the update
+        if (project.master.household != undefined) {
+            for (var s in project) { // we ensure all the scenarios have the same household data and heating off periods
+                project[s].household = project.master.household;
+                project[s].temperature.hours_off.weekday = get_hours_off_weekday(project[s]);
+                project[s].temperature.hours_off.weekend = get_hours_off_weekend(project[s]);
+            }
+        }
+
+        project[scenario] = calc.run(project[scenario]);
+        data = project[scenario];
+        if (undo_redo === false) {
+            historical.splice(0, historical_index); // reset the historical removing all the elements that were still there because of undoing
+            historical.unshift(JSON.stringify(project));
+            historical_index = 0;
+            refresh_undo_redo_buttons();
+        }
+
+        UpdateUI(data);
+        draw_openbem_graphics('#topgraphic');
+
+        redraw_emissions();
+
+        mhep_helper.set(projectid, project, function (result) {
+            alertifnotlogged(result);
+            alert_if_assessment_locked(result);
+        });
+    }
+    function show_hide_if_master() {
+        if (scenario == 'master')
+            $('#content .if-not-master').hide();
+        else {
+            $('#content .if-master').hide();
+            $('#content .disabled-if-not-master').attr('disabled', 'true');
+        }
+    }
+    function has_changed_base_scenario(scenario_id) {
+        const creation_hash = project[scenario_id].creation_hash
+        if (!creation_hash) {
+            return false;
+        }
+
+        const created_from = project[scenario_id].created_from
+        let original_scenario = JSON.parse(JSON.stringify(project[created_from]));
+        original_scenario.locked = false;
+        let current_hash = generate_hash(JSON.stringify(original_scenario));
+
+        return creation_hash != current_hash;
+    }
+    function scenario_block(id, currently_open) {
+        const title = project[id].scenario_name || id.charAt(0).toUpperCase() + id.slice(1)
+        const locked = project[id].locked
+        const menu_class = id === currently_open ? "active" : ""
+        const is_master = id === "master"
+
+        const created_from = project[id].created_from
+        let created_from_html = ""
+        if (created_from) {
+            let created_from_extra = ""
+            let created_from_title = ""
+
+            if (project[created_from] == undefined) {
+                // If the parent scenario has been deleted
+                created_from_extra = " - deleted"
+            } else if (has_changed_base_scenario(id)) {
+                created_from_extra = '*'
+                created_from_title = `title="${created_from} has changed since the creation of ${title}"`
+            }
+
+            created_from_html = `<span style="font-weight: normal" ${created_from_title}>Based on ${created_from}${created_from_extra}</span>`
+        }
+
+        return `
+        <div class="side-block scenario-block" scenario="${id}">
+            <div class="block-header block-header--clickable" style="height:40px; display: flex; justify-content: space-between;">
+                <div>
+                    ${title}
+                    ${locked ? '<i class="icon-lock"></i>' : ''}
+                    <br>
+                    ${created_from_html}
+                </div>
+
+                <div style="text-align: right; font-weight: normal">
+                    <span class="block_emissions"></span>
+                    <small>kgCO<sub>2</sub>/m<sup>2</sup></small>
+                </div>
+            </div>
+
+            <div class="menu-content" class="${menu_class}">
+                <div class="side-section" style="margin-top: 10px">
+                    <ul>
+                        <li><a href="#${id}/context">Basic Dwelling Data</a></li>
+                        <li><a href="#${id}/ventilation">Ventilation and Infiltration</a></li>
+                        <li><a href="#${id}/elements">Fabric</a></li>
+                        <li><a href="#${id}/LAC">Lighting, Appliances & Cooking</a></li>
+                        <li><a href="#${id}/heating">Heating</a></li>
+                        <li><a href="#${id}/fuel_requirements">Fuel requirements</a></li>
+                        <li><a href="#${id}/generation">Generation</a></li>
+                        <li>
+                            <a href="#${id}/solarhotwater">
+                                <input type="checkbox" key="data.use_SHW">
+                                Solar Hot Water heating
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="side-section">
+                    <div class="side-section--header">Other</div>
+                        <ul>
+                        <li><a href="#${id}/worksheets">SAP worksheets</a></li>
+                        <li>
+                            <button class="lock" data-scenario="${id}">
+                                ${locked ? "Unlock scenario" : "Lock scenario" }
+                            </button>
+                        </li>
+
+                        <li ${is_master ? "hidden" : ""}>
+                            <button class="delete-scenario-launch" data-scenario="${id}">
+                                <i class="icon-trash"></i>
+                                Delete scenario
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        `
+    }
+    function redraw_scenario_menu() {
+        const currently_open = $("[scenario] .menu-content").filter(".active").closest("[scenario]").attr("scenario")
+
+        $("#scenario-list").html(
+            Object.keys(project).map(id => scenario_block(id, currently_open)).join("")
+        )
+
+        toggle_scenario_menu(currently_open);
+
+        redraw_emissions();
+    }
+    function redraw_emissions() {
+        for (let s in project) {
+            const $emissions = $(`[scenario="${s}"] .block_emissions`)
+            const kgco2perm2 = project[s].kgco2perm2
+            if (typeof(kgco2perm2) == "number" && !isNaN(kgco2perm2)) {
+              $emissions.html(kgco2perm2.toFixed(0));
+            } else {
+              $emissions.html("-")
+            }
+        }
+    }
+    function load_page_from_hash() {
+        var tmp = (window.location.hash).substring(1).split('/');
+        page = tmp[1];
+        scenario = tmp[0];
+
+        if (!scenario)
+            scenario = "master";
+        if (!page)
+            page = "context";
+
+        if (project[scenario] == undefined)
+            scenario = 'master';
+
+        data = project[scenario];
+
+        // Render page
+        load_view("#content", page);
+
+        let $topgraphic = $('#topgraphic');
+        if (page == 'report') {
+            $topgraphic.hide();
+        } else {
+            $topgraphic.show();
+            draw_openbem_graphics('#topgraphic');
+        }
+
+        InitUI();
+        UpdateUI(data);
+
+        // Add lock functionality to buttons and icons
+        if (page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary' && page != 'report') {
+            $('#content button').addClass('if-not-locked');
+            $('#content i').addClass('if-not-locked');
+            $('#content .revert-to-original').each(function () {
+                if ($(this).css('display') != 'none')
+                    $(this).addClass('if-not-locked');
+            });
+        }
+
+        // Disable measures if master
+        show_hide_if_master();
+
+        if (data.locked)
+            $('.if-not-locked').hide();
+        else
+            $('.if-not-locked').show();
+
+        // Disable measures if master
+        show_hide_if_master();
+
+        // Make modals draggable
+        $("#openbem .modal-header").css("cursor", "move");
+        $("#openbem .modal").draggable({
+            handle: ".modal-header"
+        });
+    }
+    function refresh_undo_redo_buttons() {
+        if (historical_index == historical.length - 1) {
+            $('#undo').css('opacity', 0.1);
+            $('#undo').css('cursor', 'default');
+        }
+        else {
+            $('#undo').css('opacity', 1);
+            $('#undo').css('cursor', 'pointer');
+        }
+
+        if (historical_index > 0) {
+            $('#redo').css('opacity', 1);
+            $('#redo').css('cursor', 'pointer');
+        }
+        else {
+            $('#redo').css('opacity', 0.1);
+            $('#redo').css('cursor', 'default');
+        }
+    }
+    function generate_hash(string) {
+        var hash = 0, i, chr;
+        if (string.length === 0)
+            return hash;
+        for (i = 0; i < string.length; i++) {
+            chr = string.charCodeAt(i);
+            hash = ((hash << 5) - hash) + chr;
+            hash |= 0; // Convert to 32bit integer
+        }
+        return hash;
+    }
+    function sidebar_resize() {
+        var width = $(window).width();
+
+        if (width < max_wrapper_width) {
+            hide_sidebar()
+        } else if (sidebar_enabled) {
+            show_sidebar()
+        }
+    }
+    function show_sidebar() {
+        if (printmode)
+            return;
+
+        var width = $(window).width();
+        sidebar_visible = true;
+
+        $("#wrapper").css("margin", "15px 15px 15px 305px")
+        $("#sidebar").show();
+    }
+    function hide_sidebar() {
+        sidebar_visible = false;
+        $("#wrapper").css("margin", "15px auto")
+        $("#sidebar").hide();
+    }
+    function toggle_scenario_menu(project_id) {
+        const $menu_content = $(`div[scenario="${project_id}"] .menu-content`);
+        const visible = $menu_content.hasClass("active");
+
+        $(".menu-content").removeClass("active")
+        if (!visible) {
+            $menu_content.addClass("active");
+        }
+    }
+
+</script>
+
+{% endblock %}

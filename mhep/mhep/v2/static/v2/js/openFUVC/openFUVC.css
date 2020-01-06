@@ -1,0 +1,57 @@
+#openFUVC-modal.modal{
+    left:50%;
+    margin-top:15px;
+    position:fix;
+    width:90%;
+    margin-left:-45%;
+    max-width:1600px
+}
+/*#openFUVC-modal.modal{
+    background:white;
+    left:50%;
+    max-width:1600px;
+    margin-left:-800;
+    margin-top:15px;
+}*/
+#openFUVC-modal .modal-body, #openFUVC-form{
+    padding-bottom:0;
+    margin-bottom:0;
+    max-height: 900px;
+}
+#openFUVC-modal .modal-footer{
+    padding-top:15px;
+}
+
+#openFUVC-modal p{
+    font-size:16px
+}
+#openFUVC-modal p.other{
+    margin-top:10px;
+}
+
+#openFUVC-modal p.other input{
+    width:75px;
+    margin-left:15px
+}
+#openFUVC-modal .left,.middle,.right{
+    display:inline-block;
+    vertical-align:top;
+    margin:0 20px;
+}
+#openFUVC-modal .left{
+    width:35%;
+}
+#openFUVC-modal .middle{
+    width:55%
+}
+#openFUVC-modal .w100{
+    width:100px;
+}
+
+#openFUVC-modal .w75{
+    width:75px;
+}
+
+#openFUVC-modal .indent td{
+    padding-left:50px;
+}

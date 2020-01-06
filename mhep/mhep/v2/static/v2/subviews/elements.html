@@ -1,0 +1,709 @@
+<style>
+    #modal-bulk-measure-body table td,
+    #modal-bulk-measure-body table th {
+        padding: 4px 10px;
+        vertical-align: top;
+        text-align: left;
+    }
+</style>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-15">Thermal Mass Parameter (TMP)</h3>
+
+    <div class="d-flex align-items-start">
+        <input
+            type="checkbox"
+            id="global_TMP"
+            key="data.fabric.global_TMP"
+            class="ma-0 big-checkbox">
+
+        <div class="ml-7">
+            <label for="global_TMP">
+                Ignore the <i>k</i> value of individual elements and use a global TMP value instead:
+            </label>
+
+            <select key="data.fabric.global_TMP_value">
+                <option value="100">Low TMP</option>
+                <option value="250">Medium TMP</option>
+                <option value="450">High TMP</option>
+            </select>
+        </div>
+    </div>
+</section>
+
+<template id="element-table-template">
+    <table class="table">
+        <thead>
+            <tr class="bg-lighter">
+                <th></th>
+                <th>Label/Location</th>
+                <th>Length<br /><span class="text-normal">m</span></th>
+                <th>Height<br /><span class="text-normal">m</span></th>
+                <th>Area<br /><span class="text-normal">m²</span></th>
+                <th>Window area</th>
+                <th class="text-nowrap">Net area</th>
+                <th>Loss</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody></tbody>
+
+        <tfoot>
+            <tr class="bg-lighter">
+                <td></td>
+                <td colspan="3" class="text-bold">Totals</td>
+                <td colspan="2"></td>
+                <td class="text-right">
+                    <span data-template-area dp="1">0.0</span>m²
+                </td>
+                <td class="text-right">
+                    <span data-template-loss dp="2">0.00</span> W/K
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+</template>
+
+<!-- This template is re-used for everything apart from openings and floors -->
+<template id="element-template">
+    <tr>
+        <td style="width: 0">
+            <!--
+                XXX Disabled because it using it can cause data loss.
+
+            <i data-action class="icon-arrow-up if-not-locked move-up clickable"></i><br>
+            <i data-action class="icon-arrow-down if-not-locked move-down clickable"></i>
+            -->
+        </td>
+        <td colspan="7">
+            <b>
+                <span data-key="lib"></span> - <span data-key="name"></span>
+            </b>
+            <br>
+
+            U-value:
+            <span data-key="uvalue"></span> <span class="text-units">W/K.m²</span>,
+
+            k-value:
+            <span data-key="kvalue"></span> <span class="text-units">kJ/K.m²</span>
+
+            <span data-section="cost">
+                <br>
+                £<span data-key="cost_total"></span>
+
+                <span
+                    class="ml-7"
+                    data-section="EWI"
+                    title="When EWI is applied, the area used to calculate of the cost of the measure is the area of the wall increased by 1.15"
+                >
+                    <b>EWI</b>
+                    <i class="icon-question-sign"></i>
+                </span>
+            </span>
+        </td>
+
+        <td rowspan="2" style="width: 0">
+            <button data-action class="apply-measure d-b mb-7 btn btn--icon text-nowrap">
+                Apply Measure
+            </button>
+
+            <button data-action class="edit-item d-b mb-7 btn btn--icon">
+                <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-edit" /></svg>
+                Edit
+            </button>
+
+            <button data-action class="revert-to-original d-b mb-7 btn btn--icon text-nowrap">
+                <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-undo" /></svg>
+                Revert
+            </button>
+
+            <button data-action class="delete-element d-b mb-7 btn btn--icon text-nowrap">
+                <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-trash" /></svg>
+                Delete
+            </button>
+        </td>
+    </tr>
+    <tr class="tr-no-top-border">
+        <td colspan="1"></td>
+        <td>
+            <input type="text" data-key="location">
+        </td>
+        <td>
+            <input
+                data-key="l" dp="2"
+                type="number" min="0" step="0.01"
+                style="width:50px">
+        </td>
+        <td>
+            <input
+                data-key="h" dp="2"
+                type="number" min="0" step="0.01"
+                style="width:50px">
+        </td>
+        <td>
+            <input
+                data-key="area" dp="2"
+                type="number" min="0" step="0.01"
+                style="width:50px">
+        </td>
+        <td class="text-right">
+            <span data-key="windowarea" dp="2">0.00</span>m²
+        </td>
+        <td class="text-right">
+            <span data-key="netarea" dp="2">0.00</span>m²
+        </td>
+        <td class="text-right text-nowrap">
+            <span data-key="wk" dp="2">0.00</span> W/K
+        </td>
+    </tr>
+</template>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-7">Walls</h3>
+    <p class="mb-15 text-italic">
+        Note: If the element length and height is given it will automatically
+        calculate and override the area calculation. Leave length and height blank
+        and enter area for ceilings and floors and other elements where its easier
+        to enter the area directly.
+    </p>
+
+    <div data-fabric-table="walls"
+         data-area-key="data.fabric.total_wall_area"
+         data-loss-key="data.fabric.total_wall_WK"></div>
+
+    <button class="add-from-lib btn" tags="Wall">
+        <i class="icon-plus"></i>
+        Add wall from library
+    </button>
+
+    <button
+        class="if-not-master apply-bulk-measure btn btn-secondary"
+        tags="Wall"
+        item='{"type":"Wall","name":"--","lib":"--","l":0,"h":0,"area":0,"uvalue":0,"id":0,"location":"","description":"","kvalue":"","orientation":0,"overshading":0,"g":"0","gL":"0","ff":"0","performance":"","benefits":"","cost":"","who_by":"","disruption":"","associated_work":"","notes":"","maintenance":"","netarea":0,"wk":0,"gain":0}'
+        tag="--"
+        item_id="0"
+        row="13"
+    >
+        <i class="icon-wrench"></i>
+        Apply bulk measure
+    </button>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-15">Party walls</h3>
+
+    <div data-fabric-table="party_walls"
+         data-area-key="data.fabric.total_party_wall_area"
+         data-loss-key=""></div>
+
+    <button class="btn add-from-lib" tags="Party_wall">
+        <i class="icon-plus"></i>
+        Add party wall from library
+    </button>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-7">Roofs and lofts</h3>
+    <p class="mb-15 text-italic">
+        Note: When creating a roof or loft element only add that area which forms
+        part of the thermal envelope of the building. Do not add a 'roof' where it
+        sits above a loft which is insulated at ceiling level. Do not add a 'loft'
+        where it sits below a roof which is insulated at rafter level
+    </p>
+
+    <div data-fabric-table="roofs"
+         data-area-key="data.fabric.total_roof_area"
+         data-loss-key="data.fabric.total_roof_WK"></div>
+
+    <button class="btn add-from-lib" tags="Roof,Loft">
+        <i class="icon-plus"></i>
+        Add roof or loft from library
+    </button>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-7">Floors</h3>
+    <p class="mb-15 text-italic">
+        Floor U-values are to be calculated conforming to the standards:
+        BS EN ISO 6946, 13370, 13789, BRE 443, 497.
+    </p>
+
+    <template id="floor-template">
+        <tr>
+            <td style="width: 0">
+            <!--
+                XXX Disabled because it using it can cause data loss.
+
+                <i data-action class="icon-arrow-up if-not-locked move-up clickable"></i><br>
+                <i data-action class="icon-arrow-down if-not-locked move-down clickable"></i>
+            -->
+            </td>
+            <td colspan="5">
+                <b>
+                    <span data-key="lib"></span> - <span data-key="name"></span>
+                </b>
+                <br>
+                k-value:
+                <span data-key="kvalue"></span> <span class="text-units">kJ/K.m²</span>
+
+                <span data-section="cost">
+                    <br>
+                    £<span data-key="cost_total"></span>
+                </span>
+            </td>
+            <td rowspan="2" style="width:0">
+                <button data-action class="apply-measure d-b mb-7 btn btn--icon text-nowrap">
+                    Apply Measure
+                </button>
+
+                <button data-action class="edit-item d-b mb-7 btn btn--icon">
+                    <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-edit" /></svg>
+                    Edit
+                </button>
+
+                <button data-action class="revert-to-original d-b mb-7 btn btn--icon text-nowrap">
+                    <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-undo" /></svg>
+                    Revert
+                </button>
+
+                <button data-action class="delete-element d-b mb-7 btn btn--icon text-nowrap">
+                    <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-trash" /></svg>
+                    Delete
+                </button>
+            </td>
+        </tr>
+        <tr class="tr-no-top-border">
+            <td></td>
+            <td>
+                <input type="text" data-key="location" style="width: 15rem">
+            </td>
+            <td class="d-flex">
+                <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    class="floor-uvalue"
+                    dp="2"
+                    data-key="uvalue"
+                    style="flex-grow: 1; max-width: 60px">
+
+                <button
+                    class="calculate-floor-uvalue d-flex align-items-center"
+                    style="border: none; margin-bottom: 10px; margin-left: 0.25rem;">
+                    <svg width="1.2rem" viewBox="0 0 1792 1792">
+                        <use xlink:href="#iconset-calculator" />
+                    </svg>
+                </button>
+            </td>
+            <td class="text-right">
+                <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    data-key="perimeter"
+                    dp="2"
+                    style="width:50px"> m
+            </td>
+            <td class="text-right text-nowrap">
+                <input
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    data-key="area"
+                    dp="2"
+                    style="width:50px"> m²
+            </td>
+            <td class="text-right text-nowrap">
+                <span data-key="wk" dp="2">0.00</span> W/K
+            </td>
+        </tr>
+    </template>
+
+    <table class="table">
+        <thead>
+            <tr class="bg-lighter">
+                <th></th>
+                <th>Label/Location</th>
+                <th>U-value</th>
+                <th>Exposed perimeter</th>
+                <th>Area</th>
+                <th>Loss</th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody id="floors"></tbody>
+
+        <tfoot>
+            <tr class="bg-lighter">
+                <td></td>
+                <td colspan="3" class="font-bold">Totals</td>
+                <td class="text-right">
+                    <span key="data.fabric.total_floor_area" dp="1">0.0</span>m²
+                </td>
+                <td class="text-right">
+                    <span key="data.fabric.total_floor_WK" dp="2">0.00</span> W/K
+                </td>
+                <td colspan="1"></td>
+            </tr>
+        </tfoot>
+    </table>
+
+    <button class="btn add-from-lib" tags="Floor">
+        <i class="icon-plus"></i>
+        Add floor from library
+    </button>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-7">Windows, doors, roof-lights and hatches</h3>
+    <p class="text-italic mb-15">
+        MHEP applies the same solar access factor to roof lights as to other windows.
+        This is a deviation from SAP2012 (p.26 note 2), where solar factors for roof
+        lights are always 1, independent of the overshading.
+    </p>
+
+    <template id="window-template">
+        <tr>
+            <td rowspan="2">
+                <!--
+                Like above, these aren't working...
+                <i class="icon-arrow-up if-not-locked move-up clickable"></i><br>
+                <i class="icon-arrow-down if-not-locked move-down clickable"></i>
+                -->
+            </td>
+            <td colspan="5">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <b>
+                            <span data-key="lib"></span> - <span data-key="name"></span>
+                        </b>
+                        <br>
+                        U-value: <span data-key="uvalue"></span>,
+                        K-value: <span data-key="kvalue"></span><span data-section="not-hatch">,
+                        g:<span data-key="g"></span>,
+                        gL:<span data-key="gL"></span>,
+                        ff:<span data-key="ff"></span>
+                        </span>
+                        <span
+                            data-section="cost"
+                            data-key="cost_total"
+                        ></span>
+                    </div>
+                    <div>
+                        <span class="px-15 py-7" style="border-radius: 5px" data-type></span>
+                    </div>
+                </div>
+            </td>
+
+            <td rowspan="2" style="width: 0">
+                <button data-action class="apply-measure d-b mb-7 btn btn--icon text-nowrap">
+                    Apply Measure
+                </button>
+
+                <button data-action class="edit-item d-b mb-7 btn btn--icon">
+                    <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-edit" /></svg>
+                    Edit
+                </button>
+
+                <button data-action class="revert-to-original d-b mb-7 btn btn--icon text-nowrap">
+                    <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-undo" /></svg>
+                    Revert
+                </button>
+
+                <button data-action class="delete-element d-b mb-7 btn btn--icon text-nowrap">
+                    <svg viewBox="0 0 1792 1792"><use xlink:href="#iconset-trash" /></svg>
+                    Delete
+                </button>
+            </td>
+        </tr>
+        <tr class="tr-no-top-border">
+            <td>
+                <label class="small-caps">Label/location</label>
+                <input
+                    type="text"
+                    data-key="location"
+                    style="width: 100%; box-sizing: border-box; height: 30px"
+                    class="mb-15"
+                />
+
+                <label class="small-caps">Subtract from</label>
+                <select
+                    class="subtractfrom"
+                    data-key="subtractfrom"
+                    style="width: 100%; box-sizing: border-box; height: 30px"
+                >
+                </select>
+            </td>
+
+            <td>
+                <div class="d-flex align-items-center mb-15">
+                    <div>
+                        <span class="small-caps">Width</span>
+                        <span class="text-units">m</span>
+                        <br>
+                        <input
+                            type="number"
+                            min="0"
+                            dp="2"
+                            step="0.01"
+                            value="0"
+                            data-key="l"
+                            style="width:50px; margin-bottom: 0">
+                    </div>
+                    <span style="font-size: 1.5rem; margin: 0 0.2rem">
+                        <br>
+                        ⨯
+                    </span>
+                    <div>
+                        <span class="small-caps">Height</span>
+                        <span class="text-units">m</span>
+                        <br>
+                        <input
+                            type="number"
+                            min="0"
+                            dp="2"
+                            step="0.01"
+                            value="0"
+                            data-key="h"
+                            style="width:50px; margin-bottom: 0">
+                    </div>
+                </div>
+
+                <label class="mb-0">
+                    <span class="small-caps">Area</span>
+                    <span class="text-units">m²</span>
+                </label>
+                <input
+                    type="number"
+                    min="0"
+                    dp="2"
+                    step="0.01"
+                    value="0"
+                    data-key="area"
+                    style="width:50px">
+            </td>
+
+            <td>
+                <div data-section="not-hatch">
+                    <span class="small-caps">Orientation</span>
+                    <div class="text-nowrap d-flex">
+                        <input type="radio" class="my-0" name="orientation-NN" data-key="orientation" value="0" id="orientation-NN-0">
+                        <label style="padding-left: 5px" class="mb-0" for="orientation-NN-0">North</label>
+                    </div>
+                    <div class="text-nowrap d-flex">
+                        <input type="radio" class="my-0" name="orientation-NN" data-key="orientation" value="1" id="orientation-NN-1">
+                        <label style="padding-left: 5px" class="mb-0" for="orientation-NN-1">NE/NW</label>
+                    </div>
+                    <div class="text-nowrap d-flex">
+                        <input type="radio" class="my-0" name="orientation-NN" data-key="orientation" value="2" id="orientation-NN-2">
+                        <label style="padding-left: 5px" class="mb-0" for="orientation-NN-2">East/West</label>
+                    </div>
+                    <div class="text-nowrap d-flex">
+                        <input type="radio" class="my-0" name="orientation-NN" data-key="orientation" value="3" id="orientation-NN-3">
+                        <label style="padding-left: 5px" class="mb-0" for="orientation-NN-3">SE/SW</label>
+                    </div>
+                    <div class="text-nowrap d-flex">
+                        <input type="radio" class="my-0" name="orientation-NN" data-key="orientation" value="4" id="orientation-NN-4">
+                        <label style="padding-left: 5px" class="mb-0" for="orientation-NN-4">South</label>
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div data-section="not-hatch">
+                    <span class="small-caps">% overshading</span>
+                    <table class="table-unstyled">
+                        <tr>
+                            <td><input type="radio" class="mt-0" name="overshading-NN" data-key="overshading" value="0" id="overshading-NN-0"></td>
+                            <td class="pl-7"><label class="d-i" for="overshading-NN-0">> 80</label></td>
+                            <td class="pl-7"><small>Heavy</small></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" class="mt-0" name="overshading-NN" data-key="overshading" value="1" id="overshading-NN-1"></td>
+                            <td class="pl-7"><label class="d-i" for="overshading-NN-1">60–80</label></td>
+                            <td class="pl-7"><small>Above average</small></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" class="mt-0" name="overshading-NN" data-key="overshading" value="2" id="overshading-NN-2"></td>
+                            <td class="pl-7"><label class="d-i" for="overshading-NN-2">20–60</label></td>
+                            <td class="pl-7"><small>Average/unknown</small></td>
+                        </tr>
+                        <tr>
+                            <td><input type="radio" class="mt-0" name="overshading-NN" data-key="overshading" value="3" id="overshading-NN-3"></td>
+                            <td class="pl-7"><label class="d-i" for="overshading-NN-3">< 20</label></td>
+                            <td class="pl-7"><small>Very little</small></td>
+                        </tr>
+                    </table>
+                </div>
+            </td>
+
+            <td class="text-nowrap">
+                <p data-section="not-hatch">
+                    <span class="small-caps">Gains</span><br>
+                    <span data-key="gain" dp="2">0</span> W
+                </p>
+                <p>
+                    <span class="small-caps">Losses</span><br>
+                    <span data-key="wk" dp="2">0</span> W/K
+                </p>
+            </td>
+        </tr>
+    </template>
+
+
+    <table class="table">
+        <tbody id="windows"></tbody>
+
+        <tfoot>
+            <tr class="bg-lighter">
+                <td></td>
+                <td colspan="1" style="font-weight: bold;">Totals</td>
+                <td>
+                    Area = <span key="data.fabric.total_window_area" dp="2"></span>m²
+                </td>
+                <td colspan="2"></td>
+                <td colspan="2" class="text-nowrap">
+                    Gains = <span key="data.fabric.annual_solar_gain" dp="2"></span> W<br>
+                    Losses = <span key="data.fabric.total_window_WK" dp="2"></span> W/K
+                </td>
+            </tr>
+        </tfoot>
+
+    </table>
+
+    <div class="mb-45">
+        <button class="btn add-from-lib" tags="Window,Door,Roof_light,Hatch">
+            <i class="icon-plus"></i>
+            Add window, door, roof light or hatch from library
+        </button>
+
+        <button
+            class="if-not-master apply-bulk-measure btn"
+            tags="Window"
+            item='{"type":"Window","name":"--","lib":"--","l":0,"h":0,"area":0,"uvalue":0,"id":0,"location":"","description":"","kvalue":"","orientation":0,"overshading":0,"g":"0","gL":"0","ff":"0","performance":"","benefits":"","cost":"","who_by":"","disruption":"","associated_work":"","notes":"","maintenance":"","netarea":0,"wk":0,"gain":0}'
+            tag="--"
+            item_id="0"
+            row="13"
+        >
+            <i class="icon-wrench"></i>
+            Apply bulk measure
+        </button>
+    </div>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-15">Thermal Bridging</h3>
+
+    <div class="d-flex align-items-center my-15">
+        <div>
+            Total External Area<br>
+            <span class="text-bigger text-bold">
+                <span key="data.fabric.total_external_area" dp="2"></span> m²
+            </span>
+        </div>
+        <div class="mx-15" style="font-size: 2rem">
+            ×
+        </div>
+        <div>
+            Thermal bridging heat loss factor (y)<br>
+            <input
+                type="number"
+                step="0.01"
+                min="0"
+                value="0.15"
+                key="data.fabric.thermal_bridging_yvalue"
+                style="width:60px"
+                class="text-bigger text-bold">
+            <span class="text-bigger text-bold">W/m².K</span>
+        </div>
+        <div class="mx-15" style="font-size: 2rem">
+            =
+        </div>
+        <div>
+            Thermal bridging heat loss<br>
+            <span class="text-bigger text-bold">
+                <span key="data.fabric.thermal_bridging_heat_loss" dp="2">0</span> W/K<br>
+            </span>
+        </div>
+    </div>
+
+    <button id="apply-measure-TB" class="btn if-not-master">
+        Apply measure
+    </button>
+    <p id="TB-measured-applied" style="display:none;">
+        Measure applied
+    </p>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="ma-0 mb-15">Totals</h3>
+
+    <div class="d-flex align-items-center my-15">
+        <div>
+            Total fabric heat loss<br>
+            <span class="text-bigger text-bold">
+                <span key="data.fabric.total_heat_loss_WK" dp="2">0</span> W/K<br>
+            </span>
+        </div>
+        <div class="mx-15" style="font-size: 2rem">
+            +
+        </div>
+        <div>
+            Ventilation heat loss<br>
+            <span class="text-bigger text-bold">
+                <span key="data.ventilation.average_WK" dp="2">0</span> W/K<br>
+            </span>
+        </div>
+        <div class="mx-15" style="font-size: 2rem">
+            =
+        </div>
+        <div>
+            Total heat loss<br>
+            <span class="text-bigger text-bold">
+                <span key="data.totalWK" dp="2">0</span> W/K<br>
+            </span>
+        </div>
+    </div>
+
+    <table>
+        <tr>
+            <td class="pr-15 py-7">Total fabric thermal capacity:</td>
+            <td>
+                <span class="text-bigger text-bold">
+                    <span key="data.fabric.total_thermal_capacity" dp="2">0</span> kJ/K.m3
+                </span>
+            </td>
+        </tr>
+        <tr>
+            <td class="pr-15 py-7">Annual solar gains:</td>
+            <td>
+                <span class="text-bigger text-bold">
+                    <span key="data.fabric.annual_solar_gain" dp="2">0</span>W
+                    (<span key="data.fabric.annual_solar_gain_kwh" dp="0">0</span>kWh)
+                </span>
+            </td>
+        </tr>
+    </table>
+    </div>
+</section>
+
+
+<div id="apply-measure-TB-modal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+        <h3 id="myModalLabel">Apply measure to Thermal Bridging</h3>
+    </div>
+    <div class="modal-body">
+        <p>Please, introduce a new value and the description of the measure.</p>
+        <table class="table">
+            <tr><td>Value: </td><td><input style="width:60px" id="TB-measure-value" type="number" min="0" step="0.01" /></td></tr>
+            <tr><td>Description:</td><td><input id="TB-measure-description" type="text" /></td></tr>
+        </table>
+    </div>
+    <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
+        <button class="btn btn-primary" id="apply-measure-TB-modal-ok">OK</button>
+    </div>
+</div>

@@ -24,6 +24,7 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     path("", RedirectView.as_view(url=reverse_lazy(DEFAULT_ROUTE)), name="index"),
     # Add app versions after this line
+    path("v2/", include("mhep.v2.urls", namespace="v2")),
     path("dev/", include("mhep.dev.urls", namespace="dev")),
     path("v1/", include("mhep.v1.urls", namespace="v1")),
     path("versions/", include("mhep.versions.urls", namespace="versions")),
