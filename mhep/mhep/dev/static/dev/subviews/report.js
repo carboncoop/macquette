@@ -1079,10 +1079,10 @@ function add_comparison_tables(scenarios, scenarios_comparison) {
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
     scenarios.forEach(function (scenario, index) {
         if (scenario != 'master') {
-            var html = '<div class="highlight-box pink-highlight" style="page-break-before:avoid; page-break-inside: auto">';
-            html += ' <h4 class="top-border-title title-margin-bottom ">Figure 15' + abc[index - 1] + ' Master/Scenario ' + scenario.split('scenario')[1] + 'Comparison Table</h4>';
+            var html = '<section class="minor">';
+            html += ' <h3>Figure 15' + abc[index - 1] + ' Master/Scenario ' + scenario.split('scenario')[1] + 'Comparison Table</h3>';
             html += '<div class="js-scenario-comparison">' + scenarios_comparison[scenario] + '</div>';
-            html += '</div>';
+            html += '</section>';
             $('#comparison-tables').append(html);
         }
     });
