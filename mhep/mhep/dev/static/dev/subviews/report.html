@@ -17,11 +17,7 @@
     margin-left: 2em;
 }
 
-.report p,
-.report h1,
-.report h2,
-.report h3,
-.report h4 {
+.report p {
     margin-top: 0;
 }
 
@@ -29,26 +25,32 @@
     margin-bottom: 1em;
 }
 
-.report h1, .report .h1 {
-    font: bold 34pt/36pt "Work Sans";
+.report h1, .report .h1,
+.report h2, .report .h2,
+.report h3, .report .h3,
+.report h4, .report .h4, .report dt {
+    margin-top: 0;
     letter-spacing: -0.03em;
     color: var(--report-primary-colour) !important;
+}
+
+.report h1, .report .h1 {
+    font: bold 34pt/36pt "Work Sans";
 }
 .report h2, .report .h2 {
     font: bold 28pt/30pt "Work Sans";
-    letter-spacing: -0.03em;
-    color: var(--report-primary-colour) !important;
 }
 .report h3, .report .h3 {
     font: bold 16pt/18pt "Work Sans";
-    letter-spacing: -0.03em;
-    color: var(--report-primary-colour) !important;
 }
 .report h4, .report .h4, .report dt, figcaption {
     font: bold 14pt/18pt "Work Sans";
-    letter-spacing: -0.03em;
-    color: var(--report-primary-colour) !important;
 }
+
+figcaption {
+    color: #645656 !important;
+}
+
 
 
 /*** Colours ***/
