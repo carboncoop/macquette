@@ -12,7 +12,7 @@ admin.site.site_title = "Django admin"
 admin.site.index_title = "My Home Energy Planner administration"
 
 if settings.ENV == "production":
-    DEFAULT_ROUTE = "v1:list-assessments"
+    DEFAULT_ROUTE = "v2:list-assessments"
 else:
     DEFAULT_ROUTE = "dev:list-assessments"
 
