@@ -8,6 +8,7 @@ from .views import CreateDeleteOrganisationLibrarians
 from .views import CreateDeleteOrganisationMembers
 from .views import CreateOrganisationLibraries
 from .views import CreateUpdateDeleteLibraryItem
+from .views import DuplicateAssessment
 from .views import ListAssessmentsHTMLView
 from .views import ListCreateAssessments
 from .views import ListCreateLibraries
@@ -40,6 +41,11 @@ urlpatterns = [
         "api/assessments/<int:pk>/",
         view=RetrieveUpdateDestroyAssessment.as_view(),
         name="retrieve-update-destroy-assessment",
+    ),
+    path(
+        "api/assessments/<int:pk>/duplicate/",
+        view=DuplicateAssessment.as_view(),
+        name="duplicate-assessment",
     ),
     path(
         "api/assessments/<int:pk>/images/featured/",

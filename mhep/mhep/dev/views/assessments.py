@@ -53,6 +53,24 @@ class RetrieveUpdateDestroyAssessment(
             return response
 
 
+class DuplicateAssessment(AssessmentQuerySetMixin, generics.GenericAPIView):
+    permission_classes = [
+        IsAuthenticated,
+        IsAssessmentOwner | IsMemberOfConnectedOrganisation,
+    ]
+
+    def post(self, request, pk):
+        assessment = self.get_object()
+
+        assessment.pk = None
+        assessment.name = f"Copy of {assessment.name}"
+        assessment.save()
+
+        response = AssessmentMetadataSerializer(assessment).data
+
+        return Response(response, status.HTTP_200_OK)
+
+
 class SetFeaturedImage(AssessmentQuerySetMixin, generics.GenericAPIView):
     permission_classes = [
         IsAuthenticated,

@@ -341,3 +341,37 @@ class TestDestroyAssessment(APITestCase):
         assert b"" == response.content
 
         assert (assessment_count - 1) == Assessment.objects.count()
+
+
+class TestDuplicateAssessment(APITestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.me = UserFactory.create()
+        with freeze_time("2019-06-01T16:35:34Z"):
+            cls.assessment = AssessmentFactory.create(owner=cls.me)
+
+        super().setUpClass()
+
+    def test_returns_200_if_user_is_owner(self):
+        assessment_count = Assessment.objects.count()
+
+        self.client.force_authenticate(self.me)
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/{self.assessment.pk}/duplicate/"
+        )
+
+        assert status.HTTP_200_OK == response.status_code
+        assert (assessment_count + 1) == Assessment.objects.count()
+
+    def test_returns_404_if_user_is_not_owner(self):
+        other_user = UserFactory.create()
+        assessment_count = Assessment.objects.count()
+
+        self.client.force_authenticate(other_user)
+        response = self.client.post(
+            f"/{VERSION}/api/assessments/{self.assessment.pk}/duplicate/"
+        )
+
+        assert status.HTTP_404_NOT_FOUND == response.status_code
+        assert assessment_count == Assessment.objects.count()
+        assert self.assessment.data == Assessment.objects.last().data
