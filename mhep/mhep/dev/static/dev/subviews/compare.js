@@ -597,7 +597,7 @@ function compareHeating(scenario) {
     // Water efficiency
     ///////////////////
 
-    //   Check if any water usage has been deleted
+    // Check if any water usage has been deleted
     project.master.water_heating.water_usage.forEach(function (wu_in_master, key) {
         var found = false;
         project[scenario].water_heating.water_usage.forEach(function (wu_in_scenario, key) {
@@ -642,9 +642,9 @@ function compareHeating(scenario) {
     // Heating systems
     ///////////////////
 
-    //   Check if any heating system has been changed
+    // Check if any heating system has been changed
     var hs_changed = false;
-    var out_hs = '<tr><td><h4>Heating systems</h4></td></tr><tbody><tr><th style="width:47%">Before</th><th style="width:47%">After</th></tr>';
+    var out_hs = '</table><h4>Heating systems</h4><table class="table table-striped"><tbody><tr><th style="width:47%">Before</th><th style="width:47%">After</th></tr>';
     project.master.heating_systems.forEach(function (hs_in_master, key) {
         var found = false;
         project[scenario].heating_systems.forEach(function (hs_in_scenario, key) {
