@@ -20,6 +20,7 @@ function report_initUI() {
     add_prioirities_figure();
     add_featured_image();
     add_date();
+    add_address();
     add_commentary();
 }
 
@@ -97,6 +98,7 @@ const defaultOrg = {
     'report': {
         'logo': '',
         'colour': 'black',
+        'highlight_colour': '#ddd',
     }
 };
 
@@ -108,11 +110,12 @@ function choose_organisation() {
 
     const selected_id = selected.value;
     const org = report_organisations.find(e => e.id === selected_id) || defaultOrg;
-    const report = org.report;
+    const report = Object.assign({}, defaultOrg.report, org.report);
 
     $('.report-org-name').html(org.name);
 
     document.documentElement.style.setProperty('--report-primary-colour', report.colour);
+    document.documentElement.style.setProperty('--report-highlight-colour', report.highlight_colour);
 
     $('#contact-for-questions').html(report.text_contact);
     $('#section-3-text').html(report.text_section3);
@@ -196,6 +199,18 @@ function add_featured_image() {
         $('.home-image').attr('src', featuredImage.url);
     }
 }
+function add_address() {
+    let address = [
+        data.household['1a_addressline1'],
+        data.household['1a_addressline2'],
+        data.household['1a_addressline3'],
+        data.household['1a_towncity'],
+        data.household['1a_postcode'],
+    ];
+
+    let joinedHTML = address.filter(e => e != '').join('<br>');
+    $('#report_address').html(joinedHTML);
+}
 function add_date() {
     var date = new Date();
     var months_numbers = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
@@ -269,7 +284,7 @@ function add_prioirities_figure() {
         for (var priority_order = 1; priority_order <= 3; priority_order++) {
             for (var i = 0; i < sortedPriorities.length; i++) {
                 if (sortedPriorities[i][1] == priority_order) {
-                    $('#retrofit-priorities').append('<li>' + sortedPriorities[i][1] + '. ' + sortedPriorities[i][2] + '</li>');
+                    $('#retrofit-priorities').append('<li>' + sortedPriorities[i][2] + '</li>');
                 }
             }
         }
@@ -279,7 +294,7 @@ function add_scenario_names(scenarios) {
     $('.scenarios-list').html('');
     scenarios.forEach(function (scenario) {
         if (scenario != 'master') {
-            $('.scenarios-list').append('<li><p>Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</p></li>');
+            $('.scenarios-list').append('<li>Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</li>');
         }
     });
 }
@@ -403,40 +418,39 @@ function add_performance_summary_figure(scenarios) {
     // };
     // targetbarCarboncoop("energy-use-per-person", options);
 
-    $('#performace-summary-key ul').html('');
+    $('#performance-summary-key').html('');
     for (var i = 0; i < scenarios.length; i++) {
+        let name;
+
         if (scenarios[i] == 'master') {
-            $('#performace-summary-key ul').append('<li style="display: inline-block"><div style="width:15px; height:15px;background-color:' + colors[i] + '; display:inline-block; margin - right: 55px"></div> Your home now</li>');
+            name = 'Your home now';
         } else {
-            $('#performace-summary-key ul').append('<li style="display: inline-block"><div style="width:15px; height:15px;background-color:' + colors[i] + '; display:inline-block; margin - right: 55px"></div> Scenario ' + scenarios[i].split('scenario')[1] + ': ' + project[scenarios[i]].scenario_name + '</li>');
+            name = 'Scenario ' + scenarios[i].split('scenario')[1] + ': ' + project[scenarios[i]].scenario_name;
         }
+
+
+        $('#performance-summary-key').append(`
+            <li class="mb-0">
+                <svg viewBox="1 1 15 15" height="15" width="15">
+                    <rect y="1" x="1" width="15" height="15" fill="${colors[i]}"></rect>
+                </svg>
+                ${name}
+            </li>`);
     }
 }
 function add_heat_loss_summary_figure(scenarios) {
     $('.js-house-heatloss-diagrams-wrapper').html("<ul class='js-house-heatloss-diagram-picker house-heatloss-diagram-picker'></ul>");
-    // Add list to choose which scenario to show
-    scenarios.forEach(function (scenario) {
-        if (scenario == 'master') {
-            var selected = 'selected';
-            var name = 'Your home now';
-        } else {
-            var selected = '';
-            var name = 'Scenario ' + scenario.split('scenario')[1];
-        }
-        $('.house-heatloss-diagram-picker').append('<li class="' + selected + '" data-scenario="' + scenario + '">' + name + '</li>');
-    });
 
     // Add the diagrams
     scenarios.forEach(function (scenario) {
-        var house_markup = generateHouseMarkup(heatlossData(scenario));
-        var html = '<div class="bar-chart-container centered-house no-break" id="house-heatloss-diagram-' + scenario + '" data-scenario-diagram="' + scenario + '" style="display:none">';
-        if (scenario == 'master') {
-            html += '<p>Your home now</p>';
-        } else {
-            html += '<p>Scenario ' + scenario.split('scenario')[1] + '</p>';
-        }
-        html += '<div class="js-svg">' + house_markup + '</div>';
-        html += '</div>';
+        let house_markup = generateHouseMarkup(heatlossData(scenario));
+        let name = scenario == 'master' ? 'Your home now' : 'Scenario ' + scenario.split('scenario')[1];
+        let html = `
+            <div class="report-house">
+                <span class="report-house-name">${name}</span>
+                ${house_markup}
+            </div>`;
+
         $('.js-house-heatloss-diagrams-wrapper').append(html);
     });
 
@@ -484,7 +498,6 @@ function add_heat_balance_figure(scenarios) {
     });
 
     var HeatBalance = new BarChart({
-        chartTitle: 'Heat Balance',
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
@@ -1010,14 +1023,14 @@ function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
             if (index == 1) {
                 var html = '<div>';
             } else {
-                var html = '<div class="no-break">';
+                var html = '<div class="break-before-always">';
             }
             html += '<h4 class="top-border-title title-margin-bottom">Figure 13' + abc[index - 1] + ' - Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</h4>';
             if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
                 html += '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
             }
             html += '<p>Total cost of the scenario £' + Math.round(measures_costs(scenario) / 10) * 10 + ' </p>';
-            html += '<div class="five-col-table-wrapper">' + scenarios_measures_summary[scenario] + '</div>';
+            html += '<div class="measures-table-wrapper">' + scenarios_measures_summary[scenario] + '</div>';
             html += '</div>';
             //html = html.replace('measures-summary-table', 'measures-summary-table no-break');
             $('#ccop-report-measures-summary-tables').append(html);
@@ -1031,25 +1044,34 @@ function add_commentary() {
     }
 }
 function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
-    $('#ccop-report-measures-complete-tables').html('');
-    var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
+    $('#report-measures-complete-tables').html('');
+
     scenarios.forEach(function (scenario, index) {
-        if (scenario != 'master') {
-            if (index == 1) {
-                var html = '<div>';
-            } else {
-                var html = '<div class="no-break">';
-            }
-            html += '<h4 class="top-border-title title-margin-bottom">Figure 14' + abc[index - 1] + ' - Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</h4>';
-            if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
-                html += '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
-            }
-            html += '<p>Total cost of the scenario £' + Math.round(measures_costs(scenario) / 10) * 10 + ' </p>';
-            html += '<div class="five-col-table-wrapper">' + scenarios_measures_complete[scenario] + '</div>';
-            html += '</div>';
-            html = html.replace(/complete-measures-table/g, 'complete-measures-table no-break');
-            $('#ccop-report-measures-complete-tables').append(html);
+        if (scenario == 'master') {
+            return;
         }
+
+        let scenarioName = scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name;
+        let className = index == 1 ? '' : 'break-before-always';
+        let totalCost = Math.round(measures_costs(scenario) / 10) * 10;
+        let createdFrom = '';
+
+        if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
+            createdFrom = '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
+        }
+
+        html = `
+            <section class="minor ${className}">
+                <h4>Scenario ${scenarioName}</h4>
+                ${createdFrom}
+                <p>Total cost of the scenario £${totalCost}</p>
+                <div class="five-col-table-wrapper">
+                    ${scenarios_measures_complete[scenario]}
+                </div>
+            </div>
+        `;
+
+        $('#report-measures-complete-tables').append(html);
     });
 }
 function add_comparison_tables(scenarios, scenarios_comparison) {
@@ -1057,10 +1079,10 @@ function add_comparison_tables(scenarios, scenarios_comparison) {
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
     scenarios.forEach(function (scenario, index) {
         if (scenario != 'master') {
-            var html = '<div class="highlight-box pink-highlight" style="page-break-before:avoid; page-break-inside: auto">';
-            html += ' <h4 class="top-border-title title-margin-bottom ">Figure 15' + abc[index - 1] + ' Master/Scenario ' + scenario.split('scenario')[1] + 'Comparison Table</h4>';
+            var html = '<section class="minor">';
+            html += ' <h3>Figure 15' + abc[index - 1] + ' Master/Scenario ' + scenario.split('scenario')[1] + 'Comparison Table</h3>';
             html += '<div class="js-scenario-comparison">' + scenarios_comparison[scenario] + '</div>';
-            html += '</div>';
+            html += '</section>';
             $('#comparison-tables').append(html);
         }
     });
@@ -1107,8 +1129,7 @@ function generateHouseMarkup(heatlossData) {
     var sWalls = Math.sqrt(heatlossData.wallswk / uscale);
     var sRoof = Math.sqrt(heatlossData.roofwk / uscale);
     var sThermal = Math.sqrt(heatlossData.thermalbridgewk / uscale);
-    var html = '<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"\
-     width="444px" height="330.5px" viewBox="0 0 444 330.5" enable-background="new 0 0 444 330.5" xml:space="preserve">\
+    var html = '<svg x="0px" y="0px" viewBox="0 -20 444 370" enable-background="new 0 0 444 330.5">\
      <path fill="none" stroke="#F0533C" stroke-width="6" stroke-miterlimit="10" d="M106.8,108.1"/>\
      <polyline fill="none" stroke="#F0533C" stroke-width="8" stroke-miterlimit="10" points="316.6,108.1 316.6,263.4 106.8,263.4 \
      106.8,230.9 "/>\
@@ -1284,13 +1305,13 @@ function createComforTable(options, tableID, chosenValue) {
     }));
 
     let html = `
-        <div class="comfort-table-text text-right">${leftText}</div>
+        <div class="text-right" style="width: 6em; margin-right: 0.5em;"><small>${leftText}</small></div>
         <svg viewBox="0 0 94 32" height="32" width="94">
             <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[0].selected ? 'red' : 'white'}"></rect>
             <rect y="1" x="32" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[1].selected ? 'green' : 'white'}"></rect>
             <rect y="1" x="63" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[2].selected ? 'red' : 'white'}"></rect>
         </svg>
-        <div class="comfort-table-text">${rightText}</div>`;
+        <div style="width: 6em; margin-left: 0.5em;"><small>${rightText}</small></div>`;
 
     document.getElementById(tableID).innerHTML = html;
 }

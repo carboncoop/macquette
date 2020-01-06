@@ -6,7 +6,7 @@ function compare_initUI() {
     // Comparison tables
     for (var scenario in project) {
         if (scenario != 'master') {
-            $('#compare').append('<h3 style="margin-top:25px">Master/' + scenario + ' Comparison table</h3>');
+            $('#compare').append('<h3 style="margin-top:25px">Master/' + scenario + ' Comparison table</h4>');
             $('#compare').append('<hr />');
             $('#compare').append('<div id="comparison-' + scenario + '" style="margin-left:25px">');
             $('#comparison-' + scenario).html(compareCarbonCoop(scenario));
@@ -16,7 +16,7 @@ function compare_initUI() {
     // Summary of measures
     for (var scenario in project) {
         if (scenario != 'master') {
-            $('#summary-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - summary of measures</h3>');
+            $('#summary-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - summary of measures</h4>');
             $('#summary-measures').append('<hr />');
             $('#summary-measures').append('<div id="summary-measures-' + scenario + '" style="margin-left:25px">');
             $('#summary-measures-' + scenario).append(getMeasuresSummaryTable(scenario));
@@ -27,7 +27,7 @@ function compare_initUI() {
     // Complete measures tables
     for (var scenario in project) {
         if (scenario != 'master') {
-            $('#complete-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - comple list of measures</h3>');
+            $('#complete-measures').append('<h3 style="margin-top:25px">' + scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - comple list of measures</h4>');
             $('#complete-measures').append('<hr />');
             $('#complete-measures').append('<div id="complete-measures-' + scenario + '" style="margin-left:25px">');
             $('#complete-measures-' + scenario).append(getMeasuresCompleteTables(scenario));
@@ -167,68 +167,68 @@ function compareCarbonCoop(scenario) {
     ];
     var BDD = comparePropertiesInArray(scenario, properties_to_check);
     if (BDD.changed === true) {
-        out += '<h3>Basic dwelling data</h3><table class="table table-striped">' + BDD.html + '</table><br />';
+        out += '<h4>Basic dwelling data</h4><table class="table table-striped">' + BDD.html + '</table>';
     }
     // Ventilation
     var Vent = compareVentilation(scenario);
     if (Vent.changed === true) {
-        out += '<h3>Ventilation</h3><table class="table table-striped">' + Vent.html + '</table></br>';
+        out += '<h4>Ventilation</h4><table class="table table-striped">' + Vent.html + '</table>';
     }
     // Infiltration
     var Inf = compareInfiltration(scenario);
     if (Inf.changed === true) {
-        out += '<h3>Infiltration</h3><table class="table table-striped">' + Inf.html + '</table></br>';
+        out += '<h4>Infiltration</h4><table class="table table-striped">' + Inf.html + '</table>';
     }
     // Clothes drying facilities
     var CDF = compareClothesDryingFacilities(scenario);
     if (CDF.changed === true) {
-        out += '<h3>Clothes drying facilities</h3><table class="table table-striped">' + CDF.html + '</table></br>';
+        out += '<h4>Clothes drying facilities</h4><table class="table table-striped">' + CDF.html + '</table>';
     }
     //Fabric
     var Fabric = compareFabric(scenario);
     if (Fabric.changed === true) {
-        out += '<h3>Fabric</h3><p>Changes to Floor\'s, Wall\'s, Windows and Roof elements</p>\n\
+        out += '<h4>Fabric</h4><p>Changes to floors, walls, windows and roof elements</p>\n\
         <table class="table table-striped"><tr><th>Before</th><th>W/K</th><th>After</th><th>W/K</th><th>Change</th></tr>'
-                + Fabric.html + '</table></br>';
+                + Fabric.html + '</table>';
     }
     // Lighting - SAP
     var Lighting = compareLighting(scenario);
     if (Lighting.changed === true) {
-        out += '<h3>Lighting</h3><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table></br>';
+        out += '<h4>Lighting</h4><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table>';
     }
     // Heating
     var Heating = compareHeating(scenario);
     if (Heating.changed === true) {
-        out += '<h3>Heating</h3><table class="table table-striped">' + Heating.html + '</table></br>';
+        out += '<h4>Heating</h4><table class="table table-striped">' + Heating.html + '</table>';
     }
     // Solar hot water
     if (project[scenario].use_SHW == true) {
         var SHW = compareSolarHotWater(scenario);
         if (SHW.changed === true) {
-            out += '<h3>Solar hot water</h3><table class="table table-striped">' + SHW.html + '</table></br>';
+            out += '<h4>Solar hot water</h4><table class="table table-striped">' + SHW.html + '</table>';
         }
     }
     // Generation
     var GEN = compareGeneration(scenario);
     if (GEN.changed === true) {
-        out += '<h3>Generation</h3><table class="table table-striped">' + GEN.html + '</table></br>';
+        out += '<h4>Generation</h4><table class="table table-striped">' + GEN.html + '</table>';
     }
     // Energy requirements
     var ER = compareEnergyRequirements(scenario);
     if (ER.changed === true) {
-        out += '<h3>Energy requirements</h3><table class="table table-striped">' + ER.html + '</table></br>';
+        out += '<h4>Energy requirements</h4><table class="table table-striped">' + ER.html + '</table>';
     }
     // Fuel requirements
     var FR = compareFuelRequirements(scenario);
     if (FR.changed === true) {
-        out += '<h3>Fuel requirements</h3><table class="table table-striped">' + FR.html + '</table></br>';
+        out += '<h4>Fuel requirements</h4><table class="table table-striped">' + FR.html + '</table>';
     }
     // Totals
-    out += '<h3>Totals</h3><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
+    out += '<h4>Totals</h4><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
     out += '<tr><td>Annual cost</td><td><i>£' + project.master.total_cost.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_cost.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>Total income</td><td><i>£' + project.master.total_income.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_income.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>SAP rating</td><td><i>' + project.master.SAP.rating.toFixed(0) + '</i></td><td><i>' + project[scenario].SAP.rating.toFixed(0) + '</i></td></tr>';
-    out += '</table></br>';
+    out += '</table>';
     return out;
 }
 
@@ -535,7 +535,7 @@ function compareFabric(scenario) {
             out += '</i></td>';
             out += "<td style='padding-left:3px;padding-right:5px'>" + (element_scenario.uvalue * element_scenario.netarea).toFixed(2) + ' W/K</td>';
             out += '<td>';
-            out += "<span style='color:#aa0000'>+" + element_scenario.uvalue * element_scenario.netarea + ' W/K</span></td>';
+            out += "<span style='color:#aa0000'>+" + (element_scenario.uvalue * element_scenario.netarea).toFixed(2) + ' W/K</span></td>';
             out += '</tr>';
         }
     }
@@ -597,7 +597,7 @@ function compareHeating(scenario) {
     // Water efficiency
     ///////////////////
 
-    //   Check if any water usage has been deleted
+    // Check if any water usage has been deleted
     project.master.water_heating.water_usage.forEach(function (wu_in_master, key) {
         var found = false;
         project[scenario].water_heating.water_usage.forEach(function (wu_in_scenario, key) {
@@ -642,9 +642,9 @@ function compareHeating(scenario) {
     // Heating systems
     ///////////////////
 
-    //   Check if any heating system has been changed
+    // Check if any heating system has been changed
     var hs_changed = false;
-    var out_hs = '<tr><td><h4>Heating systems</h4></td></tr><tbody><tr><th style="width:47%">Before</th><th style="width:47%">After</th></tr>';
+    var out_hs = '</table><h4>Heating systems</h4><table class="table table-striped"><tbody><tr><th style="width:47%">Before</th><th style="width:47%">After</th></tr>';
     project.master.heating_systems.forEach(function (hs_in_master, key) {
         var found = false;
         project[scenario].heating_systems.forEach(function (hs_in_scenario, key) {
@@ -1159,46 +1159,48 @@ function getMeasuresCompleteTables(scenario) {
 }
 
 function measureForCompleteTable(measure) {
-    var html = "<table class='complete-measures-table'>";
-    html += '<tr><td style="width:13%"><strong>Measure: </strong></td><td colspan=3>' + measure.name + '</td></tr>';
+    let location = 'Whole house';
     if (typeof measure.location != 'undefined') {
-        var location = measure.location.replace(/,br/g, ', '); // for measures applied in bulk to fabric elements the location has the form of: W9,brW10,brW21,brD3,brW4,brW5,brW6a,brW16 , and we dont want that
+        // for measures applied in bulk to fabric elements the location has the form of:
+        // W9,brW10,brW21,brD3,brW4,brW5,brW6a,brW16 , and we dont want that
+        location = measure.location.replace(/,br/g, ', ');
         if (location[location.length - 2] == ',' && location[location.length - 1] == ' ') {
             location = location.substring(0, location.length - 2);
         }
-        html += '<tr><td><strong>Label/location: </strong></td><td colspan=3>' + location + '</td></tr>';
-    } else {
-        html += '<tr><td><strong>Label/location: </strong></td><td colspan=3> Whole house</td></tr>';
     }
-    html += '<tr><td><strong>Description: </strong></td><td colspan=3>' + measure.description + '</td></tr>';
-    html += '<tr><td><strong>Associated work: </strong></td><td colspan=3>' + measure.associated_work + '</td></tr>';
-    if (measure.maintenance != 'undefined') {
-        html += '<tr><td><strong>Maintenance: </strong></td><td colspan=3>' + measure.maintenance + '</td></tr>';
-    } else {
-        html += '<tr><td><strong>Maintenance: </strong></td><td colspan=3> N/A</td></tr>';
-    }
-    html += '<tr><td><strong>Special and other considerations: </strong></td><td colspan=3>' + measure.notes + '</td></tr>';
-    html += '<tr><td><strong>Who by: </strong></td><td style="width:35%">' + measure.who_by + '</td>';
-    html += '<td style="width:13%"><strong>Key risks: </strong></td><td>' + measure.key_risks + '</td></tr>';
-    html += '<tr><td><strong>Benefits: </strong></td><td>' + measure.benefits + '</td>';
-    if (measure.disruption != undefined) {
-        html += '<td><strong>Dirt and disruption: </strong></td><td>' + measure.disruption.replace('MEDIUMHIGH', 'MEDIUM / HIGH') + '</td></tr>';
-    } else {
-        html += '<td><strong>Dirt and disruption: </strong></td><td></td></tr>';
-    }
-    if (measure.performance == undefined) {
-        var perf = '';
-    } else {
-        perf = format_performance_string(measure.performance);
-    } // We have realized that some units were inputted wrong in the library
-    html += '<tr><td><strong>Performance target: </strong></td><td style="width:35%">' + perf + '</td>';
-    html += '<td colspan=2><table  style="width:100%">';
-    html += measure.min_cost == undefined ? '' : '<tr><td><strong>Minimum cost</strong></td><td colspan=3>' + measure.min_cost + '</td></tr>';
-    html += '<tr><td style="width:25%"><strong>Cost (£/unit): </strong></td><td>' + measure.cost + '</td><td style="width:30%"><strong>Units: </strong></td><td>' + measure.cost_units + '</td></tr>';
-    html += '<tr><td><strong>Quantity (units): </strong></td><td>' + (1.0 * measure.quantity).toFixed(2) + '</td><td><strong>Total cost (£): </strong></td><td>' + (1.0 * measure.cost_total).toFixed(2) + '</td></tr></table></td></tr>';
-    html += '</table>';
 
-    return html;
+    let maintenance = measure.maintenance != 'undefined' ? measure.maintenance : 'N/A';
+    let disruption = measure.disruption != undefined ? measure.disruption.replace('MEDIUMHIGH', 'MEDIUM / HIGH') : 'N/A';
+    let performance = measure.performance == undefined ? '' : format_performance_string(measure.performance);
+    let quantity = (1.0 * measure.quantity).toFixed(2);
+    let totalCost = (1.0 * measure.cost_total).toFixed(2);
+
+    let min_cost =
+        measure.min_cost != undefined
+            ? `<tr><th>Minimum cost</th>         <td>${measure.min_cost}</td></tr>`
+            : '';
+
+    return `
+        <div class="complete-measures-wrapper">
+            <table class='complete-measures-table break-inside-avoid'>
+                <tr><th>Measure:</th>              <td>${measure.name}</td></tr>
+                <tr><th>Label/location:</th>       <td>${location}</td></tr>
+                <tr><th>Description:</th>          <td>${measure.description}</td></tr>
+                <tr><th>Associated work:</th>      <td>${measure.associated_work}</td></tr>
+                <tr><th>Maintenance:</th>          <td>${maintenance}</td></tr>
+                <tr><th colspan="2">Special and other considerations:</th></tr>
+                <tr><td></td>                      <td>${measure.notes}</td></tr>
+                <tr><th>Who by:</th>               <td>${measure.who_by}</td></tr>
+                <tr><th>Key risks:</th>            <td>${measure.key_risks}</td></tr>
+                <tr><th>Dirt and disruption:</th>  <td>${disruption}</td></tr>
+                <tr><th>Benefits:</th>             <td>${measure.benefits}</td></tr>
+                <tr><th>Performance target:</th>   <td>${performance}</td></tr>
+                <tr><th>Cost per unit</th>         <td>£${measure.cost} per ${measure.cost_units} × ${quantity} ${measure.cost_units}</td></tr>
+                ${min_cost}
+                <tr><th>Total cost</th>            <td>£${totalCost}</td></tr>
+            </table>
+        </div>
+    `;
 }
 
 function measuresByIdForCompleteTable(measures_by_id) {

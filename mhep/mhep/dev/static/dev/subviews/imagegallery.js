@@ -7,7 +7,7 @@ class ImageGallery {
         };
         this.projectId = id;
         this.list = data;
-        this.featured = this.list.find(image => image.is_featured === true);
+        this.featured_id = this.list.find(image => image.is_featured === true).id;
 
         this.selected = [];
         this.currentlyEditing = null;
@@ -75,7 +75,7 @@ class ImageGallery {
         mhep_helper
             .set_featured_image(this.projectId, id)
             .then(_ => {
-                this.featured = id;
+                this.featured_id = id;
                 this.view();
             });
     }
@@ -99,7 +99,7 @@ class ImageGallery {
     // ----------------------------------------------------------------- //
 
     isFeatured(id) {
-        return this.featured === id;
+        return this.featured_id === id;
     }
 
     isSelected(id) {
