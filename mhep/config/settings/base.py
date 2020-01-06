@@ -95,8 +95,9 @@ THIRD_PARTY_APPS = ["corsheaders", "crispy_forms", "social_django", "rest_framew
 
 LOCAL_APPS = [
     "mhep.users.apps.UsersConfig",
-    # Your stuff: custom apps go here
     "mhep.dev.apps.AssessmentsConfig",
+    # Your stuff: custom apps go here
+    "mhep.v2.apps.AssessmentsConfig",
     "mhep.v1.apps.AssessmentsConfig",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps

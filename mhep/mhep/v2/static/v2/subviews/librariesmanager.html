@@ -1,0 +1,47 @@
+
+
+
+<div id="librariesmanager" class="page">
+    <hr>
+    <h3>Libraries</h3>
+    <hr>
+
+    <table id="libraries-manager-table-template" style="display:none; width: 100%;">
+        <thead>
+            <tr style="background-color:#eee">
+                <th class="library-type-name" colspan="4"></th>
+                <th style="text-align:right">
+                    <button style="padding-top:2px; padding-bottom:2px" data-library-type="" class="btn create-new-library">
+                        <i class="icon-plus"></i> Add
+                    </button>
+                </th>
+            </tr>
+            <tr>
+                <th></th>
+                <th>Library</th>
+                <th>Owner</th>
+                <th>Access</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr id="libraries-manager-row-template" style="display: none;">
+                <td style="white-space:nowrap; width: 50px;">
+                    <i data-library-id="" data-library-name="" class="icon-edit if-write-access edit-library-name" style="cursor:pointer;margin-right:5px"></i>
+                    <i data-library-id="" class="icon-trash delete-library if-write-access" style="cursor:pointer;margin-right:5px"></i>
+                    <i data-library-id="" data-owner-id="" class="icon-share if-share-access share-library" style="cursor:pointer;margin-right:15px"></i>
+                </td>
+                <td class="library-name" style="width: 30%;"></td>
+                <td class="library-owner" style="width: 20%;"></td>
+                <td class="library-access" style="width: 10%; white-space:nowrap;"></td>
+                <td style="width: 30%; white-space:nowrap;">
+                    <button data-library-id="" data-library-type="" class="add-item if-write-access" style="margin-right:15px">Add item</button>
+                    <button data-library-id="" class="show-items-edit-mode" style="margin-right:15px">Show items</button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div id="libraries-table" class="table" style="width: 100%;">
+    </div>
+</div>

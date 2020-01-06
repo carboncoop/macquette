@@ -1,0 +1,63 @@
+<style>
+    .gallery-card {
+        border: 1px solid #CCC7B4;
+        background: #444;
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1.75rem;
+        max-width: 800px;
+    }
+    .gallery-head {
+        display: flex;
+        flex-direction: row;
+        width: 100%;
+        justify-content: center;
+        align-items: center;
+        max-width: 300px;
+        max-height: 300px;
+    }
+    .gallery-head img {
+        object-fit: scale-down;
+        max-height: 100%;
+        max-width: 100%;
+    }
+    .gallery-content {
+        flex: 1;
+        padding: 1rem;
+        background-color: #EEECE5;
+    }
+    .gallery-card--selected .gallery-content {
+        background-color: #dff3ff;
+    }
+    .gallery-card--selected {
+        border-color: #8cd4ff;
+    }
+    .gallery-card p {
+        margin-bottom: 0;
+    }
+    .gallery-feature {
+        transform: scale(1.5);
+    }
+    .gallery-checkbox {
+        transform: scale(1.5);
+    }
+    .gallery-editor {
+        width: 100%;
+        margin-bottom: 0 !important;
+    }
+    .text-muted {
+        color: #999;
+    }
+</style>
+
+<div class="gallery">
+    <h3>Image gallery</h3>
+
+    <h4>Upload images</h4>
+    <input type="file" multiple accept="image/*" class="gallery-files">
+    <button class="btn gallery-upload">Upload</button>
+    <p>Maximum size: 10MB</p>
+    <div id="upload_result" style="margin: 0 0 25px 25px"></div>
+
+    <div class="gallery-list"></div>
+</div>
