@@ -150,7 +150,7 @@
         </div>
     </div>
 
-    <table class="table">
+    <table id="assessment-table" class="table">
         <thead>
             <tr>
                 <th>Name</th>
@@ -165,7 +165,7 @@
         <tbody id="assessments"></tbody>
     </table>
 
-    <div id="noassessments" class="alert alert-warning" style="display:none">
+    <div id="noassessments" style="display:none">
         You don't have any assessments yet.  Click "New" to get started.
     </div>
 </section>
@@ -366,10 +366,13 @@
         }
 
         $(element).html(out);
-        if (assessments.length == 0)
+        if (assessments.length == 0) {
             $("#noassessments").show();
-        else
+            $("#assessment-table").hide();
+        } else {
+            $("#assessment-table").show();
             $("#noassessments").hide();
+        }
     }
 
 // ----------------------------------------------------------------------------
