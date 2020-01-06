@@ -5,6 +5,11 @@
 <style>
     .icon { width: 1em; height: 1em; }
 
+    .unpad-8 {
+        margin: -8px;
+        padding: 8px;
+    }
+
     .modal-backdrop {
         opacity:0.3 !important;
     }
@@ -363,7 +368,7 @@
             out +=
                 `<tr>
                     <td>
-                        <a href="${assessmentURL}" target="_blank" class="underline d-b">
+                        <a href="${assessmentURL}" target="_blank" class="underline d-b unpad-8">
                             ${assessment.name}</td>
                         </a>
                     </td>
