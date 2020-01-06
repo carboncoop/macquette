@@ -25,6 +25,15 @@ const isRoofOrLoft      = type => isRoof(type) || isLoft(type);
 const isExternalOpening = type => isWindow(type) || isDoor(type) || isRoofLight(type);
 const isOpening         = type => isExternalOpening(type) || isHatch(type);
 
+function get_last_external_opening() {
+    let arr = data.fabric.elements.filter(elem => isExternalOpening(elem.type));
+    if (arr.length > 0) {
+        return arr.pop();
+    } else {
+        return null;
+    }
+}
+
 // button defined in: libraryHelper:elements_library_to_html
 $('#openbem').on('click', '.add-element', function () {
 
@@ -43,12 +52,16 @@ $('#openbem').on('click', '.add-element', function () {
     }
 
     if (isExternalOpening(type)) {
-        // Set a default value for orientation and overshading
-        element.orientation = 3;
-        element.overshading = 2;
-
-        // Set a default value for subtractfrom
-        element.subtractfrom = $('.subtractfrom')[0][0].value;
+        open = get_last_external_opening();
+        if (open) {
+            element.orientation = open.orientation;
+            element.overshading = open.overshading;
+            element.subtractfrom = open.subtractfrom;
+        } else {
+            element.orientation = 3;
+            element.overshading = 2;
+            element.subtractfrom = 'no';
+        }
     }
 
     data.fabric.elements.push(element);
