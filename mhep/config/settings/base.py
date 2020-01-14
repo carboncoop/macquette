@@ -53,15 +53,25 @@ SITE_URL = env.str("SITE_URL", "")
 # ------------------------------------------------------------------------------
 # We set up Sentry early on so that other config errors get logged to Sentry.
 # If no DSN is provided, then we skip setup, that's fine.
-SENTRY_DSN = env("SENTRY_DSN", default=None)
+SENTRY_DSN = env("SENTRY_DSN", default="")
 if SENTRY_DSN:
     SENTRY_LOG_LEVEL = env.int("DJANGO_SENTRY_LOG_LEVEL", logging.INFO)
 
     sentry_logging = LoggingIntegration(
         level=SENTRY_LOG_LEVEL,  # Capture info and above as breadcrumbs
-        event_level=logging.ERROR,  # Send errors as events
+        event_level=logging.ERROR,  # Send events from Error messages
     )
-    sentry_sdk.init(dsn=SENTRY_DSN, integrations=[sentry_logging, DjangoIntegration()])
+
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[sentry_logging, DjangoIntegration()],
+        environment=ENV,
+    )
+
+    # DisallowedHost errors are basically spam
+    from sentry_sdk.integrations.logging import ignore_logger
+
+    ignore_logger("django.security.DisallowedHost")
 
 
 # DATABASES
@@ -271,10 +281,6 @@ EMAIL_TIMEOUT = 5
 # ------------------------------------------------------------------------------
 # Django Admin URL.
 ADMIN_URL = "admin/"
-# https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = [("""Carbon Co-op""", "info@carbon.coop")]
-# https://docs.djangoproject.com/en/dev/ref/settings/#managers
-MANAGERS = ADMINS
 
 # LOGGING
 # ------------------------------------------------------------------------------
