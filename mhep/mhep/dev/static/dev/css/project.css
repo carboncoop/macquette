@@ -199,6 +199,10 @@ body .modal {
     border-top: none;
 }
 
+.table--vertical-middle tr, .table--vertical-middle td {
+    vertical-align: middle;
+}
+
 .clickable { cursor: pointer; }
 
 
@@ -210,6 +214,8 @@ body .modal {
 
 .text-nowrap { white-space: nowrap; }
 .text-right { text-align: right !important; }
+.text-center { text-align: center !important; }
+.text-left { text-align: left !important; }
 
 .text-normal { font-weight: normal !important; font-style: normal !important; }
 .text-bold { font-weight: bold; }
@@ -219,11 +225,12 @@ body .modal {
 
 
 .d-i { display: inline; }
+.d-ib { display: inline-block; }
 .d-flex { display: flex; }
 .d-b { display: block; }
 
-.align-items-start { align-items: start; }
-.align-items-center { align-items: center; }
+.align-items-start { align-items: start !important; }
+.align-items-center { align-items: center !important; }
 
 .justify-content-between { justify-content: space-between; }
 .justify-content-around { justify-content: space-around; }
