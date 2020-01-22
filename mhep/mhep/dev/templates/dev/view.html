@@ -50,6 +50,8 @@
 
 
 {% block extra_nav %}
+    <span id="saving_status" class="mr-7"></span>
+
     <a id="undo">
         <svg style="width: 1rem; height: 1rem"><use xlink:href="#iconset-undo" /></svg>
     </a>
@@ -568,9 +570,16 @@
 
         redraw_emissions();
 
-        mhep_helper.set(projectid, project, function (result) {
-            alertifnotlogged(result);
-            alert_if_assessment_locked(result);
+        $("#saving_status").text("Saving...");
+
+        mhep_helper.set(projectid, project, function (err, result) {
+            if (err) {
+                $("#saving_status").text("Failed to save");
+            } else {
+                $("#saving_status").text("Saved");
+                alertifnotlogged(result);
+                alert_if_assessment_locked(result);
+            }
         });
     }
     function show_hide_if_master() {

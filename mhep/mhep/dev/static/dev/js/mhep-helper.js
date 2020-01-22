@@ -38,9 +38,12 @@ var mhep_helper = {
             dataType: 'json',
             contentType: 'application/json;charset=utf-8',
             async: true,
-            error: handleServerError('updating assessment'),
+            error: function (err) {
+                callback(err, null);
+                handleServerError('updating assessment');
+            },
             success: function (data) {
-                callback(data);
+                callback(null, data);
             },
         });
         //console.log(JSON.stringify(inputdata));
