@@ -367,6 +367,13 @@ button.demote-role {
 }
 
 
+/**** FORMS ****/
+
+label input[type=radio] {
+    margin-top: 0;
+}
+
+
 /**** NAVIGATION ****/
 
 .nav-container {
