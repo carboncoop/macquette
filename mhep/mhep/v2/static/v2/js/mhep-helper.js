@@ -38,9 +38,12 @@ var mhep_helper = {
             dataType: 'json',
             contentType: 'application/json;charset=utf-8',
             async: true,
-            error: handleServerError('updating assessment'),
+            error: function (err) {
+                callback(err, null);
+                handleServerError('updating assessment');
+            },
             success: function (data) {
-                callback(data);
+                callback(null, data);
             },
         });
         //console.log(JSON.stringify(inputdata));
@@ -374,6 +377,7 @@ var mhep_helper = {
     extract_inputdata: function (data) {
         var inputdata = {};
         inputdata.scenario_name = data.scenario_name;
+        inputdata.scenario_description = data.scenario_description;
         inputdata.household = data.household;
         inputdata.region = data.region;
         inputdata.altitude = data.altitude;

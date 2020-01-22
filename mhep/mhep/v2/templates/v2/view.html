@@ -13,6 +13,7 @@
 
 <link rel="stylesheet" href="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
 <script src="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+<script src="{% static VERSION|add:'/js/papaparse-5.0.2.min.js' %}"></script>
 
 <!-- open floor uvalue calculator -->
 <script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
@@ -50,6 +51,8 @@
 
 
 {% block extra_nav %}
+    <span id="saving_status" class="mr-7"></span>
+
     <a id="undo">
         <svg style="width: 1rem; height: 1rem"><use xlink:href="#iconset-undo" /></svg>
     </a>
@@ -318,13 +321,6 @@
     redraw_scenario_menu();
     toggle_scenario_menu(scenario);
 
-    //*****************
-    // Top graphic
-    //*****************
-    $("#topgraphic").show();
-    $("#rating").hide();
-    $(".house_graphic").html("Hide house graphic");
-
     //****************
     // Sidebar
     //****************
@@ -388,7 +384,7 @@
             console.log(key + " changed from " + lastval + " to " + val);
             changelog += key + " changed from " + lastval + " to " + val + "<br>";
 
-            if (key == 'data.scenario_name') {
+            if (key.endsWith('.scenario_name')) {
               redraw_scenario_menu();
             }
         }
@@ -397,16 +393,20 @@
     $(window).on('hashchange', function () {
         load_page_from_hash();
     });
+    function hide_house_graphic() {
+        $("#topgraphic").hide();
+        $(".house_graphic").html("Show house graphic");
+    }
+    function show_house_graphic() {
+        $("#topgraphic").show();
+        $(".house_graphic").html("Hide house graphic");
+    }
     $(".house_graphic").click(function () {
         if ($(".house_graphic").html() == "Show house graphic") {
-            $(".overview").show();
-            $("#rating").hide();
-            $(".house_graphic").html("Hide house graphic");
+            show_house_graphic();
         }
         else {
-            $(".overview").hide();
-            $("#rating").show();
-            $(".house_graphic").html("Show house graphic");
+            hide_house_graphic();
         }
     });
     // Scenarios interactions
@@ -571,9 +571,16 @@
 
         redraw_emissions();
 
-        mhep_helper.set(projectid, project, function (result) {
-            alertifnotlogged(result);
-            alert_if_assessment_locked(result);
+        $("#saving_status").text("Saving...");
+
+        mhep_helper.set(projectid, project, function (err, result) {
+            if (err) {
+                $("#saving_status").text("Failed to save");
+            } else {
+                $("#saving_status").text("Saved");
+                alertifnotlogged(result);
+                alert_if_assessment_locked(result);
+            }
         });
     }
     function show_hide_if_master() {
@@ -717,11 +724,10 @@
         // Render page
         load_view("#content", page);
 
-        let $topgraphic = $('#topgraphic');
-        if (page == 'report') {
-            $topgraphic.hide();
+        if (page == 'report' || page == 'householdquestionnaire' || page == 'commentary') {
+            hide_house_graphic();
         } else {
-            $topgraphic.show();
+            show_house_graphic();
             draw_openbem_graphics('#topgraphic');
         }
 

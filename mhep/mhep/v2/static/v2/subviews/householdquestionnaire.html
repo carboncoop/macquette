@@ -1,850 +1,1480 @@
-<hr>
-<h3>General</h3>
-<hr>
-<br>
-<div id ="load-questionnaire" style="float:right;width:300px">
-    <h4>Upload questionnaire</h4>
-    <form style="margin-bottom:5px" action="#" id="upload_questionnaire" method="post" enctype="multipart/form-data" >
-        <input type="file" id="file_to_upload">
-        <p>Max. size: 1MB</p>
-        <input class="btn" type="submit" value="Import file" />
-    </form>
+<style>
+    .form-row { display: flex; align-items: first baseline; margin-bottom: 15px; }
+    .form-row-label { width: 10rem; flex-shrink: 0; }
+    .form-row-control { flex-grow: 1; }
+    .form-row-control input, .form-row-control select { margin-bottom: 0; }
+
+    .form-row--twoline { display: block; }
+    .form-row--twoline .form-row-label { width: 100%; }
+    .form-row--twoline .form-row-control { margin-left: 10rem; }
+
+    .{ margin-left: 2rem; }
+
+    .w-50 { width: 50%; box-sizing: border-box; }
+
+    .textarea--100 {
+        height: 5em;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .textarea {
+        width: 38em;
+        height: 5em;
+    }
+    .textarea-sm {
+        width: 26rem;
+        height: 3em;
+    }
+
+    .bg-assessor {
+        background-color: #eee;
+    }
+
+    input { max-width: 100%; }
+
+    .input--num {
+        width: 40px;
+        height: 1.5rem !important;
+        font-size: 1.5rem !important;
+        text-align: center;
+        margin-bottom: 0 !important;
+    }
+
+</style>
+
+<section class="mb-45">
+    <div class="d-flex">
+        <div class="mr-15 w-50">
+            <div class="form-row mb-7">
+                <label class='form-row-label' for="assessor_name">Assessor's name:</label>
+                <div class="form-row-control">
+                    <input type="text" key="data.household.assessor_name" id="assessor_name" style="width:250px">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class='form-row-label' for="assessment_date">Assessment date:</label>
+                <div class="form-row-control">
+                    <input type="text" placeholder="dd/mm/yyyy" key="data.household.assessment_date" id="assessment_date" style="width:150px">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class='form-row-label' for="householder_name">Householder's name:</label>
+                <div class="form-row-control">
+                    <input type="text" key="data.household.householder_name" id="householder_name" style="width:250px">
+                </div>
+            </div>
+
+            <div class="form-row mb-7">
+                <label class='form-row-label' for="address_1">Address:</label>
+                <div class="form-row-control">
+                    <input type="text" key="data.household.address_1" class="mb-7" style="width:250px" id="address_1"><br>
+                    <input type="text" key="data.household.address_2" class="mb-7" style="width:250px"><br>
+                    <input type="text" key="data.household.address_3" class="mb-0" style="width:250px">
+                </div>
+            </div>
+            <div class="form-row mb-7">
+                <label class='form-row-label' for="address_town">Town/city:</label>
+                <div class="form-row-control">
+                    <input type="text" key="data.household.address_town" id="address_town" style="width:130px">
+                </div>
+            </div>
+            <div class="form-row">
+                <label class='form-row-label' for="address_postcode">Postcode:</label>
+                <div class="form-row-control">
+                    <input type="text" key="data.household.address_postcode" id="address_postcode" style="width:130px">
+                </div>
+            </div>
+        </div>
+        <div class="ml-15 w-50">
+            <div class="bg-assessor pa-15 mb-30">
+                <div class="d-flex justify-content-between">
+                    <h4 class="ma-0 mb-15">CSV Questionnaire</h4>
+                    <a style="text-decoration: underline; cursor: pointer;" id="get_csv">Get CSV file</a>
+                </div>
+
+                <input type="file" id="csv_file" class="mb-15"><br>
+                <button class="btn" id="process_csv">Import answers</button>
+
+                <p class="mb-0" id="csv-result"></p>
+            </div>
+
+            <div class="bg-assessor pa-15">
+                <p class="text-italic mb-15">Assessor: check and fill these if required.</p>
+
+                <div class="form-row">
+                    <label class='form-row-label' for="address_la">Local authority:</label>
+                    <div class="form-row-control">
+                        <input type="text" key="data.household.address_la" id="address_la" style="width:200px">
+                    </div>
+                </div>
+
+                <div class="form-row bg-assessor mb-0">
+                    <label class='form-row-label' for="address_lsoa">
+                        <abbr title="Lower Super Output Area">LSOA</abbr>:
+                    </label>
+                    <div class="form-row-control">
+                        <input type="text" key="data.household.address_lsoa" id="address_lsoa" style="width:200px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <h4>Household details</h4>
+    <p class="text-italic">This section contains sensitive data so won't be included in the report.</p>
+
+    <div class="d-flex mb-15">
+        <div class="mr-15 w-50 form-row">
+            <span class='form-row-label'>Tenure:</span>
+            <div class="form-row-control">
+                <label class="radio d-flex mb-7" for="tenure_1">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.tenure"
+                            id="tenure_1"
+                            name="tenure"
+                            value="OWNER">
+                    Owner occupied
+                </label>
+
+                <label class="radio d-flex mb-7" for="tenure_2">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.tenure"
+                            id="tenure_2"
+                            name="tenure"
+                            value="RENT_PRIVATE">
+                    Private rent
+                </label>
 
 
-    <p id="upload-result"></p>
-</div>
-<p>Assessment date (dd-mm-yyyy):<br>
-    <input type="text" value="" key="data.household.assessment_date" style="width:300px" /></p>
-<p>Assessor's name:<br>
-    <input type="text" value="" key="data.household.assessors_name" style="width:300px" /></p>
-<p>Assessor's biography:<br>
-    <textarea type="text" style="width:98%; height:150px" key="data.household.assessors_biography" style="width:300px" /></p>
+                <label class="radio d-flex mb-7" for="tenure_3">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.tenure"
+                            id="tenure_3"
+                            name="tenure"
+                            value="RENT_SOCIAL">
+                    Social rent
+                </label>
 
 
-<br>
-<hr>
-<h3>1 Basic house data</h3>
-<hr>
-<br>
-<p><b>1a Location</b></p>
-
-<p>Name:<br>
-    <input type="text" value="" key="data.household.1a_name" style="width:300px" /></p>
-
-<p>Address line 1:<br>
-    <input type="text" value="" key="data.household.1a_addressline1" style="width:300px" /></p>
-
-<p>Address line 2:<br>
-    <input type="text" value="" key="data.household.1a_addressline2" style="width:300px" /></p>
-
-<p>Address line 3:<br>
-    <input type="text" value="" key="data.household.1a_addressline3" style="width:300px" /></p>
-
-<p>Town/city:<br>
-    <input type="text" value="" key="data.household.1a_towncity" style="width:300px" /></p>
-
-<p>Postcode:<br>
-    <input type="text" value="" key="data.household.1a_postcode" style="width:300px" /></p>
-
-<p>Local authority:<br>
-    <input type="text" value="" key="data.household.1a_localauthority" style="width:300px" /></p>
-
-<p>Lower Super Output Area (LSOA):<br>
-    <input type="text" value="" key="data.household.1a_LSOA" style="width:300px" /></p>
-
-<p>Conservation Area:<br>
-    <select key="data.household.1a_conservationarea" style="width:180px">
-        <option value="No">No</option>
-        <option value="Yes">Yes</option>
-        <option value="Dont Know">Dont know</option>
-    </select></p>
-
-<p>Listed Building:<br>
-    <input key="data.household.1a_listedbuilding" type="checkbox" />
-</p>
-
-<p><b>1b House</b></p>
-
-<p>House type:<br>
-    <select key="data.household.1b_housetype" style="width:180px">
-        <option value="flat-conversion">Flat (conversion)</option>
-        <option value="flat-purposebuilt">Flat (purpose built)</option>
-        <option value="mid-terrace">Mid-terrace</option>
-        <option value="end-terrace">End-terrace</option>
-        <option value="semi-detached">Semi-detached</option>
-        <option value="detached">Detached</option>
-    </select></p>
-
-<p>Number of bedrooms<br>
-    <input type="text" value="" key="data.household.1b_bedrooms" style="width:150px" /></p>
-
-<!--<p>Number of storeys<br>
-    <input type="text" value="" key="data.household.1b_bedrooms" style="width:150px" /></p>-->
-
-<p>Age:<br>
-    <select key="data.household.1b_agesap" style="width:180px">
-        <option value="before-1900">Before 1900</option>
-        <option value="1900-1929">1900 - 1929</option>
-        <option value="1930-1949">1930 - 1949</option>
-        <option value="1950-1966">1950 - 1966</option>
-        <option value="1967-1975">1967 - 1975</option>
-        <option value="1976-1982">1976 - 1982</option>
-        <option value="1983-1990">1983 - 1990</option>
-        <option value="1991-1995">1991 - 1995</option>
-        <option value="1996-2002">1996 - 2002</option>
-        <option value="2003-2006">2003 - 2006</option>
-        <option value="2007-2011">2007 - 2011</option>
-        <option value="2012 onwards">2012 onwards</option>
-    </select></p>
-
-<p>Exact year<br>
-    <input type="text" value="" key="data.household.1b_age" style="width:150px" /></p>
+                <label class="radio d-flex mb-7" for="tenure_4">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.tenure"
+                            id="tenure_4"
+                            name="tenure"
+                            value="COOP">
+                    Co-op
+                </label>
 
 
-<hr>
-<h3>2 Household details</h3>
-<hr>
-<br>
-<p><b>2a Tenure</b></p>
+                <label class="radio d-flex mb-7" for="tenure_5">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.tenure"
+                            id="tenure_5"
+                            name="tenure"
+                            value="SHARED">
+                    Shared ownership
+                </label>
+            </div>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes:</div>
+            <textarea key="data.household.tenure_note" class="textarea--100 mb-7 mt-7"></textarea>
+            <p class="text-italic mb-0">Any peculiarities to do with ownership?  Freehold/easements/access, etc.</p>
+        </div>
+    </div>
 
-<p>Tenure:<br>
-    <select key="data.household.2a_tenure">
-        <option value="owner-occupied">Owner occupied</option>
-        <option value="private-tenant">Private tenant</option>
-        <option value="shared-ownership">Shared ownership</option>
-        <option value="tenant-social-housing">Tenant (social housing)</option>
-    </select>
-</p>
+    <div class="d-flex mb-15">
+        <div class="form-row w-50 mr-15" style="align-items: flex-start;">
+            <label class='form-row-label mt-15'>How many occupants:</label>
+            <div class="form-row-control">
+                <table class="table mb-0 table--vertical-middle" style="width: 240px">
+                    <tr>
+                        <td style="border-top: none" width="1" class="text-left">Children</td>
+                        <td style="border-top: none" width="1" class="text-right">under 5</td>
+                        <td style="border-top: none" class="text-right" width="1"><input type="text" key="data.household.occupants_under5" class="input--num" ></td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">Children</td>
+                        <td class="text-right">5 – 17</td>
+                        <td class="text-right" width="1"><input type="text" key="data.household.occupants_5to17" class="input--num"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">Adults</td>
+                        <td class="text-right">18 – 65</td>
+                        <td class="text-right" width="1"><input type="text" key="data.household.occupants_18to65" class="input--num"></td>
+                    </tr>
+                    <tr>
+                        <td class="text-left">Adults</td>
+                        <td class="text-right">over 65</td>
+                        <td class="text-right" width="1"><input type="text" key="data.household.occupants_over65" class="input--num"></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes:</div>
+            <textarea key="data.household.occupants_note" class="textarea--100 mb-7 mt-7"></textarea>
+            <p class="text-italic mb-0">Any non-straightforward patterns?  Occasional/regular lodgers or returning adult children, etc.</p>
+        </div>
+    </div>
 
-<p>Length of occupancy:<br>
-    <select key="data.household.2a_lengthofoccupancy">
-        <option>Just moved in</option>
-        <option>Less than 12 months</option>
-        <option>1-2 years</option>
-        <option>2+ years</option>
-    </select>
-</p>
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <label for="occupants_pets">Do you have any pets?</label>
+            <textarea key="data.household.occupants_pets" id="occupants_pets" class="textarea--100 mb-0"></textarea>
+            <p class="text-italic mb-30">Anything that would affect energy use?  Windows left open for cats, etc.</p>
+        </div>
+    </div>
 
-<p><b>2b People and pets</b></p>
+    <div class="d-flex">
+        <div class="w-50 mr-15">
+            <label for="health">Do you have any health conditions that could be caused or affected by living in a cold or damp home?</label>
+            <textarea key="data.household.health" id="health" class="textarea--100 mb-0"></textarea>
+            <p class="text-italic mb-30">Make clear they don't have to answer this if they don't want to.  Check on asthma, cold, arthritis, etc.<br>
+            When planning scenarios note that disruption may be a big issue for some people with health conditions.</p>
+        </div>
+    </div>
+</section>
 
-<p>Number of adults 18-65<br>
-    <input type="text" value="" key="data.household.2b_adults18to65" style="width:150px" /></p>
-<p>Number of adults 65+<br>
-    <input type="text" value="" key="data.household.2b_adults65plus" style="width:150px" /></p>
-<p>Number of children <5<br>
-    <input type="text" value="" key="data.household.2b_childrenlessthan5" style="width:150px" /></p>
-<p>Number of children 5-17<br>
-    <input type="text" value="" key="data.household.2b_children5to17" style="width:150px" /></p>
-<br>
-<p>Do you have any pets?<br>
-    <input type="text" value="" key="data.household.2b_pets" style="width:150px" /></p>
-<br>
-<p>Do you have any health conditions that could be caused or affected by living in a cold or damp home? If so, please describe and note who this affects.<br>
-    <input type="text" value="" key="data.household.2b_health" style="width:150px" /></p>
+<section class="line-top mb-45">
+    <h3 class="mt-0">1 Your aims</h3>
+
+    <p class="text-italic mb-30">Explain to the householder that it is important for us to understand their aims and priorities so we can tailor our recommendations to suit.  So we'd like them to tell us about why they're investigating energy efficiency works for their home.</p>
+
+    <h4>1.1 Your Plans</h4>
+
+    <p>How long have you lived here?</p>
+
+    <div class="mb-30">
+        <label class="radio d-flex mb-7" for="occupancy_actual_1">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_1"
+                    name="occupancy_actual"
+                    value="0">
+            Not yet moved in
+        </label>
+        <label class="radio d-flex mb-7" for="occupancy_actual_2">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_2"
+                    name="occupancy_actual"
+                    value="1Y">
+            Less than 12 months
+        </label>
+        <label class="radio d-flex mb-7" for="occupancy_actual_3">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_3"
+                    name="occupancy_actual"
+                    value="2Y">
+            1-2 years
+        </label>
+        <label class="radio d-flex mb-7" for="occupancy_actual_4">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_4"
+                    name="occupancy_actual"
+                    value="5Y">
+            2-5 years
+        </label>
+        <label class="radio d-flex mb-7" for="occupancy_actual_5">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_5"
+                    name="occupancy_actual"
+                    value="10Y">
+            5-10 years
+        </label>
+        <label class="radio d-flex mb-7" for="occupancy_actual_6">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_6"
+                    name="occupancy_actual"
+                    value="20Y">
+            10-20 years
+        </label>
+        <label class="radio d-flex mb-7" for="occupancy_actual_7">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.occupancy_actual"
+                    id="occupancy_actual_7"
+                    name="occupancy_actual"
+                    value="20+Y">
+            more than 20 years
+        </label>
+    </div>
+
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <p>How long do you see yourself living here?</p>
+
+            <div class="mb-15">
+                <label class="radio d-flex mb-7" for="occupancy_expected_1">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.occupancy_expected"
+                            id="occupancy_expected_1"
+                            name="occupancy_expected"
+                            value="LONG">
+                    long term (10 years+)
+                </label>
+
+                <label class="radio d-flex mb-7" for="occupancy_expected_2">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.occupancy_expected"
+                            id="occupancy_expected_2"
+                            name="occupancy_expected"
+                            value="MED">
+                    medium term (5-10 years)
+                </label>
+
+                <label class="radio d-flex mb-7" for="occupancy_expected_3">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.occupancy_expected"
+                            id="occupancy_expected_3"
+                            name="occupancy_expected"
+                            value="SHORT">
+                    short term (less than 5 years)
+                </label>
+            </div>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes:</div>
+            <textarea key="data.household.occupancy_expected_note" class="textarea--100 mb-7 mt-7"></textarea>
+        </div>
+    </div>
+
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <p>Do you envisage any changes in your lifestyle/household? (e.g. working from home, children/other family members)</p>
+
+            <label class="radio d-flex mb-7" for="expected_lifestyle_change_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_lifestyle_change"
+                        id="expected_lifestyle_change_1"
+                        name="expected_lifestyle_change"
+                        value="NO">
+                No
+            </label>
+
+            <label class="radio d-flex mb-7" for="expected_lifestyle_change_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_lifestyle_change"
+                        id="expected_lifestyle_change_2"
+                        name="expected_lifestyle_change"
+                        value="YES">
+                Yes
+            </label>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes:</div>
+            <textarea key="data.household.expected_lifestyle_change_note" class="textarea--100 mb-0 mt-7"></textarea>
+            <p class="text-italic mb-0">This could be starting to work from home, new children, returning children, etc.</p>
+        </div>
+    </div>
+
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <p>Are you planning other building works in your home?</p>
+
+            <label class="radio d-flex mb-7" for="expected_other_works_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_other_works"
+                        id="expected_other_works_1"
+                        name="expected_other_works"
+                        value="NO">
+                No
+            </label>
+
+            <label class="radio d-flex mb-7" for="expected_other_works_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_other_works"
+                        id="expected_other_works_2"
+                        name="expected_other_works"
+                        value="YES">
+                Yes
+            </label>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes:</div>
+            <textarea key="data.household.expected_other_works_note" class="textarea--100 mb-0 mt-7"></textarea>
+            <p class="text-italic mb-0">This could include loft converstion, extension, "knocking through", etc.</p>
+        </div>
+    </div>
+
+    <div class="d-flex mb-30">
+        <div class="w-50 mr-15">
+            <p>How soon do you hope to start retrofit work on your home?</p>
+
+            <label class="radio d-flex mb-7" for="expected_start_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_start"
+                        id="expected_start_1"
+                        name="expected_start"
+                        value="3_MONTH">
+                3 months
+            </label>
+
+            <label class="radio d-flex mb-7" for="expected_start_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_start"
+                        id="expected_start_2"
+                        name="expected_start"
+                        value="6_MONTH">
+                3–6 months
+            </label>
+
+            <label class="radio d-flex mb-7" for="expected_start_3">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_start"
+                        id="expected_start_3"
+                        name="expected_start"
+                        value="24_MONTH">
+                12–24 months
+            </label>
+
+            <label class="radio d-flex mb-7" for="expected_start_4">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.expected_start"
+                        id="expected_start_4"
+                        name="expected_start"
+                        value="5_YEAR">
+                2–5 years
+            </label>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes:</div>
+            <textarea key="data.household.expected_start_note" class="textarea--100 mb-0 mt-7"></textarea>
+            <p class="text-italic mb-0">Include notes on specific deadlines here</p>
+        </div>
+    </div>
+
+    <h4>1.2 Priorities</h4>
+
+    <div class="d-flex mb-30">
+        <div class="w-50 mr-15">
+            <p>What are your priorities?</p>
+            <p class="text-italic">Enter numbers 1, 2, 3.  You can also use 1, 2, 2 if equal.</p>
+
+            <table class="table table--vertical-middle mb-0" style="width: 20rem">
+                <tr>
+                    <td style="border-top: none" width="1"><input key="data.household.priority_carbon" type="text" class="input--num"></td>
+                    <td style="border-top: none">Save carbon</td>
+                </tr>
+                <tr>
+                    <td><input key="data.household.priority_money" type="text" class="input--num"></td>
+                    <td>Save money</td>
+                </tr>
+                <tr>
+                    <td><input key="data.household.priority_comfort" type="text" class="input--num"></td>
+                    <td>Improve comfort</td>
+                </tr>
+                <tr>
+                    <td><input key="data.household.priority_airquality" type="text" class="input--num"></td>
+                    <td>Improve indoor air quality</td>
+                </tr>
+                <tr>
+                    <td><input key="data.household.priority_modernisation" type="text" class="input--num"></td>
+                    <td>General modernisation</td>
+                </tr>
+                <tr>
+                    <td><input key="data.household.priority_health" type="text" class="input--num"></td>
+                    <td>Improve health</td>
+                </tr>
+            </table>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes: key qualitative criteria</div>
+            <textarea key="data.household.priority_qualitative_note" class="textarea--100 mb-7 mt-7" style="height: 10em !important"></textarea>
+            <p class="text-italic mb-0">This could include - using only local or natural materials, focussing on high-performance/high-tech solutions, focussing on low toxicity/health improving materials, focusing on low maintenance materials – or a "pragmatic" approach that includes all of the above.</p>
+        </div>
+    </div>
+
+    <div class="d-flex mb-30">
+        <div class="w-50 mr-15">
+            <p class="mb-15">Would you mind changing the aesthetics of your home...</p>
+
+            <div class="form-row">
+                <span class="form-row-label">Externally?</span>
+                <div class="form-row-control">
+                    <label class="d-ib mr-15" for="aesthetics_external_2">
+                        <input class="big-checkbox" id="aesthetics_external_2" name="aesthetics_external" type="radio" value="YES" key="data.household.aesthetics_external">
+                        Yes
+                    </label>
+                    <label class="d-ib mr-15" for="aesthetics_external_1">
+                        <input class="big-checkbox" id="aesthetics_external_1" name="aesthetics_external" type="radio" value="NO" key="data.household.aesthetics_external">
+                        No
+                    </label>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <span class="form-row-label">Internally?</span>
+                <div class="form-row-control">
+                    <label class="d-ib mr-15" for="aesthetics_internal_2">
+                        <input class="big-checkbox" id="aesthetics_internal_2" name="aesthetics_internal" type="radio" value="YES" key="data.household.aesthetics_internal">
+                        Yes
+                    </label>
+                    <label class="d-ib mr-15" for="aesthetics_internal_1">
+                        <input class="big-checkbox" id="aesthetics_internal_1" name="aesthetics_internal" type="radio" value="NO" key="data.household.aesthetics_internal">
+                        No
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <div style="margin-top: -7px">Assessor notes</div>
+            <textarea key="data.household.aesthetics_note" class="textarea--100 mb-7 mt-7"></textarea>
+            <p class="text-italic mb-0">
+                Any key features the householder isparticularly fond of.<br>
+                Any materials/measures they'd want to avoid.
+            </p>
+        </div>
+    </div>
+
+    <h4>1.3 Logistics</h4>
+
+    <div class="d-flex mb-30">
+        <div class="w-50 mr-15">
+            <div class="mb-15">
+                <p>Do you plan to do the work...</p>
+
+                <label class="radio d-flex mb-7" for="logistics_packaging_1">
+                    <input class="big-checkbox mr-7" id="logistics_packaging_1" name="logistics_packaging" type="radio" value="ONEGO" key="data.household.logistics_packaging">
+                    all in one go
+                </label>
+                <label class="radio d-flex mb-7" for="logistics_packaging_2">
+                    <input class="big-checkbox mr-7" id="logistics_packaging_2" name="logistics_packaging" type="radio" value="PHASES" key="data.household.logistics_packaging">
+                    in phases
+                </label>
+            </div>
+
+            <div>
+                <p>Are you willing to do some of the work yourself?</p>
+
+                <label class="radio d-flex mb-7" for="logistics_diy_1">
+                    <input class="big-checkbox mr-7" id="logistics_diy_1" name="logistics_diy" type="radio" value="YES" key="data.household.logistics_diy">
+                    yes
+                </label>
+                <label class="radio d-flex mb-7" for="logistics_diy_2">
+                    <input class="big-checkbox mr-7" id="logistics_diy_2" name="logistics_diy" type="radio" value="NO" key="data.household.logistics_diy">
+                     no
+                </label>
+            </div>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <label class="form-row-label" style="margin-top: -7px" for="logistics_diy_note">Assessor notes</label>
+            <textarea key="data.household.logistics_diy_note" id="logistics_diy_note" class="textarea--100"></textarea>
+            <p class="text-italic mb-0">Record here any issues to do with procurement/packaging of works</p>
+        </div>
+    </div>
+
+    <div class="d-flex mb-30">
+        <div class="w-50 mr-15">
+            <p>How much disruption would you be willing to live with?</p>
+
+            <label for="disruption_1">
+                <input class="big-checkbox mr-7" id="logistics_disruption_1" name="logistics_disruption" type="radio" value="0" key="data.household.logistics_disruption">
+                very minimal logistics_disruption
+            </label>
+            <label for="logistics_disruption_2">
+                <input class="big-checkbox mr-7" id="logistics_disruption_2" name="logistics_disruption" type="radio" value="1" key="data.household.logistics_disruption">
+                having to redecorate in some rooms
+            </label>
+            <label for="logistics_disruption_3">
+                <input class="big-checkbox mr-7" id="logistics_disruption_3" name="logistics_disruption" type="radio" value="2" key="data.household.logistics_disruption">
+                complete strip out and redecoration
+            </label>
+            <label for="logistics_disruption_4">
+                <input class="big-checkbox mr-7" id="logistics_disruption_4" name="logistics_disruption" type="radio" value="3" key="data.household.logistics_disruption">
+                moving out for a few days
+            </label>
+            <label for="logistics_disruption_4">
+                <input class="big-checkbox mr-7" id="logistics_disruption_4" name="logistics_disruption" type="radio" value="4" key="data.household.logistics_disruption">
+                moving out for several months
+            </label>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <label class="form-row-label" style="margin-top: -7px" for="logistics_disruption_note">Assessor notes</label>
+            <textarea key="data.household.logistics_disruption_note" id="logistics_disruption_note" class="textarea--100"></textarea>
+            <p class="text-italic mb-0">Any areas where disruption should be avoided, or vulnerable residents that need to be considered in planning?</p>
+        </div>
+    </div>
+
+    <div class="d-flex">
+        <div class="w-50 mr-15">
+            <p>Do you have a budget in mind?</p>
+
+            <label for="logistics_budget_1">
+                <input class="big-checkbox mr-7" id="logistics_budget_1" name="budget" type="radio" value="YES" key="data.household.logistics_budget">
+                yes
+            </label>
+            <label for="logistics_budget_2" class="mb-15">
+                <input class="big-checkbox mr-7" id="logistics_budget_2" name="budget" type="radio" value="NO" key="data.household.logistics_budget">
+                I will work out a budget after understanding what's possible
+            </label>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <label class="form-row-label" style="margin-top: -7px" for="logistics_budget_note">Assessor notes</label>
+            <textarea key="data.household.logistics_budget_note" id="logistics_budget_note" class="textarea--100"></textarea>
+            <p class="text-italic mb-0">Can include budget figure here or specific thoughts/comments</p>
+        </div>
+    </div>
+</section>
+
+<section class="line-top mb-45">
+    <h3 class="mt-0">2 Your Home Now</h3>
+    <h4>2.1 General property information</h4>
+
+    <div class="d-flex mt-15">
+        <div class="w-50 mr-15 form-row">
+            <span class='form-row-label'>House type:</span>
+            <div class="form-row-control">
+                <label class="radio d-flex mb-7" for="house_type_1">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.house_type"
+                            id="house_type_1"
+                            name="house_type"
+                            value="MIDTERRACE">
+                    Mid-terrace
+                </label>
+
+                <label class="radio d-flex mb-7" for="house_type_2">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.house_type"
+                            id="house_type_2"
+                            name="house_type"
+                            value="SEMIDETACHED">
+                    Semi-detached or end terrace
+                </label>
 
 
-<hr>
-<h3>3 Heating, hot water and ventilation</h3>
-<hr>
-<br>
-<p><b>3a Heating</b></p>
-
-<p>Do you completely switch off your space heating over summer? 
-    <select key="data.household.3a_heatingoffsummer" style="margin-left:20px;width:75px">
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-    </select>
-</p>
-
-<table class="table">
-    <tr><td>
-            <p>Room thermostat temperature setting<br>
-                <input type="text" value="" key="data.household.3a_roomthermostat" style="width:100px" /></p>
-        </td><td>
-            <p>How do you use your room thermostat?<br>
-                <input type="text" value="" key="data.household.3a_roomthermostatcomment" style="width:300px" /></p>
-        </td></tr>
-</table>
-
-<table class="table">
-    <tr>
-        <th>Controller</th>
-        <th>Used</th>
-        <th>Comment</th>
-    </tr>
-    <tr>
-        <td>Thermostatic Radiator Valves (TRVs)</td>
-        <td><input key="data.household.3a_TRVs" type="checkbox" /></td>
-        <td><input key="data.household.3a_TRVs_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Programmer</td>
-        <td><input key="data.household.3a_programmer" type="checkbox" /></td>
-        <td><input key="data.household.3a_programmer_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Timer</td>
-        <td><input key="data.household.3a_timer" type="checkbox" /></td>
-        <td><input key="data.household.3a_timer_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Cylinder thermostat</td>
-        <td><input key="data.household.3a_cylinderthermostat" type="checkbox" /></td>
-        <td><input key="data.household.3a_cylinderthermostat_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Zone control</td>
-        <td><input key="data.household.3a_zonecontrol" type="checkbox" /></td>
-        <td><input key="data.household.3a_zonecontrol_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Boiler energy manager</td>
-        <td><input key="data.household.3a_boilerenergymanager" type="checkbox" /></td>
-        <td><input key="data.household.3a_boilerenergymanager_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Intelligent thermostats (e.g. NEST)</td>
-        <td><input key="data.household.3a_intelligentthermostats" type="checkbox" /></td>
-        <td><input key="data.household.3a_intelligentthermostats_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Remote control (e.g. HIVE)</td>
-        <td><input key="data.household.3a_remotecontrol" type="checkbox" /></td>
-        <td><input key="data.household.3a_remotecontrol_comment" type="text" /></td>
-    </tr>
-</table>
-
-<p>Heating hours: week day</p>
-<table class="table">
-    <tr>
-        <td width="500px">Period 1</td>
-        <td width="250px">On at <input class="hours-off" key="data.household.3a_heatinghours_weekday_on1_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekday_on1_mins" type="number" min="0" max="59" style="width:45px"/> min </td>
-        <td>Off at <input class="hours-off" key="data.household.3a_heatinghours_weekday_off1_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekday_off1_mins" type="number" min="0" max="59" style="width:45px"/> min</td>
-    </tr>
-    <tr>
-        <td>Period 2</td>
-        <td>On at <input class="hours-off" key="data.household.3a_heatinghours_weekday_on2_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekday_on2_mins" type="number" min="0" max="59" style="width:45px"/> min </td>
-        <td>Off at <input class="hours-off" key="data.household.3a_heatinghours_weekday_off2_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekday_off2_mins" type="number" min="0" max="59" style="width:45px"/> min</td>
-    </tr>
-    <tr>
-        <td>Period 3</td>
-        <td>On at <input class="hours-off" key="data.household.3a_heatinghours_weekday_on3_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekday_on3_mins" type="number" min="0" max="59" style="width:45px"/> min </td>
-        <td>Off at <input class="hours-off" key="data.household.3a_heatinghours_weekday_off3_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekday_off3_mins" type="number" min="0" max="59" style="width:45px"/> min</td>
-    </tr>
-</table>
-<p id="periods_heating_off_weekday" style="display:none; margin-bottom:25px;margin-left:8px"></p>
-
-<p>Heating hours: weekend day</p>
-<table class="table">
-    <tr>
-        <td width="500px">Period 1</td>
-        <td width="250px">On at <input class="hours-off" key="data.household.3a_heatinghours_weekend_on1_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekend_on1_mins" type="number" min="0" max="59" style="width:45px"/> min </td>
-        <td>Off at <input class="hours-off" key="data.household.3a_heatinghours_weekend_off1_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekend_off1_mins" type="number" min="0" max="59" style="width:45px"/> min</td>
-    </tr>
-    <tr>
-        <td>Period 2</td>
-        <td>On at <input class="hours-off" key="data.household.3a_heatinghours_weekend_on2_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekend_on2_mins" type="number" min="0" max="59" style="width:45px"/> min </td>
-        <td>Off at <input class="hours-off" key="data.household.3a_heatinghours_weekend_off2_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekend_off2_mins" type="number" min="0" max="59" style="width:45px"/> min</td>
-    </tr>
-    <tr>
-        <td>Period 3</td>
-        <td>On at <input class="hours-off" key="data.household.3a_heatinghours_weekend_on3_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekend_on3_mins" type="number" min="0" max="59" style="width:45px"/> min </td>
-        <td>Off at <input class="hours-off" key="data.household.3a_heatinghours_weekend_off3_hours" type="number" min="0" max="23" style="width:45px"/> h <input key="data.household.3a_heatinghours_weekend_off3_mins" type="number" min="0" max="59" style="width:45px"/> min</td>
-    </tr>
-</table>
-<p id="periods_heating_off_weekend" style="display:none; margin-bottom:25px;margin-left:8px"></p>
-
-<p>Rooms</p>
-<table class="table">
-    <tr>
-        <td width="44%">Number of habitable rooms not heated</td>
-        <td><input key="data.household.3a_habitable_rooms_not_heated" type="number" style="width:100px" min="0" /></td>
-    </tr>
-</table>
-
-<br>
-<p><b>3b Hot water</b></p>
+                <label class="radio d-flex mb-7" for="house_type_3">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.house_type"
+                            id="house_type_3"
+                            name="house_type"
+                            value="DETACHED">
+                    Detached
+                </label>
 
 
-<p><b>Shower</b></p>
-
-<table class="table">
-    <tr><td>Shower type:</td><td>
-            <select key="data.household.3b_showertype">
-                <option value="Unknown">Unknown</option>
-                <option value="Mixer direct">Mixer (direct)</option>
-                <option value="Electric">Electric</option>
-                <option value="Pumpedpower direct">Pumped/power (direct)</option>
-                <option value="Pumpedpower electric">Pumped/power (electric)</option>
-            </select></td></tr>
-
-    <tr><td>If electric, shower rating (kW):</td><td>
-            <input type="number" value="" key="data.household.3b_showerrating"  /></td></tr>
-
-    <tr><td>Frequency of use per day:</td><td>
-            <input type="number" value="" key="data.household.3b_shower_frequency"  /></td></tr>
-
-    <tr><td>Flow rate if known (litres/min):</td><td>
-            <input type="number" value="" key="data.household.3b_shower_flowrate"  /></td></tr>
+                <label class="radio d-flex mb-7" for="house_type_4">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.house_type"
+                            id="house_type_4"
+                            name="house_type"
+                            value="FLAT_CONVERSION">
+                    Flat (conversion)
+                </label>
 
 
-    <tr><td>Bath, frequency of use (per day):</td><td>
-            <input type="number" value="" key="data.household.3b_bath_frequency"  /></td></tr>
-</table>
+                <label class="radio d-flex mb-7" for="house_type_5">
+                    <input type="radio" class="mr-7 big-checkbox"
+                            key="data.household.house_type"
+                            id="house_type_5"
+                            name="house_type"
+                            value="FLAT_PURPOSE">
+                    Flat (purpose built)
+                </label>
+            </div>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <label class="form-row-label" style="margin-top: -7px" for="house_type_note">Assessor notes</label>
+            <textarea key="data.household.house_type_note" id="house_type_note" class="textarea--100"></textarea>
+            <p class="text-italic mb-0">Any peculiarities?</p>
+        </div>
+    </div>
 
-<div id='more-showers'><p><b>Extra showers</b></p></div>
-<p style='margin:0 15px 35px; vertical-align: middle'><button id='add-shower'>Add shower</button></p>
+    <div class="form-row mb-30">
+        <label class='form-row-label'>Number of bedrooms:</label>
+        <div class="form-row-control">
+            <input type="text" key="data.household.house_nr_bedrooms" class="input--num">
+        </div>
+    </div>
 
-<p><b>Taps:</b></p>
-<table class="table">
-    <tr><td></td><td>Number</td><td>Type</td></tr>
-    <tr>
-        <td>Kitchen</td>
-        <td><input type="number" value="" key="data.household.3b_kitchen_taps_num" style="width:100px" /></td>
-        <td><select key="data.household.3b_kitchen_taps_type">
-                <option>No energy saving feature</option>
-                <option>Low flow/spray</option>
-                <option>Retrofitted flow restrictor</option>
-            </select></td>
-    </tr>
-    <tr>
-        <td>Utility room</td>
-        <td><input type="number" value="" key="data.household.3b_utility_room_taps_num" style="width:100px" /></td>
-        <td><select key="data.household.3b_utility_room_taps_type">
-                <option>No energy saving feature</option>
-                <option>Low flow/spray</option>
-                <option>Retrofitted flow restrictor</option>
-            </select></td>
-    </tr>
-    <tr>
-        <td>Bathroom 1</td>
-        <td><input type="number" value="" key="data.household.3b_bathroom_1_taps_num" style="width:100px" /></td>
-        <td><select key="data.household.3b_bathroom_1_taps_type">
-                <option>No energy saving feature</option>
-                <option>Low flow/spray</option>
-                <option>Retrofitted flow restrictor</option>
-            </select></td>
-    </tr>
-    <tr>
-        <td>Bathroom 2</td>
-        <td><input type="number" value="" key="data.household.3b_bathroom_2_taps_num" style="width:100px" /></td>
-        <td><select key="data.household.3b_bathroom_2_taps_type">
-                <option>No energy saving feature</option>
-                <option>Low flow/spray</option>
-                <option>Retrofitted flow restrictor</option>
-            </select></td>
-    </tr>
-</table>
+    <div class="bg-assessor pa-15 mb-30">
+        <h4 class="mt-0">2.1.1 General construction</h4>
+        <p>Provide a one-line description of each element, plus any issues noticed during the survey.</p>
 
-<p><b>3c Ventilation</b></p>
+        <div class="form-row">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_floors">Floors</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_floors" key="data.household.construct_note_floors" style="width: 90% !important">
+            </div>
+        </div>
 
-<table class="table">
-    <tr>
-        <td>Trickle vents</td>
-        <td><input key="data.household.3c_trickle_vents" type="checkbox" /></td>
-        <td><input key="data.household.3c_trickle_vents_comment" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Intake vents</td>
-        <td><input key="data.household.3c_intake_vents" type="checkbox" /></td>
-        <td><input key="data.household.3c_intake_vents_comment" type="text" /></td>
-    </tr> 
-    <tr>
-        <td>Extract vents</td>
-        <td><input key="data.household.3c_extract_vents" type="checkbox" /></td>
-        <td><input key="data.household.3c_extract_vents_comment" type="text" /></td>
-    </tr>
-</table>
+        <div class="form-row">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_walls">Walls</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_walls" key="data.household.construct_note_walls" style="width: 90% !important">
+            </div>
+        </div>
 
-<p>Are air bricks clear from obstructions?<br>
-    <input type="text" value="" key="data.household.3c_airbricks_comment" style="width:300px" /></p>
+        <div class="form-row">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_roof">Roof</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_roof" key="data.household.construct_note_roof" style="width: 90% !important">
+            </div>
+        </div>
 
-<p><b>Temperature and Humidity spot readings:</b></p>
+        <div class="form-row">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_openings">Windows and doors</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_openings" key="data.household.construct_note_openings" style="width: 90% !important">
+            </div>
+        </div>
 
-<table class="table">
-    <tr>
-        <td></td>
-        <td>Temperature</td>
-        <td>Humidity</td>
-    </tr>
-    <tr>
-        <td>Reading 1</td>
-        <td><input key="data.household.reading_temp1" type="text" /></td>
-        <td><input key="data.household.reading_humidity1" type="text" /></td>
-    </tr>
-    <tr>
-        <td>Reading 2</td>
-        <td><input key="data.household.reading_temp2" type="text" /></td>
-        <td><input key="data.household.reading_humidity2" type="text" /></td>
-    </tr> 
-</table>
+        <div class="form-row">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_drainage">Rainwater and drainage goods</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_drainage" key="data.household.construct_note_drainage" style="width: 90% !important">
+            </div>
+        </div>
 
+        <div class="form-row">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_ventiliation">Construction ventilation</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_ventiliation" key="data.household.construct_note_ventiliation" style="width: 90% !important">
+            </div>
+        </div>
 
-<hr>
-<h3>4 Appliances, cooking and laundry</h3>
-<hr>
-<br>
-<p><b>4a Kitchen appliances and cooking (section removed, use <i>Lighting, Appliances & Cooking</i>)</b></p>
+        <div class="form-row mb-0">
+            <label style="width: 18rem" class="form-row-label" for="construct_note_ingress">Any evidence of water ingress or leaks?</label>
+            <div class="form-row-control">
+                <input type="text" id="construct_note_ingress" key="data.household.construct_note_ingress" style="width: 90% !important">
+            </div>
+        </div>
+    </div>
 
-<!--<table class="table">
-    <tr><th></th><th>Number</th><th>A+?</th></tr>
-    <tr><th>Dishwasher</th><td></td><td></td></tr>
-    <tr>
-        <td>Cold feed</td>
-        <td><input type="text" key="data.household.4a_dishwasher_coldfeed_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4a_dishwasher_coldfeed_Aplus"/></td>
-    </tr>
-    <tr>
-        <td>Hot feed</td>
-        <td><input type="text" key="data.household.4a_dishwasher_hotfeed_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4a_dishwasher_hotfeed_Aplus"/></td>
-    </tr>
-    <tr><th>Cold food storage</th><td></td><td></td></tr>
-    <tr>
-        <td>Fridge/freezer</td>
-        <td><input type="text" key="data.household.4a_fridgefreezer_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4a_fridgefreezer_Aplus"/></td>
-    </tr>
-    <tr>
-        <td>Fridge</td>
-        <td><input type="text" key="data.household.4a_fridge_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4a_fridge_Aplus"/></td>
-    </tr>
-    <tr>
-        <td>Freezer - upright</td>
-        <td><input type="text" key="data.household.4a_freezer_upright_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4a_freezer_upright_Aplus"/></td>
-    </tr>
-    <tr>
-        <td>Freezer - chest</td>
-        <td><input type="text" key="data.household.4a_freezer_chest_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4a_freezer_chest_Aplus"/></td>
-    </tr>
-    <tr>
-        <td>Larder/pantry</td>
-        <td><input type="text" key="data.household.4a_larder/pantry_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr><th>Cooking</th><td></td><td></td></tr>
-    <tr>
-        <td>Gas hob, gas oven</td>
-        <td><input type="text" key="data.household.4a_gashobgasoven_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Gas hob, electric oven</td>
-        <td><input type="text" key="data.household.4a_gashobelecoven_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Electric hob (standard), electric oven</td>
-        <td><input type="text" key="data.household.4a_elechobelecoven_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Electric hob (induction), electric oven</td>
-        <td><input type="text" key="data.household.4a_elechobinductionelecoven_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Electric range/aga (hot all year)</td>
-        <td><input type="text" key="data.household.4a_electricrange_allyear_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Electric range/aga (hot in winter)</td>
-        <td><input type="text" key="data.household.4a_electricrange_winter_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Gas/oil range/aga (hot all year)</td>
-        <td><input type="text" key="data.household.4a_gasoilrange_winter_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Gas/oil range/aga (hot in winter)</td>
-        <td><input type="text" key="data.household.4a_gasoilrange_allyear_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Microwave</td>
-        <td><input type="text" key="data.household.4a_microwave_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Slow cooker<td>
-        <td><input type="text" key="data.household.4a_slowcooker_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr><th>Cooking</th><td></td><td></td></tr>
-    <tr>
-        <td>Electric</td>
-        <td><input type="text" key="data.household.4a_kettle_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Gas on hob</td>
-        <td><input type="text" key="data.household.4a_kettle_gas_hob_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Electric on hob</td>
-        <td><input type="text" key="data.household.4a_kettle_electric_hob_num" style="width:100px" /></td>
-        <td></td>
-    </tr>
-</table>
--->
+    <h4>2.1.2 Works already undertaken</h4>
 
-<p><b>4b Laundry</b></p>
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <label for="previous_works">What has already been done, by you or previous residents?</p>
+            <textarea key="data.household.previous_works" id="previous_works" class="textarea--100 mb-0" style="height: 8rem;">A suitably ugly cat</textarea>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            Check for:
+            <ul>
+                <li>Windows + doors</li>
+                <li>Loft insulation</li>
+                <li>Floor insulation</li>
+                <li>Cavity/internal wall insulation</li>
+                <li>Heating system/boilers</li>
+                <li>Renewable generation</li>
+            </ul>
+        </div>
+    </div>
 
-<table class="table">
-    <tr><th></th><th>Number</th><th></th></tr>
-    <!--<tr><th>Clothes washing</th><td></td><td></td></tr>
+    <h4>2.1.3 Structural issues</h4>
 
-    <tr>
-        <td>Cold feed</td>
-        <td><input type="text" key="data.household.4b_washingmachine_cold_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4b_washingmachine_cold_Aplus"/></td>
-    </tr>
-    <tr>
-        <td>Hot feed</td>
-        <td><input type="text" key="data.household.4b_washingmachine_hot_num" style="width:100px" /></td>
-        <td><input type="checkbox" key="data.household.4b_washingmachine_hot_Aplus"/></td>
-    </tr>
-    -->
+    <div class="d-flex">
+        <div class="w-50 mr-15">
+            <p>Are there any past, current or potential structural issues in your home?  (location, status, severity)</p>
 
-    <tr><th>Clothes drying (Note fraction used)</th><td></td><td></td></tr>
-    <tr>
-        <td>Outdoor clothes line</td>
-        <td><input type="text" key="data.household.4b_drying_outdoorline" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Indoor clothes racks</td>
-        <td><input type="text" key="data.household.4b_drying_indoorrack" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Airing cupboard</td>
-        <td><input type="text" key="data.household.4b_drying_airingcupboard" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Tumble dryer</td>
-        <td><input type="text" key="data.household.4b_drying_tumbledryer" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Washer/dryer</td>
-        <td><input type="text" key="data.household.4b_drying_washerdryer" style="width:100px" /></td>
-        <td></td>
-    </tr>    
-    <tr>
-        <td>Radiators</td>
-        <td><input type="text" key="data.household.4b_drying_radiators" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <tr>
-        <td>Electric drying maiden</td>
-        <td><input type="text" key="data.household.4b_drying_electricmaiden" style="width:100px" /></td>
-        <td></td>
-    </tr>
-    <!--
-        <tr><th>TV</th><td></td><td></td></tr>
+            <textarea key="data.household.structural_issues" class="mb-30 textarea--100"></textarea>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <label class="form-row-label" style="margin-top: -7px" for="structural_issues_note">Assessor notes</label>
+            <textarea key="data.household.structural_issues_note" id="structural_issues_note" class="textarea--100 mb-0"></textarea>
+            <p class="text-italic mb-0">check for cracks, shifting/leaning walls, etc.</p>
+        </div>
+    </div>
+
+    <h4>2.1.4 Damp, condensation or mould</h4>
+
+    <div class="d-flex">
+        <div class="w-50 mr-15">
+            <p>Is there any damp, condensation or mould in your home?</p>
+
+            <textarea key="data.household.damp" class="mb-30 textarea--100"></textarea>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <label class="form-row-label" style="margin-top: -7px" for="damp_note">Assessor notes</label>
+            <textarea key="data.household.damp_note" id="damp_note" class="textarea--100 mb-0"></textarea>
+            <p class="text-italic mb-0">check for cracks, shifting/leaning walls, etc.</p>
+        </div>
+    </div>
+
+    <h4>2.1.5 Heating and hot water services</h4>
+
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <p>Your space heating is currently provided by...</p>
+            <textarea key="data.household.space_heating_provided" class="textarea--100"></textarea>
+
+            <p>which you control by...</p>
+            <textarea key="data.household.space_heating_controls" class="textarea--100 mb-30"></textarea>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <ul>
+                <li>Check whether multiple systems in place</li>
+                <li>Ask about controls and how they are used</li>
+                <li>Check whether they have and use:
+                    <ul>
+                        <li>programmer</li>
+                        <li>timer</li>
+                        <li>TRVs</li>
+                        <li>zoning</li>
+                        <li>intelligent thermostat</li>
+                        <li>etc.</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="mb-30">
+        <p>Do you completely switch off your space heating over summer?</p>
+
+        <label class="radio d-flex mb-7" for="heating_off_summer_1">
+            <input class="big-checkbox mr-7" id="heating_off_summer_1" name="heating_off_summer" type="radio" value="YES" key="data.household.heating_off_summer">
+            yes
+        </label>
+        <label class="radio d-flex mb-7" for="heating_off_summer_2">
+            <input class="big-checkbox mr-7" id="heating_off_summer_2" name="heating_off_summer" type="radio" value="NO" key="data.household.heating_off_summer">
+             no
+        </label>
+    </div>
+
+    <p>If you have a room thermostat, what temperature is it normally set at in winter?</p>
+    <div class="d-flex align-items-center mb-30">
+        <input type="text" key="data.household.heating_thermostat" class="input--num"> <span class="input--num">°C</span>
+    </div>
+
+    <p>Your normal heating hours on a <b>weekday</b> in winter are:</p>
+    <table class="table table-striped" style="width: 24rem">
         <tr>
-            <td>LED / LCD</td>
-            <td><input type="text" key="data.household.4b_tvledlcd_num" style="width:100px" /></td>
-            <td></td>
+            <th></th>
+            <th>On</th>
+            <th>Off</th>
         </tr>
         <tr>
-            <td>CRT</td>
-            <td><input type="text" key="data.household.4b_crt_num" style="width:100px" /></td>
-            <td></td>
+            <td>Period 1</td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekday_on1_hours" type="number" min="0" max="23" style="width:45px"/> : <input  class="mb-0" key="data.household.heating_weekday_on1_mins" type="number" min="0" max="59" style="width:45px"/></td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekday_off1_hours" type="number" min="0" max="23" style="width:45px"/> : <input class="mb-0"  key="data.household.heating_weekday_off1_mins" type="number" min="0" max="59" style="width:45px"/></td>
         </tr>
         <tr>
-            <td>Plasma</td>
-            <td><input type="text" key="data.household.4b_plasma_num" style="width:100px" /></td>
-            <td></td>
-        </tr>
-        <tr><th>Computers</th><td></td><td></td></tr>
-        <tr>
-            <td>Desktop</td>
-            <td><input type="text" key="data.household.4b_desktops_num" style="width:100px" /></td>
-            <td></td>
+            <td>Period 2</td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekday_on2_hours" type="number" min="0" max="23" style="width:45px"/> : <input  class="mb-0" key="data.household.heating_weekday_on2_mins" type="number" min="0" max="59" style="width:45px"/></td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekday_off2_hours" type="number" min="0" max="23" style="width:45px"/> : <input class="mb-0"  key="data.household.heating_weekday_off2_mins" type="number" min="0" max="59" style="width:45px"/></td>
         </tr>
         <tr>
-            <td>Laptop</td>
-            <td><input type="text" key="data.household.4b_laptops_num" style="width:100px" /></td>
-            <td></td>
-        </tr>-->
-</table>
+            <td>Period 3</td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekday_on3_hours" type="number" min="0" max="23" style="width:45px"/> : <input  class="mb-0" key="data.household.heating_weekday_on3_mins" type="number" min="0" max="59" style="width:45px"/></td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekday_off3_hours" type="number" min="0" max="23" style="width:45px"/> : <input class="mb-0"  key="data.household.heating_weekday_off3_mins" type="number" min="0" max="59" style="width:45px"/></td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-right">
+                Periods heating off week day: <span id="periods_heating_off_weekday"></p>
+            </td>
+        </tr>
+    </table>
 
-<!--
-<p>Computer peripherals<br>
-    <input type="text" value="" key="data.household.4b_computer_peripherals" style="width:300px" /></p>
+    <p>Your normal heating hours on a <b>weekend</b> in winter are:</p>
+    <table class="table table-striped mb-30" style="width: 24rem">
+        <tr>
+            <th></th>
+            <th>On</th>
+            <th>Off</th>
+        </tr>
+        <tr>
+            <td>Period 1</td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekend_on1_hours" type="number" min="0" max="23" style="width:45px"/> : <input  class="mb-0" key="data.household.heating_weekend_on1_mins" type="number" min="0" max="59" style="width:45px"/></td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekend_off1_hours" type="number" min="0" max="23" style="width:45px"/> : <input class="mb-0"  key="data.household.heating_weekend_off1_mins" type="number" min="0" max="59" style="width:45px"/></td>
+        </tr>
+        <tr>
+            <td>Period 2</td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekend_on2_hours" type="number" min="0" max="23" style="width:45px"/> : <input  class="mb-0" key="data.household.heating_weekend_on2_mins" type="number" min="0" max="59" style="width:45px"/></td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekend_off2_hours" type="number" min="0" max="23" style="width:45px"/> : <input class="mb-0"  key="data.household.heating_weekend_off2_mins" type="number" min="0" max="59" style="width:45px"/></td>
+        </tr>
+        <tr>
+            <td>Period 3</td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekend_on3_hours" type="number" min="0" max="23" style="width:45px"/> : <input  class="mb-0" key="data.household.heating_weekend_on3_mins" type="number" min="0" max="59" style="width:45px"/></td>
+            <td><input class="hours-off mb-0" key="data.household.heating_weekend_off3_hours" type="number" min="0" max="23" style="width:45px"/> : <input class="mb-0"  key="data.household.heating_weekend_off3_mins" type="number" min="0" max="59" style="width:45px"/></td>
+        </tr>
+        <tr>
+            <td colspan="3" class="text-right">
+                Periods heating off weekend: <span id="periods_heating_off_weekend"></p>
+            </td>
+        </tr>
+    </table>
 
-<p>Other (e.g. fish/reptile tanks, games consoles)<br>
-    <input type="text" value="" key="data.household.4b_appliances_other" style="width:300px" /></p>
-
-<p>Health/medical equipment (note if any require continuous power supply)<br>
-    <input type="text" value="" key="data.household.4b_appliances_health" style="width:300px" /></p>
--->
-
-<hr>
-<h3>5 Property condition</h3>
-<hr>
-<br>
-<p><b>5a Structural problems</b></p>
-
-<table class="table">
-    <tr>
-        <th></th>
-        <th>Location</th>
-        <th>Severity</th>
-        <th>How was it resolved?</th>
-    </tr>
-    <tr>
-        <td>Past structural problems</td>
-        <td><input type="text" value="" key="data.household.5a_past_location" style="width:150px"/></td>
-        <td><input type="text" value="" key="data.household.5a_past_severity" style="width:150px" /></td>
-        <td><input type="text" value="" key="data.household.5a_past_howresolved" style="width:150px" /></td>
-    </tr>
-    <tr>
-        <td>Current structural problems</td>
-        <td><input type="text" value="" key="data.household.5a_current_location" style="width:150px" /></td>
-        <td><input type="text" value="" key="data.household.5a_current_severity" style="width:150px" /></td>
-        <td><input type="text" value="" key="data.household.5a_current_howresolved" style="width:150px" /></td>
-    </tr>
-</table>
-
-<p><b>5b Have you or previous occupants made any improvements to your property?</b></p>
-
-<table class="table">
-
-    <tr><th></th><th>When</th></tr>
-    <tr><th>Loft conversion</th><th><input type="text" value="" key="data.household.5b_loftconversion" style="width:150px" /></th></tr>
-    <tr><th>Extension</th><th><input type="text" value="" key="data.household.5b_extension" style="width:150px" /></th></tr>
-    <tr><th>Insulation</th><th><input type="text" value="" key="data.household.5b_insulation" style="width:150px" /></th></tr>
-    <tr><th>Windows</th><th><input type="text" value="" key="data.household.5b_windows" style="width:150px" /></th></tr>
-    <tr><th>Heating and hot water system</th><th><input type="text" value="" key="data.household.5b_heatinghotwater" style="width:150px" /></th></tr>
-    <tr><th>Other</th><th><input type="text" value="" key="data.household.5b_other" style="width:150px" /></th></tr>
-</table>
-
-<p><b>5c Damp, condensation and mould</b></p>
-<table class="table">
-    <tr>
-        <th></th>
-        <th>Location</th>
-        <th>Severity</th>
-        <th>Duration</th>
-    </tr>
-    <tr>
-        <td>Damp</td>
-        <td><input type="text" value="" key="data.household.5c_damp_location" style="width:150px"/></td>
-        <td><input type="text" value="" key="data.household.5c_damp_severity" style="width:150px" /></td>
-        <td><input type="text" value="" key="data.household.5c_damp_duration" style="width:150px" /></td>
-    </tr>
-    <tr>
-        <td>Condensation </td>
-        <td><input type="text" value="" key="data.household.5c_condensation_location" style="width:150px"/></td>
-        <td><input type="text" value="" key="data.household.5c_condensation_severity" style="width:150px" /></td>
-        <td><input type="text" value="" key="data.household.5c_condensation_duration" style="width:150px" /></td>
-    </tr>
-    <tr>
-        <td>Mould</td>
-        <td><input type="text" value="" key="data.household.5c_mould_location" style="width:150px"/></td>
-        <td><input type="text" value="" key="data.household.5c_mould_severity" style="width:150px" /></td>
-        <td><input type="text" value="" key="data.household.5c_mould_duration" style="width:150px" /></td>
-    </tr>
-</table>
-
-<hr>
-<h3>6 Perceptions</h3>
-<hr>
-<br>
-<p><b>6a Thermal comfort</b></p>
-
-<table class="table">
-    <tr><th></th><th>Winter</th><th>Summer</th><th></th></tr>
-
-    <tr>
-        <td>Temperature</td>
-        <td><select key="data.household.6a_temperature_winter">
-                <option>Too cold</option>
-                <option>Just right</option>
-                <option>Too hot</option>
-            </select>
-        </td>
-        <td><select key="data.household.6a_temperature_summer">
-                <option>Too cold</option>
-                <option>Just right</option>
-                <option>Too hot</option>
-            </select>
-        </td>
-    </tr>
-
-    <tr>
-        <td>Air Quality</td>
-        <td><select key="data.household.6a_airquality_winter">
-                <option>Too dry</option>
-                <option>Just right</option>
-                <option>Too stuffy</option>
-            </select></td>
-        <td><select key="data.household.6a_airquality_summer">
-                <option>Too dry</option>
-                <option>Just right</option>
-                <option>Too stuffy</option>
-            </select></td>
-    </tr>
-
-    <tr>
-        <td>Draughts</td>
-        <td><select key="data.household.6a_draughts_winter">
-                <option>Too draughty</option>
-                <option>Just right</option>
-                <option>Too still</option>
-            </select></td>
-        <td><select key="data.household.6a_draughts_summer">
-                <option>Too draughty</option>
-                <option>Just right</option>
-                <option>Too still</option>
-            </select></td>
-    </tr>
-
-</table>
-
-<p>Any problem locations?<br>
-    <input type="text" value="" key="data.household.6a_problem_locations" style="width:400px" /></p>
-
-<p><b>6b Lighting</b></p>
-
-<table class="table">
-    <tr>
-        <td>Is the amount of daylight:</td>
-        <td><select key="data.household.6b_daylightamount">
-                <option>Too little</option>
-                <option>Just right</option>
-                <option>Too much</option>
-            </select></td>
-    </tr>
-    <tr>
-        <td>Is the amount of artificial light:</td>
-        <td><select key="data.household.6b_artificallightamount">
-                <option>Too little</option>
-                <option>Just right</option>
-                <option>Too much</option>
-            </select></td>
-    </tr>
-</table>
-
-<p>Any problem locations?<br>
-    <input type="text" value="" key="data.household.6b_problem_locations" style="width:400px" /></p>
-
-<p><b>6c Noise</b></p>
-
-<p>Any problems with noise from neighbours, between rooms or from outside?<br>
-    <input type="text" value="" key="data.household.6c_noise_comment" style="width:400px" /></p>
+    <p>
+        Are any habitable rooms in your home not heated?<br>
+        <i>List rooms not heated and sense-check during survey.</i>
+    </p>
+    <textarea key="data.household.heating_unheated_habitable" class="mb-30 textarea-sm"></textarea>
 
 
-<p><b>6d Loved and unloved rooms</b></p>
+    <p>
+        Your hot water is currently provided by...<br>
+        <i>State what generates hot water, and also wether any water efficient taps etc. are fitted.</i>
+    </p>
 
-<p>Are any rooms in your home unloved? Why?<br>
-    <input type="text" value="" key="data.household.6d_unloved_rooms" style="width:400px" /></p>
+    <p></p>
+    <textarea key="data.household.hot_water_provided" class="mb-30 textarea-sm"></textarea>
 
-<p>Do you have a favourite room? Why?<br>
-    <input type="text" value="" key="data.household.6d_favourite_room" style="width:400px" /></p>
+    <h4>2.1.6 Utilities</h4>
 
-<hr>
-<h3>7 Priorities</h3>
-<hr>
-<br>
-<p><b>7a Future plans</b></p>
+    <p>Does your home have a...</p>
 
-<p>How long do you see yourself living here?<br><select key="data.household.7a_occupancylength"><option>Short term, move out within the next 5 years</option><option>Long term, more than 10 years</option></select>
-    <input type="text" value="" key="data.household.7a_occupancylength_comment" style="width:400px" /></p>
+    <label class="checkbox">
+        <input class="big-checkbox mr-7" type="checkbox" key="data.household.mains_electricity">
+        mains electricity connection
+    </label>
+    <label class="checkbox">
+        <input class="big-checkbox mr-7" type="checkbox" key="data.household.mains_gas">
+        mains gas connection
+    </label>
+    <label class="checkbox">
+        <input class="big-checkbox mr-7" type="checkbox" key="data.household.mains_water">
+        mains water connection
+    </label>
+    <label class="checkbox mb-30">
+        <input class="big-checkbox mr-7" type="checkbox" key="data.household.mains_sewer">
+        mains sewer connection
+    </label>
 
-<p>Do you envisage any changes in your lifestyle/household? (e.g. working from home, children/other family members)<br><input type="text" value="" key="data.household.7a_lifestylechange_comment" style="width:400px" /></p>
+    <h4>2.2 Ventilation + Indoor air quality</h4>
 
-<p>Do you envisage extending your home/loft conversion?<br><input type="text" value="" key="data.household.7a_homeconversion_comment" style="width:400px" /></p>
+    <h4>2.2.1 Existing ventilation system</h4>
 
-<p><b>7b Retrofit priorities</b></p>
-<p>List in priority order (top 3)</p>
-<table class="table">
-    <tr><td>Save carbon</td><td><input key="data.household.7b_carbon" type="text" style="width:70px" /></td></tr>
-    <tr><td>Save money</td><td><input key="data.household.7b_money" type="text" style="width:70px" /></td></tr>
-    <tr><td>Improve comfort</td><td><input key="data.household.7b_comfort" type="text" style="width:70px" /></td></tr>
-    <tr><td>Improve indoor air quality</td><td><input key="data.household.7b_airquality" type="text" style="width:70px" /></td></tr>
-    <tr><td>General modernisation</td><td><input key="data.household.7b_modernisation" type="text" style="width:70px" /></td></tr>
-    <tr><td>Improve health</td><td><input key="data.household.7b_health" type="text" style="width:70px" /></td></tr>
-</table>
+    <div class="pa-15 bg-assessor">
 
-<p><b>7c Retrofit philosophy</b></p>
-<p>Do you have any strong preferences about materials and internal finishes? (understanding that in many cases your choice will involve a trade off of sorts)</p>
-<table class="table">
-    <tr><td>Local availability</td><td><input key="data.household.7c_local" type="text" style="width:70px" /></td></tr>
-    <tr><td>Naturally derived</td><td><input key="data.household.7c_natural" type="text" style="width:70px" /></td></tr>
-    <tr><td>Best performance</td><td><input key="data.household.7c_performance" type="text" style="width:70px" /></td></tr>
-    <tr><td>Technologically driven/innovative/hi-tech</td><td><input key="data.household.7c_hitech" type="text" style="width:70px" /></td></tr>
-    <tr><td>Health focused</td><td><input key="data.household.7c_health" type="text" style="width:70px" /></td></tr>
-    <tr><td>Moisture management</td><td><input key="data.household.7c_moisture" type="text" style="width:70px" /></td></tr>
-    <tr><td>Low maintenance</td><td><input key="data.household.7c_lowmaintenance" type="text" style="width:70px" /></td></tr>
-</table>
+        <div class="mb-30">
+            <label>Is there evidence of adequate supply paths as well as extract air paths?</label>
 
-<p><b>7d Aesthetics</b></p>
+            <label class="radio d-flex mb-7" for="ventilation_adequate_paths_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.ventilation_adequate_paths"
+                        id="ventilation_adequate_paths_2"
+                        name="ventilation_adequate_paths"
+                        value="YES">
+                Yes
+            </label>
 
-<p>Would you mind changing the aesthetics of your house:</p>
-<p>Externally?<br><input type="text" value="" key="data.household.7d_externally" style="width:400px" /></p>
-<p>Internally?<br><input type="text" value="" key="data.household.7d_internally" style="width:400px" /></p>
+            <label class="radio d-flex mb-7" for="ventilation_adequate_paths_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.ventilation_adequate_paths"
+                        id="ventilation_adequate_paths_1"
+                        name="ventilation_adequate_paths"
+                        value="NO">
+                No
+            </label>
+        </div>
 
-<p><b>7e Disruption</b></p>
+        <div class="mb-30">
+            <p>
+                Is there a purge vent in each habitable room?<br>
+                This could be reasonably sized opening windows or a 'boost' function on vent system.
+            </p>
 
-<p>What would be an acceptable level of disruption?</p>
-<select key="data.household.7e_disruption_level">
-    <option>Minimal internal disruption</option>
-    <option>Some redecoration</option>
-    <option>New internal fittings and major redecoration</option>
-    <option>Move out for a few days/week</option>
-    <option>Move out for months</option>
-</select>
-<p>Comment:<br>
-    <input type="text" value="" key="data.household.7e_disruption_comment" style="width:400px" /></p>
+            <label class="radio d-flex mb-7" for="ventilation_purge_vents_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.ventilation_purge_vents"
+                        id="ventilation_purge_vents_2"
+                        name="ventilation_purge_vents"
+                        value="YES">
+                Yes
+            </label>
 
-<p><b>7f Timescales</b></p>
+            <label class="radio d-flex mb-7" for="ventilation_purge_vents_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.ventilation_purge_vents"
+                        id="ventilation_purge_vents_1"
+                        name="ventilation_purge_vents"
+                        value="NO">
+                No
+            </label>
+        </div>
 
-<p>When are you likely to start retrofit work on your home?</p>
-<select key="data.household.7f_timescale">
-    <option>Within the next few months</option>
-    <option>Within the next 3 - 12 months</option>
-    <option>Within the next 2-5 years</option>
-</select>
-<p>Comment:<br>
-    <input type="text" value="" key="data.household.7f_timescale_comment" style="width:400px" /></p>
+        <div class="mb-15">
+            <p>Is there a clear under/overcut of 10mm above or below internal doors to allow air to move through dwelling?</p>
 
-<p><b>7g Budget</b></p>
+            <label class="radio d-flex mb-7" for="ventilation_gaps_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.ventilation_gaps"
+                        id="ventilation_gaps_2"
+                        name="ventilation_gaps"
+                        value="YES">
+                Yes
+            </label>
 
-<p>Do you have a fixed pot of money?<br><input type="text" value="" key="data.household.7g_fixedpot_comment" style="width:400px" /></p>
+            <label class="radio d-flex mb-7" for="ventilation_gaps_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.ventilation_gaps"
+                        id="ventilation_gaps_1"
+                        name="ventilation_gaps"
+                        value="NO">
+                No
+            </label>
+        </div>
 
-<p>Or do you plan to set a budget according to the works planned?<br><input type="text" value="" key="data.household.7g_worksplanned_comment" style="width:400px" /></p>
+        <div class="mb-15">
+            <label for="ventilation_note">Assessor notes</label>
+            <div>
+                <textarea key="data.household.ventilation_note" id="ventilation_note" class="textarea"></textarea>
+            </div>
+        </div>
 
-<p>Do you plan to use any grant funding?<br><input type="text" value="" key="data.household.7g_grantfunding_comment" style="width:400px" /></p>
+        <p>Temperature and RH data when we visited:</p>
 
-<p><b>7h Scope of work</b></p>
+        <table class="table table--vertical-middle" style="width: 20rem">
+            <tr>
+                <td></td>
+                <th>Temperature</th>
+                <th>Humidity</th>
+            </tr>
+            <tr>
+                <td>Reading 1</td>
+                <td><div class="d-flex align-items-center">
+                    <input class="input--num" key="data.household.reading_temp1" type="text">
+                    <span class="input--num">°C</span>
+                </div></td>
+                <td><div class="d-flex align-items-center">
+                    <input class="input--num" key="data.household.reading_humidity1" type="text">
+                    <span class="input--num">%</span>
+                </div></td>
+            </tr>
+            <tr>
+                <td>Reading 2</td>
+                <td><div class="d-flex align-items-center">
+                    <input class="input--num" key="data.household.reading_temp2" type="text">
+                    <span class="input--num">°C</span>
+                </div></td>
+                <td><div class="d-flex align-items-center">
+                    <input class="input--num" key="data.household.reading_humidity2" type="text">
+                    <span class="input--num">%</span>
+                </div></td>
+            </tr>
+        </table>
 
-<select key="data.household.7h_work">
-    <option>In packages</option>
-    <option>As a whole house (in one go)</option>
-</select>
+        <p>Given the above information we would suggest:</p>
 
-<p>Comment:<br><input type="text" value="" key="data.household.7h_work_comment" style="width:400px" /></p>
+        <label class="radio d-flex mb-7" for="ventilation_suggestion_1">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.ventilation_suggestion"
+                    id="ventilation_suggestion_1"
+                    name="ventilation_suggestion"
+                    value="BAD">
+            Inadequate and should be upgraded as soon as possible
+        </label>
+        <label class="radio d-flex mb-7" for="ventilation_suggestion_2">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.ventilation_suggestion"
+                    id="ventilation_suggestion_2"
+                    name="ventilation_suggestion"
+                    value="OK">
+            Adequate for the current condition but will need to be upgraded as part of retrofit
+        </label>
+        <label class="radio d-flex mb-7" for="ventilation_suggestion_3">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.ventilation_suggestion"
+                    id="ventilation_suggestion_3"
+                    name="ventilation_suggestion"
+                    value="GOOD">
+            Is adequate and likely to be adequate for most foreseeable retrofit scenarios
+        </label>
 
-<p><b>7i Procurement</b></p>
+        <p class="mt-15 text-italic">Assessor guidance: if there is any sign of damp/mould, or no planned vent system, or if you suspect system is undersized / not functioning correctly / has elements missing, e.g intake vents, it should be upgraded as soon as possible.</p>
+    </div>
 
-<p>How confident would you be to undertake some of the work DIY?</p>
-<select key="data.household.7i_DIYconfidence">
-    <option>Very confident</option>
-    <option>Not sure</option>
-    <option>Definitely not</option>
-</select>
-<p>Comment:<br><input type="text" value="" key="data.household.7i_DIYconfidence_comment" style="width:400px" /></p>
+    <h4>2.2.2 Solid fuel appliances</h4>
 
-<p>Are you likely to use building professionals in the design and planning of your retrofit (e.g. architect, quantity surveyor)? Or are you likely to use a contractor for this?<br><input type="text" value="" key="data.household.7i_buildingprofessionals" style="width:400px" /></p>
+    <div class="d-flex">
+        <div class="w-50 mr-15">
+            <p>Does any solid fuel appliance have an appropriate dedicated supply air vent or duct?</p>
+
+            <label class="radio d-flex mb-7" for="solid_fuel_vents_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.solid_fuel_vents"
+                        id="solid_fuel_vents_1"
+                        name="solid_fuel_vents"
+                        value="YES">
+                Yes
+            </label>
+            <label class="radio d-flex mb-7" for="solid_fuel_vents_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.solid_fuel_vents"
+                        id="solid_fuel_vents_2"
+                        name="solid_fuel_vents"
+                        value="NO">
+                No
+            </label>
+            <label class="radio d-flex mb-7" for="solid_fuel_vents_3">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.solid_fuel_vents"
+                        id="solid_fuel_vents_3"
+                        name="solid_fuel_vents"
+                        value="NA">
+                Not applicable
+            </label>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <span class="form-row-label">Assessor notes</span>
+            <div class="form-row-control">
+                <textarea key="data.household.solid_fuel_note" class="textarea--100"></textarea>
+            </div>
+            <p>Any quirks or comments?</p>
+        </div>
+    </div>
+
+
+    <h4>2.2.3 Laundry</h4>
+
+    <p>How do you dry your laundry?</p>
+    <textarea class="ma-0 textarea" key="data.household.laundry"></textarea>
+
+
+    <h4>2.2.4 Radon</h4>
+
+    <label for="radon_risk">The chance of a high level of radon is:</label>
+    <select key="data.household.radon_risk" id="radon_risk" style="width:180px">
+            <option value="LOW">less than 1%</option>
+            <option value="1-3">1-3%</option>
+            <option value="3-5">3-5%</option>
+            <option value="5-10">5-10%</option>
+            <option value="10-30">10-30%</option>
+            <option value="30">greater than 30%</option>
+        </select><br>
+    <i>Please look this up using the <a href="https://www.ukradon.org/information/ukmaps" rel="noreferrer"target="_blank" style="text-decoration: underline;">UK Radon map</a>.</i>
+
+    <h4>2.3 Your experience</h4>
+
+    <h4>2.3.1 Thermal comfort</h4>
+
+    <table class="table">
+        <tr><th></th><th>Winter</th><th>Summer</th><th></th></tr>
+
+        <tr>
+            <td>Temperature</td>
+            <td><select class="mb-0" key="data.household.comfort_temperature_winter">
+                    <option value="LOW">Too cold</option>
+                    <option value="MID">Just right</option>
+                    <option value="HIGH">Too hot</option>
+                </select>
+            </td>
+            <td><select class="mb-0" key="data.household.comfort_temperature_summer">
+                    <option value="LOW">Too cold</option>
+                    <option value="MID">Just right</option>
+                    <option value="HIGH">Too hot</option>
+                </select>
+            </td>
+        </tr>
+
+        <tr>
+            <td>Air Quality</td>
+            <td><select class="mb-0" key="data.household.comfort_airquality_winter">
+                    <option value="LOW">Too dry</option>
+                    <option value="MID">Just right</option>
+                    <option value="HIGH">Too stuffy</option>
+                </select></td>
+            <td><select class="mb-0" key="data.household.comfort_airquality_summer">
+                    <option value="LOW">Too dry</option>
+                    <option value="MID">Just right</option>
+                    <option value="HIGH">Too stuffy</option>
+                </select></td>
+        </tr>
+
+        <tr>
+            <td>Draughts</td>
+            <td><select class="mb-0" key="data.household.comfort_draughts_winter">
+                    <option value="LOW">Too draughty</option>
+                    <option value="MID">Just right</option>
+                    <option value="HIGH">Too still</option>
+                </select></td>
+            <td><select class="mb-0" key="data.household.comfort_draughts_summer">
+                    <option value="LOW">Too draughty</option>
+                    <option value="MID">Just right</option>
+                    <option value="HIGH">Too still</option>
+                </select></td>
+        </tr>
+    </table>
+
+    <div class="mb-15">
+        <div class="mb-7">Do you have any problems with thermal comfort?</div>
+        <label class="radio d-flex mb-7" for="thermal_comfort_problems_2">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.thermal_comfort_problems"
+                    id="thermal_comfort_problems_2"
+                    name="thermal_comfort_problems"
+                    value="YES">
+            Yes
+        </label>
+
+        <label class="radio d-flex" for="thermal_comfort_problems_1">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.thermal_comfort_problems"
+                    id="thermal_comfort_problems_1"
+                    name="thermal_comfort_problems"
+                    value="NO">
+            No
+        </label>
+    </div>
+
+    <div class="mb-15">
+        <label class="form-row-label" for="thermal_comfort_note">Notes:</label>
+        <textarea key="data.household.thermal_comfort_note" id="thermal_comfort_note" class="textarea"></textarea>
+    </div>
+
+    <h4>2.3.2 Daylight</h4>
+
+    <div class="mb-15">
+        <label class="form-row-label" for="daylight">Amount of daylight:</label>
+        <select key="data.household.daylight">
+            <option value="LOW">Too little</option>
+            <option value="MID">Just right</option>
+            <option value="HIGH">Too much</option>
+        </select>
+    </div>
+
+    <div class="mb-15">
+        <div class="mb-7">Do you have any problem locations for daylight?</div>
+        <label class="radio d-flex mb-7" for="daylight_problems_2">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.daylight_problems"
+                    id="daylight_problems_2"
+                    name="daylight_problems"
+                    value="YES">
+            Yes
+        </label>
+
+        <label class="radio d-flex" for="daylight_problems_1">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.daylight_problems"
+                    id="daylight_problems_1"
+                    name="daylight_problems"
+                    value="NO">
+            No
+        </label>
+    </div>
+
+    <div class="mb-15">
+        <label class="form-row-label" for="daylight_note">Note on where & what:</label>
+        <textarea key="data.household.daylight_note" id="daylight_note" class="textarea"></textarea>
+    </div>
+
+    <h4>2.3.3 Noise</h4>
+
+    <div class="mb-15">
+        <div class="mb-7">Do you have any problems with noise from neighbours, between rooms or from outside?</div>
+        <label class="radio d-flex mb-7" for="noise_problems_2">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.noise_problems"
+                    id="noise_problems_2"
+                    name="noise_problems"
+                    value="YES">
+            Yes
+        </label>
+
+        <label class="radio d-flex" for="noise_problems_1">
+            <input type="radio" class="mr-7 big-checkbox"
+                    key="data.household.noise_problems"
+                    id="noise_problems_1"
+                    name="noise_problems"
+                    value="NO">
+            No
+        </label>
+    </div>
+
+    <div class="mb-15">
+        <label class="form-row-label" for="noise_note">Note on where & what:</label>
+        <textarea key="data.household.noise_note" id="noise_note" class="textarea"></textarea>
+    </div>
+
+    <h4>2.3.4 General</h4>
+
+    <p>Are any rooms in your home unloved? Why?<br>
+        <input type="text" key="data.household.rooms_unloved" style="width:400px"></p>
+
+    <p>Do you have a favourite room? Why?<br>
+        <input type="text" key="data.household.rooms_favourite" style="width:400px"></p>
+
+
+    <h4>2.4 Historic significance</h4>
+
+
+    <div class="d-flex">
+        <div class="w-50 mr-15">
+            <div class="form-row">
+                <label class='form-row-label'>Built:</label>
+                <div class="form-row-control">
+                    <select key="data.household.historic_age_band" style="width:180px">
+                        <option value="before-1900">Before 1900</option>
+                        <option value="1900-1929">1900 - 1929</option>
+                        <option value="1930-1949">1930 - 1949</option>
+                        <option value="1950-1966">1950 - 1966</option>
+                        <option value="1967-1975">1967 - 1975</option>
+                        <option value="1976-1982">1976 - 1982</option>
+                        <option value="1983-1990">1983 - 1990</option>
+                        <option value="1991-1995">1991 - 1995</option>
+                        <option value="1996-2002">1996 - 2002</option>
+                        <option value="2003-2006">2003 - 2006</option>
+                        <option value="2007-2011">2007 - 2011</option>
+                        <option value="2012-onwards">2012 onwards</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class="form-row-label">Exact year if known:</label>
+                <div class="form-row-control">
+                    <input type="text" key="data.household.historic_age_precise" style="width:150px">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <label class='form-row-label'>Conservation area:</label>
+                <div class="form-row-control">
+                    <select key="data.household.historic_conserved" style="width:180px">
+                        <option value="NO">No</option>
+                        <option value="YES">Yes</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <span class='form-row-label'>Listed?</span>
+                <div class="form-row-control">
+                    <label class="radio d-flex mb-0" for="historic_listed_1">
+                        <input type="radio" class="mr-7"
+                                key="data.household.historic_listed"
+                                id="historic_listed_1"
+                                name="historic_listed"
+                                value="NO">
+                        No
+                    </label>
+
+                    <label class="radio d-flex mb-0" for="historic_listed_2">
+                        <input type="radio" class="mr-7"
+                                key="data.household.historic_listed"
+                                id="historic_listed_2"
+                                name="historic_listed"
+                                value="I">
+                        Grade I
+                    </label>
+
+
+                    <label class="radio d-flex mb-0" for="historic_listed_3">
+                        <input type="radio" class="mr-7"
+                                key="data.household.historic_listed"
+                                id="historic_listed_3"
+                                name="historic_listed"
+                                value="II">
+                        Grade II
+                    </label>
+
+
+                    <label class="radio d-flex mb-0" for="historic_listed_4">
+                        <input type="radio" class="mr-7"
+                                key="data.household.historic_listed"
+                                id="historic_listed_4"
+                                name="historic_listed"
+                                value="II*">
+                        Grade II*
+                    </label>
+
+
+                    <label class="radio d-flex mb-0" for="historic_listed_5">
+                        <input type="radio" class="mr-7"
+                                key="data.household.historic_listed"
+                                id="historic_listed_5"
+                                name="historic_listed"
+                                value="LOCAL">
+                        Local Listing
+                    </label>
+                </div>
+            </div>
+        </div>
+        <div class="w-50 pa-15 ml-15 bg-assessor">
+            <span class="form-row-label">Assessor notes</span>
+            <div class="form-row-control">
+                <textarea key="data.household.historic_note" class="textarea--100"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <h4>2.5 Climate change adaption</h4>
+
+    <h4>2.5.1 Flood risk</h4>
+
+    <div class="d-flex mb-15">
+        <div class="w-50 mr-15">
+            <label>Does your home have a history of flooding?</label>
+
+            <label class="radio d-flex mb-7" for="flooding_history_2">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.flooding_history"
+                        id="flooding_history_2"
+                        name="flooding_history"
+                        value="YES">
+                Yes
+            </label>
+
+            <label class="radio d-flex mb-7" for="flooding_history_1">
+                <input type="radio" class="mr-7 big-checkbox"
+                        key="data.household.flooding_history"
+                        id="flooding_history_1"
+                        name="flooding_history"
+                        value="NO">
+                No
+            </label>
+        </div>
+        <div class="ml-15 w-50 bg-assessor pa-15">
+            <label style="margin-top: -7px" for="flooding_note">Assessor notes:</label>
+            <textarea key="data.household.flooding_note" id="flooding_note" class="textarea--100 mb-7 mt-7"></textarea>
+            <p class="text-italic mb-0">Note known frequency / extent of last flooding, plus any other relevant info</p>
+        </div>
+    </div>
+
+    <div class="bg-assessor pa-15 mb-15 w-50">
+        <p>
+            <b>Risk of flooding from...</b><br>
+            Please look this up using the <a href="https://flood-warning-information.service.gov.uk/long-term-flood-risk/map" rel="noreferrer"target="_blank" style="text-decoration: underline;">uk.gov flood risk map</a>.
+        </p>
+
+        <div class="form-row">
+            <label class="form-row-label" for="flooding_rivers_sea">Rivers and sea</label>
+            <div class="form-row-control">
+                <select class="mb-0" key="data.household.flooding_rivers_sea" id="flooding_rivers_sea">
+                    <option value="HIGH">High</option>
+                    <option value="MED">Medium</option>
+                    <option value="LOW">Low</option>
+                    <option value="VLOW">Very low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row mb-0">
+            <label class="form-row-label" for="flooding_surface_water">Surface water</label>
+            <div class="form-row-control">
+                <select class="mb-0" key="data.household.flooding_surface_water" id="flooding_surface_water">
+                    <option value="HIGH">High</option>
+                    <option value="MED">Medium</option>
+                    <option value="LOW">Low</option>
+                    <option value="VLOW">Very low</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <h4>2.5.2 Overheating risk</h4>
+
+    <div class="bg-assessor pa-15 w-50">
+        <label for="overheating_note">Assessor notes on overheating</label>
+        <textarea key="data.household.overheating_note" id="overheating_note" class="textarea--100"></textarea>
+        <p class="mb-0">Make note here of any large areas of east/west/south-facing glazing and any other concerns you have about overheating risk.
+    </div>
+
+
+    <h4>2.6 Context and other points of note</h4>
+
+    <div class="bg-assessor pa-15 w-50">
+        <label for="context_and_other_points">Assessor notes on overheating</label>
+        <textarea key="data.household.context_and_other_points" id="context_and_other_points" class="textarea--100"></textarea>
+        <p class="mb-0">This is a free text box for you to note any relevant items to do with context / setting of property and any constraints this might present.
+    </div>
+</section>

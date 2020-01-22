@@ -1,13 +1,27 @@
 
+<p class="text-bold">Initial project brief and scope:</p>
+<textarea rows="6" style="width: 38rem" class="mb-7" key="data.household.commentary_brief"></textarea>
+<p class="mb-30 text-italic">
+    The assessor should note here their understanding of the project brief and scope.<br>
+    It should include aims and priorities - how big the project is etc.
+</p>
 
+<p class="text-bold">Current context + logic of scenarios:</p>
+<textarea rows="6" style="width: 38rem" class="mb-30" key="data.household.commentary_context"></textarea>
 
-<div id="commentary" class="page">
-    <hr>
-    <h3>Commentary</h3>
-    <hr>
-    <p style="margin-top:30px">Commentary to be included in report.</p>
-    <p><i>See scenarios overviews below.</i></p>
-    <textarea key="data.household.commentary" style="width:98%; height:500px"></textarea>
-    <div id="overviews"><h2 style="margin: 30px 0 0">Scenarios overviews</h2></div>
+<template id="scenario-template">
+    <p class="text-bold">Scenario <span class="scenario_num">X</span> name:<br>
+        <input type="text" key="project.XXX.scenario_name" class="scenario_name">
+    </p>
 
+    <p class="text-bold">Scenario <span class="scenario_num">X</span> description:<br>
+        <textarea rows="6" style="width: 38rem" class="mb-30 scenario_description" key="project.XXX.scenario_description"></textarea>
+    </p>
+</template>
+
+<p class="text-bold">Key decisions to be made / risks and constraints / areas for further investigation and development:</p>
+<textarea rows="6" style="width: 38rem" class="mb-30" key="data.household.commentary_decisions"></textarea>
+
+<div id="overviews">
+    <h2 style="margin: 30px 0 0">Scenarios overviews</h2>
 </div>
