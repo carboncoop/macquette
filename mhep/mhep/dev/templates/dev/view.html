@@ -318,13 +318,6 @@
     redraw_scenario_menu();
     toggle_scenario_menu(scenario);
 
-    //*****************
-    // Top graphic
-    //*****************
-    $("#topgraphic").show();
-    $("#rating").hide();
-    $(".house_graphic").html("Hide house graphic");
-
     //****************
     // Sidebar
     //****************
@@ -397,16 +390,20 @@
     $(window).on('hashchange', function () {
         load_page_from_hash();
     });
+    function hide_house_graphic() {
+        $("#topgraphic").hide();
+        $(".house_graphic").html("Show house graphic");
+    }
+    function show_house_graphic() {
+        $("#topgraphic").show();
+        $(".house_graphic").html("Hide house graphic");
+    }
     $(".house_graphic").click(function () {
         if ($(".house_graphic").html() == "Show house graphic") {
-            $(".overview").show();
-            $("#rating").hide();
-            $(".house_graphic").html("Hide house graphic");
+            show_house_graphic();
         }
         else {
-            $(".overview").hide();
-            $("#rating").show();
-            $(".house_graphic").html("Show house graphic");
+            hide_house_graphic();
         }
     });
     // Scenarios interactions
@@ -717,11 +714,10 @@
         // Render page
         load_view("#content", page);
 
-        let $topgraphic = $('#topgraphic');
-        if (page == 'report') {
-            $topgraphic.hide();
+        if (page == 'report' || page == 'householdquestionnaire' || page == 'commentary') {
+            hide_house_graphic();
         } else {
-            $topgraphic.show();
+            show_house_graphic();
             draw_openbem_graphics('#topgraphic');
         }
 
