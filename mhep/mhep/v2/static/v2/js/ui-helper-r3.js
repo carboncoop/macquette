@@ -149,7 +149,13 @@ function InitUI() {
         $(this).html('<tr><td>' + title + '</td><td>sum:' + sum.toFixed(dp) + '<br>mean:' + mean.toFixed(dp) + '</td>' + out + '</tr>');
     });
 
-    $('.scenario-name').html(scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - ' + data.scenario_name);
+    if (page == 'householdquestionnaire') {
+        $('.scenario-name').html('Household Questionnaire');
+    } else if (page == 'commentary') {
+        $('.scenario-name').html('Commentary');
+    } else {
+        $('.scenario-name').html(scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - ' + data.scenario_name);
+    }
 }
 
 function UpdateUI(data) {
@@ -314,30 +320,30 @@ function get_fuel_categories() {
  ************************/
 function get_hours_off_weekday(data) {
     var hours_off = [];
-    if (project.master.household['3a_heatinghours_weekday_off3_hours'] != undefined
-            && project.master.household['3a_heatinghours_weekday_off3_mins'] != undefined
-            && (project.master.household['3a_heatinghours_weekday_on3_hours'] != project.master.household['3a_heatinghours_weekday_off3_hours']
-                    || project.master.household['3a_heatinghours_weekday_on3_mins'] != project.master.household['3a_heatinghours_weekday_off3_mins'])) {
-        var time_on_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on1_hours'], project.master.household['3a_heatinghours_weekday_on1_mins'], 0, 0);
-        var time_off_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off1_hours'], project.master.household['3a_heatinghours_weekday_off1_mins'], 0, 0);
-        var time_on_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on2_hours'], project.master.household['3a_heatinghours_weekday_on2_mins'], 0, 0);
-        var time_off_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off2_hours'], project.master.household['3a_heatinghours_weekday_off2_mins'], 0, 0);
-        var time_on_3 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on3_hours'], project.master.household['3a_heatinghours_weekday_on3_mins'], 0, 0);
-        var time_off_3 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off3_hours'], project.master.household['3a_heatinghours_weekday_off3_mins'], 0, 0);
+    if (project.master.household['heating_weekday_off3_hours'] != undefined
+            && project.master.household['heating_weekday_off3_mins'] != undefined
+            && (project.master.household['heating_weekday_on3_hours'] != project.master.household['heating_weekday_off3_hours']
+                    || project.master.household['heating_weekday_on3_mins'] != project.master.household['heating_weekday_off3_mins'])) {
+        var time_on_1 = new Date(2000, 1, 1, project.master.household['heating_weekday_on1_hours'], project.master.household['heating_weekday_on1_mins'], 0, 0);
+        var time_off_1 = new Date(2000, 1, 1, project.master.household['heating_weekday_off1_hours'], project.master.household['heating_weekday_off1_mins'], 0, 0);
+        var time_on_2 = new Date(2000, 1, 1, project.master.household['heating_weekday_on2_hours'], project.master.household['heating_weekday_on2_mins'], 0, 0);
+        var time_off_2 = new Date(2000, 1, 1, project.master.household['heating_weekday_off2_hours'], project.master.household['heating_weekday_off2_mins'], 0, 0);
+        var time_on_3 = new Date(2000, 1, 1, project.master.household['heating_weekday_on3_hours'], project.master.household['heating_weekday_on3_mins'], 0, 0);
+        var time_off_3 = new Date(2000, 1, 1, project.master.household['heating_weekday_off3_hours'], project.master.household['heating_weekday_off3_mins'], 0, 0);
         hours_off = (get_hours_three_periods(time_on_1, time_off_1, time_on_2, time_off_2, time_on_3, time_off_3));
 
-    } else if (project.master.household['3a_heatinghours_weekday_off2_hours'] != undefined
-            && project.master.household['3a_heatinghours_weekday_off2_mins'] != undefined
-            && (project.master.household['3a_heatinghours_weekday_on2_hours'] != project.master.household['3a_heatinghours_weekday_off2_hours']
-                    || project.master.household['3a_heatinghours_weekday_on2_mins'] != project.master.household['3a_heatinghours_weekday_off2_mins'])) {
-        var time_on_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on1_hours'], project.master.household['3a_heatinghours_weekday_on1_mins'], 0, 0);
-        var time_off_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off1_hours'], project.master.household['3a_heatinghours_weekday_off1_mins'], 0, 0);
-        var time_on_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on2_hours'], project.master.household['3a_heatinghours_weekday_on2_mins'], 0, 0);
-        var time_off_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off2_hours'], project.master.household['3a_heatinghours_weekday_off2_mins'], 0, 0);
+    } else if (project.master.household['heating_weekday_off2_hours'] != undefined
+            && project.master.household['heating_weekday_off2_mins'] != undefined
+            && (project.master.household['heating_weekday_on2_hours'] != project.master.household['heating_weekday_off2_hours']
+                    || project.master.household['heating_weekday_on2_mins'] != project.master.household['heating_weekday_off2_mins'])) {
+        var time_on_1 = new Date(2000, 1, 1, project.master.household['heating_weekday_on1_hours'], project.master.household['heating_weekday_on1_mins'], 0, 0);
+        var time_off_1 = new Date(2000, 1, 1, project.master.household['heating_weekday_off1_hours'], project.master.household['heating_weekday_off1_mins'], 0, 0);
+        var time_on_2 = new Date(2000, 1, 1, project.master.household['heating_weekday_on2_hours'], project.master.household['heating_weekday_on2_mins'], 0, 0);
+        var time_off_2 = new Date(2000, 1, 1, project.master.household['heating_weekday_off2_hours'], project.master.household['heating_weekday_off2_mins'], 0, 0);
         hours_off = (get_hours_two_periods(time_on_1, time_off_1, time_on_2, time_off_2));
-    } else if (project.master.household['3a_heatinghours_weekday_off1_hours'] != project.master.household['3a_heatinghours_weekday_on1_hours'] || project.master.household['3a_heatinghours_weekday_off1_mins'] != project.master.household['3a_heatinghours_weekday_on1_mins']) {
-        var time_off = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_off1_hours'], project.master.household['3a_heatinghours_weekday_off1_mins'], 0, 0);
-        var time_on = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekday_on1_hours'], project.master.household['3a_heatinghours_weekday_on1_mins'], 0, 0);
+    } else if (project.master.household['heating_weekday_off1_hours'] != project.master.household['heating_weekday_on1_hours'] || project.master.household['heating_weekday_off1_mins'] != project.master.household['heating_weekday_on1_mins']) {
+        var time_off = new Date(2000, 1, 1, project.master.household['heating_weekday_off1_hours'], project.master.household['heating_weekday_off1_mins'], 0, 0);
+        var time_on = new Date(2000, 1, 1, project.master.household['heating_weekday_on1_hours'], project.master.household['heating_weekday_on1_mins'], 0, 0);
         hours_off.push(get_hours_off_one_period(time_on, time_off));
     } else {
         hours_off.push(0);
@@ -346,30 +352,30 @@ function get_hours_off_weekday(data) {
 }
 function get_hours_off_weekend(data) {
     var hours_off = [];
-    if (project.master.household['3a_heatinghours_weekend_off3_hours'] != undefined
-            && project.master.household['3a_heatinghours_weekend_off3_mins'] != undefined
-            && (project.master.household['3a_heatinghours_weekend_on3_hours'] != project.master.household['3a_heatinghours_weekend_off3_hours']
-                    || project.master.household['3a_heatinghours_weekend_on3_mins'] != project.master.household['3a_heatinghours_weekend_off3_mins'])) {
-        var time_on_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on1_hours'], project.master.household['3a_heatinghours_weekend_on1_mins'], 0, 0);
-        var time_off_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off1_hours'], project.master.household['3a_heatinghours_weekend_off1_mins'], 0, 0);
-        var time_on_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on2_hours'], project.master.household['3a_heatinghours_weekend_on2_mins'], 0, 0);
-        var time_off_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off2_hours'], project.master.household['3a_heatinghours_weekend_off2_mins'], 0, 0);
-        var time_on_3 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on3_hours'], project.master.household['3a_heatinghours_weekend_on3_mins'], 0, 0);
-        var time_off_3 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off3_hours'], project.master.household['3a_heatinghours_weekend_off3_mins'], 0, 0);
+    if (project.master.household['heating_weekend_off3_hours'] != undefined
+            && project.master.household['heating_weekend_off3_mins'] != undefined
+            && (project.master.household['heating_weekend_on3_hours'] != project.master.household['heating_weekend_off3_hours']
+                    || project.master.household['heating_weekend_on3_mins'] != project.master.household['heating_weekend_off3_mins'])) {
+        var time_on_1 = new Date(2000, 1, 1, project.master.household['heating_weekend_on1_hours'], project.master.household['heating_weekend_on1_mins'], 0, 0);
+        var time_off_1 = new Date(2000, 1, 1, project.master.household['heating_weekend_off1_hours'], project.master.household['heating_weekend_off1_mins'], 0, 0);
+        var time_on_2 = new Date(2000, 1, 1, project.master.household['heating_weekend_on2_hours'], project.master.household['heating_weekend_on2_mins'], 0, 0);
+        var time_off_2 = new Date(2000, 1, 1, project.master.household['heating_weekend_off2_hours'], project.master.household['heating_weekend_off2_mins'], 0, 0);
+        var time_on_3 = new Date(2000, 1, 1, project.master.household['heating_weekend_on3_hours'], project.master.household['heating_weekend_on3_mins'], 0, 0);
+        var time_off_3 = new Date(2000, 1, 1, project.master.household['heating_weekend_off3_hours'], project.master.household['heating_weekend_off3_mins'], 0, 0);
         hours_off = (get_hours_three_periods(time_on_1, time_off_1, time_on_2, time_off_2, time_on_3, time_off_3));
 
-    } else if (project.master.household['3a_heatinghours_weekend_off2_hours'] != undefined
-            && project.master.household['3a_heatinghours_weekend_off2_mins'] != undefined
-            && (project.master.household['3a_heatinghours_weekend_on2_hours'] != project.master.household['3a_heatinghours_weekend_off2_hours']
-                    || project.master.household['3a_heatinghours_weekend_on2_mins'] != project.master.household['3a_heatinghours_weekend_off2_mins'])) {
-        var time_on_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on1_hours'], project.master.household['3a_heatinghours_weekend_on1_mins'], 0, 0);
-        var time_off_1 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off1_hours'], project.master.household['3a_heatinghours_weekend_off1_mins'], 0, 0);
-        var time_on_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on2_hours'], project.master.household['3a_heatinghours_weekend_on2_mins'], 0, 0);
-        var time_off_2 = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off2_hours'], project.master.household['3a_heatinghours_weekend_off2_mins'], 0, 0);
+    } else if (project.master.household['heating_weekend_off2_hours'] != undefined
+            && project.master.household['heating_weekend_off2_mins'] != undefined
+            && (project.master.household['heating_weekend_on2_hours'] != project.master.household['heating_weekend_off2_hours']
+                    || project.master.household['heating_weekend_on2_mins'] != project.master.household['heating_weekend_off2_mins'])) {
+        var time_on_1 = new Date(2000, 1, 1, project.master.household['heating_weekend_on1_hours'], project.master.household['heating_weekend_on1_mins'], 0, 0);
+        var time_off_1 = new Date(2000, 1, 1, project.master.household['heating_weekend_off1_hours'], project.master.household['heating_weekend_off1_mins'], 0, 0);
+        var time_on_2 = new Date(2000, 1, 1, project.master.household['heating_weekend_on2_hours'], project.master.household['heating_weekend_on2_mins'], 0, 0);
+        var time_off_2 = new Date(2000, 1, 1, project.master.household['heating_weekend_off2_hours'], project.master.household['heating_weekend_off2_mins'], 0, 0);
         hours_off = (get_hours_two_periods(time_on_1, time_off_1, time_on_2, time_off_2));
-    } else if (project.master.household['3a_heatinghours_weekend_off1_hours'] != project.master.household['3a_heatinghours_weekend_on1_hours'] || project.master.household['3a_heatinghours_weekend_off1_mins'] != project.master.household['3a_heatinghours_weekend_on1_mins']) {
-        var time_off = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_off1_hours'], project.master.household['3a_heatinghours_weekend_off1_mins'], 0, 0);
-        var time_on = new Date(2000, 1, 1, project.master.household['3a_heatinghours_weekend_on1_hours'], project.master.household['3a_heatinghours_weekend_on1_mins'], 0, 0);
+    } else if (project.master.household['heating_weekend_off1_hours'] != project.master.household['heating_weekend_on1_hours'] || project.master.household['heating_weekend_off1_mins'] != project.master.household['heating_weekend_on1_mins']) {
+        var time_off = new Date(2000, 1, 1, project.master.household['heating_weekend_off1_hours'], project.master.household['heating_weekend_off1_mins'], 0, 0);
+        var time_on = new Date(2000, 1, 1, project.master.household['heating_weekend_on1_hours'], project.master.household['heating_weekend_on1_mins'], 0, 0);
         hours_off.push(get_hours_off_one_period(time_on, time_off));
     } else {
         hours_off.push(0);
