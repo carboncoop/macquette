@@ -374,6 +374,7 @@ var mhep_helper = {
     extract_inputdata: function (data) {
         var inputdata = {};
         inputdata.scenario_name = data.scenario_name;
+        inputdata.scenario_description = data.scenario_description;
         inputdata.household = data.household;
         inputdata.region = data.region;
         inputdata.altitude = data.altitude;

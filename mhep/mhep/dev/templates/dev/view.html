@@ -389,7 +389,7 @@
             console.log(key + " changed from " + lastval + " to " + val);
             changelog += key + " changed from " + lastval + " to " + val + "<br>";
 
-            if (key == 'data.scenario_name') {
+            if (key.endsWith('.scenario_name')) {
               redraw_scenario_menu();
             }
         }
