@@ -152,14 +152,14 @@ function report_show(root, template) {
     });
 
     const graphs = [
-        [ add_heat_loss_summary_figure,         '#heat-loss-summary' ],
-        [ add_heat_balance_figure,              '#heat-balance' ],
-        [ add_space_heating_demand_figure,      '#space-heating-demand' ],
-        [ add_energy_demand_figure,             '#energy-demand' ],
-        [ add_primary_energy_usage_figure,      '#primary-energy-use' ],
-        [ add_carbon_dioxide_per_m2_figure,     '#carbon-dioxide-emissions' ],
-        [ add_carbon_dioxide_per_person_figure, '#carbon-dioxide-emissions-per-person' ],
-        [ add_energy_costs_figure,              '#estimated-energy-cost-comparison' ],
+        [ add_heat_loss_summary,         '#heat-loss-summary' ],
+        [ add_heat_balance,              '#heat-balance' ],
+        [ add_space_heating_demand,      '#space-heating-demand' ],
+        [ add_energy_demand,             '#energy-demand' ],
+        [ add_primary_energy_usage,      '#primary-energy-use' ],
+        [ add_carbon_dioxide_per_m2,     '#carbon-dioxide-emissions' ],
+        [ add_carbon_dioxide_per_person, '#carbon-dioxide-emissions-per-person' ],
+        [ add_energy_costs,              '#estimated-energy-cost-comparison' ],
     ];
 
     for (let [ draw, selector ] of graphs) {
@@ -466,7 +466,7 @@ function get_context_data() {
     };
 }
 
-function add_heat_loss_summary_figure(root, scenarios) {
+function add_heat_loss_summary(root, scenarios) {
     $(root).html('');
 
     for (let scenario of scenarios) {
@@ -482,7 +482,7 @@ function add_heat_loss_summary_figure(root, scenarios) {
     }
 }
 
-function add_heat_balance_figure(root, scenarios) {
+function add_heat_balance(root, scenarios) {
     // Heat transfer per year by element. The gains and losses here need to balance.
     var dataFig4 = [];
     var max_value = 250; // used to set the height of the chart
@@ -536,7 +536,7 @@ function add_heat_balance_figure(root, scenarios) {
     });
     HeatBalance.draw(root);
 }
-function add_space_heating_demand_figure(root, scenarios) {
+function add_space_heating_demand(root, scenarios) {
     var dataFig = [];
     var max_value = 250; // used to set the height of the chart
     var label = '';
@@ -610,7 +610,7 @@ function add_space_heating_demand_figure(root, scenarios) {
     });
     SpaceHeatingDemand.draw(root);
 }
-function add_energy_demand_figure(root, scenarios) {
+function add_energy_demand(root, scenarios) {
     let [energyDemandData, max_value] = getEnergyDemandData(scenarios);
     var dataFig = prepare_data_for_graph(energyDemandData);
 
@@ -641,7 +641,7 @@ function add_energy_demand_figure(root, scenarios) {
     });
     EnergyDemand.draw(root);
 }
-function add_primary_energy_usage_figure(root, scenarios) {
+function add_primary_energy_usage(root, scenarios) {
     var primaryEnergyUseData = getPrimaryEnergyUseData(scenarios);
     var max = primaryEnergyUseData.max;
     var min = primaryEnergyUseData.min - 50;
@@ -686,7 +686,7 @@ function add_primary_energy_usage_figure(root, scenarios) {
     });
     primaryEneryUse.draw(root);
 }
-function add_carbon_dioxide_per_m2_figure(root, scenarios) {
+function add_carbon_dioxide_per_m2(root, scenarios) {
     var carbonDioxideEmissionsData = [];
     var max = 100;
     if (project['master'] !== undefined && project['master'].kgco2perm2 !== undefined) {
@@ -743,7 +743,7 @@ function add_carbon_dioxide_per_m2_figure(root, scenarios) {
         ], });
     CarbonDioxideEmissions.draw(root);
 }
-function add_carbon_dioxide_per_person_figure(root, scenarios) {
+function add_carbon_dioxide_per_person(root, scenarios) {
     var carbonDioxideEmissionsPerPersonData = [];
     if (project['master'] !== undefined && project['master'].annualco2 !== undefined && project['master'].occupancy !== undefined) {
         var array = [{value: project['master'].annualco2 / project['master'].occupancy}];
@@ -797,7 +797,7 @@ function add_carbon_dioxide_per_person_figure(root, scenarios) {
     });
     CarbonDioxideEmissionsPerPerson.draw(root);
 }
-function add_energy_costs_figure(root, scenarios) {
+function add_energy_costs(root, scenarios) {
     var estimatedEnergyCostsData = [];
     var max = 3500;
     if (project['master'] !== undefined && project['master'].total_cost !== undefined) {
