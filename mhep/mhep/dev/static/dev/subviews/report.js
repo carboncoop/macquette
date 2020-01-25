@@ -542,7 +542,7 @@ function add_space_heating_demand(root, scenarios) {
     var label = '';
     var value = 0;
     for (var i = 0; i < scenarios.length; i++) {
-        if (project[scenarios[i]] !== undefined && project[scenarios[i]].space_heating_demand_m2 !== undefined) {
+        if (project[scenarios[i]].space_heating_demand_m2 !== undefined) {
             value = Math.round(project[scenarios[i]].space_heating_demand_m2);
             if (scenarios[i] == 'master') {
                 label = 'Your home now';
