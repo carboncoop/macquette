@@ -642,11 +642,9 @@ function add_energy_demand(root, scenarios) {
     EnergyDemand.draw(root);
 }
 function add_primary_energy_usage(root, scenarios) {
-    var primaryEnergyUseData = getPrimaryEnergyUseData(scenarios);
-    var max = primaryEnergyUseData.max;
-    var min = primaryEnergyUseData.min - 50;
-    delete primaryEnergyUseData.max;
-    delete primaryEnergyUseData.min;
+    let [ primaryEnergyUseData, min, max ] = getPrimaryEnergyUseData(scenarios);
+    min -= 50;
+
     var dataGraph = prepare_data_for_graph(primaryEnergyUseData);
     var primaryEneryUse = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
@@ -668,7 +666,9 @@ function add_primary_energy_usage(root, scenarios) {
             'Space Heating': 'rgb(66, 134, 244)',
             'Cooking': 'rgb(24,86,62)',
             'Appliances': 'rgb(240,212,156)',
-            'Lighting': 'rgb(236,102,79)', 'Fans and Pumps': 'rgb(246, 167, 7)', 'Non categorized': 'rgb(131, 51, 47)',
+            'Lighting': 'rgb(236,102,79)',
+            'Fans and Pumps': 'rgb(246, 167, 7)',
+            'Non categorized': 'rgb(131, 51, 47)',
             // 'Generation': 'rgb(200,213,203)'
         },
         data: dataGraph,
@@ -1061,71 +1061,70 @@ function getEnergyDemandData(scenarios) {
     return [ data, max_value ];
 }
 function getPrimaryEnergyUseData(scenarios) {
-    var primaryEnergyUseData = {};
-    primaryEnergyUseData.max = 500;
-    primaryEnergyUseData.min = 0;
+    let primaryEnergyUseData = {};
+    let min = 0;
+    let max = 500;
+
     for (var i = 0; i < scenarios.length; i++) {
-        primaryEnergyUseData[scenarios[i]] = [];
-        if (typeof project[scenarios[i]] !== 'undefined') {
-            if (typeof project[scenarios[i]].primary_energy_use_by_requirement !== 'undefined') {
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['waterheating'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['waterheating'] / data.TFA, label: 'Water Heating'});
-                }
+        const scenario_id = scenarios[i];
+        const scenario = project[scenario_id];
 
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['space_heating'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['space_heating'] / data.TFA, label: 'Space Heating'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['cooking'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['cooking'] / data.TFA, label: 'Cooking'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['appliances'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['appliances'] / data.TFA, label: 'Appliances'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['lighting'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['lighting'] / data.TFA, label: 'Lighting'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['fans_and_pumps'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['fans_and_pumps'] / data.TFA, label: 'Fans and Pumps'});
-                }
-                if (project[scenarios[i]].use_generation == 1 && project[scenarios[i]].fuel_totals['generation'].primaryenergy < 0) { // we offset the stack displacing it down for the amount of renewables
-                    var renewable_left = -project[scenarios[i]].fuel_totals['generation'].primaryenergy / data.TFA; // fuel_totals['generation'].primaryenergy is negative
-                    primaryEnergyUseData[scenarios[i]].forEach(function (use) {
-                        if (use.value <= renewable_left) {
-                            renewable_left -= use.value;
-                            use.value = -use.value;
-                        }
-                        if (use.value > renewable_left) {
-                            primaryEnergyUseData[scenarios[i]].push({value: use.value - renewable_left, label: use.label}); // we create another bar with the same color than current use with the amount that is still positive
-                            use.value = -renewable_left; // the amount offseted
-                            renewable_left = 0;
-                        }
-                    });
-                }
+        const val = (label, key) => {
+            if (scenario.fuel_requirements[key] !== undefined) {
+                primaryEnergyUseData[scenario_id].push({
+                    label: label,
+                    value: scenario.fuel_requirements[key].quantity / data.TFA,
+                });
             }
+        };
+
+        primaryEnergyUseData[scenario_id] = [];
+        val('Water Heating',  'waterheating');
+        val('Space Heating',  'space_heating');
+        val('Cooking',        'cooking');
+        val('Appliances',     'appliances');
+        val('Lighting',       'lighting');
+        val('Fans and Pumps', 'fans_and_pumps');
+
+        // we offset the stack displacing it down function() {}or the amount of renewables
+        if (scenario.use_generation == 1 && scenario.fuel_totals['generation'].primaryenergy < 0) {
+            // fuel_totals['generation'].primaryenergy is negative
+            var renewable_left = -scenario.fuel_totals['generation'].primaryenergy / data.TFA;
+
+            primaryEnergyUseData[scenario_id].forEach(function (use) {
+                if (use.value <= renewable_left) {
+                    renewable_left -= use.value;
+                    use.value = -use.value;
+                } else {
+                    primaryEnergyUseData[scenario_id].push({value: use.value - renewable_left, label: use.label}); // we create another bar with the same color than current use with the amount that is still positive
+                    use.value = -renewable_left; // the amount offseted
+                    renewable_left = 0;
+                }
+            });
         }
-        if (typeof project[scenarios[i]] !== 'undefined' && project[scenarios[i]].primary_energy_use_m2 > primaryEnergyUseData.max) {
-            primaryEnergyUseData.max = project[scenarios[i]].primary_energy_use_m2;
+
+        if (scenario.primary_energy_use_m2 > max) {
+            max = scenario.primary_energy_use_m2;
         }
+
         // fuel_totals['generation'] is negative
-        if (typeof project[scenarios[i]] !== 'undefined' && project[scenarios[i]].use_generation == 1 && project[scenarios[i]].fuel_totals['generation'].primaryenergy / project[scenarios[i]].TFA < primaryEnergyUseData.min) {
-            primaryEnergyUseData.min = project[scenarios[i]].fuel_totals['generation'].primaryenergy / project[scenarios[i]].TFA;
+        if (scenario.use_generation == 1 && scenario.fuel_totals['generation'].primaryenergy / scenario.TFA < min) {
+            min = scenario.fuel_totals['generation'].primaryenergy / scenario.TFA;
         }
     }
 
     primaryEnergyUseData.bills = [
         {
             value: data.currentenergy.primaryenergy_annual_kwhm2,
-            label: 'Non categorized'},
+            label: 'Non categorized'
+        },
         {
             value: -data.currentenergy.generation.primaryenergy / data.TFA,
-            label: 'Non categorized'}
+            label: 'Non categorized'
+        }
     ];
 
-    return primaryEnergyUseData;
+    return [ primaryEnergyUseData, min, max ];
 }
 
 function prepare_data_for_graph(data_source) {
