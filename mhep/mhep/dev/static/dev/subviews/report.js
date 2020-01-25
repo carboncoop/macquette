@@ -493,7 +493,7 @@ function add_heat_balance_figure(root, scenarios) {
         } else {
             var label = 'Scenario ' + scenario.split('scenario')[1];
         }
-        if (typeof project[scenario] != 'undefined' && typeof project[scenario].annual_useful_gains_kWh_m2 != 'undefined') {
+        if (project[scenario] !== undefined && project[scenario].annual_useful_gains_kWh_m2 !== undefined) {
             dataFig4.push({
                 label: label,
                 value: [
@@ -542,7 +542,7 @@ function add_space_heating_demand_figure(root, scenarios) {
     var label = '';
     var value = 0;
     for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].space_heating_demand_m2 != 'undefined') {
+        if (project[scenarios[i]] !== undefined && project[scenarios[i]].space_heating_demand_m2 !== undefined) {
             value = Math.round(project[scenarios[i]].space_heating_demand_m2);
             if (scenarios[i] == 'master') {
                 label = 'Your home now';
@@ -689,7 +689,7 @@ function add_primary_energy_usage_figure(root, scenarios) {
 function add_carbon_dioxide_per_m2_figure(root, scenarios) {
     var carbonDioxideEmissionsData = [];
     var max = 100;
-    if (typeof project['master'] !== 'undefined' && typeof project['master'].kgco2perm2 !== 'undefined') {
+    if (project['master'] !== undefined && project['master'].kgco2perm2 !== undefined) {
         var array = [{value: project['master'].kgco2perm2}];
         // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
         if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualco2 < 0) {
@@ -745,7 +745,7 @@ function add_carbon_dioxide_per_m2_figure(root, scenarios) {
 }
 function add_carbon_dioxide_per_person_figure(root, scenarios) {
     var carbonDioxideEmissionsPerPersonData = [];
-    if (typeof project['master'] != 'undefined' && typeof project['master'].annualco2 !== 'undefined' && typeof project['master'].occupancy !== 'undefined') {
+    if (project['master'] !== undefined && project['master'].annualco2 !== undefined && project['master'].occupancy !== undefined) {
         var array = [{value: project['master'].annualco2 / project['master'].occupancy}];
         // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
         if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualco2 < 0) {
@@ -800,7 +800,7 @@ function add_carbon_dioxide_per_person_figure(root, scenarios) {
 function add_energy_costs_figure(root, scenarios) {
     var estimatedEnergyCostsData = [];
     var max = 3500;
-    if (typeof project['master'] != 'undefined' && typeof project['master'].total_cost !== 'undefined') {
+    if (project['master'] !== undefined && project['master'].total_cost !== undefined) {
         var array = [{value: project['master'].total_cost}];
         // project[scenario].total_cost has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
         if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualcost < 0) {
@@ -860,7 +860,7 @@ function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
                 var html = '<div class="break-before-always">';
             }
             html += '<h4 class="top-border-title title-margin-bottom">Figure 13' + abc[index - 1] + ' - Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</h4>';
-            if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
+            if (project[scenario].created_from !== undefined && project[scenario].created_from != 'master') {
                 html += '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
             }
             html += '<p>Total cost of the scenario £' + Math.round(measures_costs(scenario) / 10) * 10 + ' </p>';
@@ -884,7 +884,7 @@ function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
         let totalCost = Math.round(measures_costs(scenario) / 10) * 10;
         let createdFrom = '';
 
-        if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
+        if (project[scenario].created_from !== undefined && project[scenario].created_from != 'master') {
             createdFrom = '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
         }
 
@@ -919,7 +919,7 @@ function add_comparison_tables(scenarios, scenarios_comparison) {
 /*****************************************************************/
 
 function heatlossData(scenario) {
-    if (typeof project[scenario] != 'undefined' && typeof project[scenario].fabric != 'undefined') {
+    if (project[scenario] !== undefined && project[scenario].fabric !== undefined) {
         return {
             floorwk: Math.round(project[scenario].fabric.total_floor_WK),
             ventilationwk: Math.round(project[scenario].ventilation.average_ventilation_WK),
@@ -1013,7 +1013,7 @@ function getEnergyDemandData(scenarios) {
         var gas = 0;
         var other = 0;
 
-        if (typeof scenario.fuel_totals !== 'undefined') {
+        if (scenario.fuel_totals !== undefined) {
             for (var fuel in scenario.fuel_totals) {
                 if (scenario.fuels[fuel].category == 'Electricity') {
                     electric += scenario.fuel_totals[fuel].quantity;
@@ -1178,7 +1178,7 @@ function BarChart(options) {
     self._font = options.font || 'Arial';
     self._fontSize = options.fontSize || 14;
     self._barLabelsColor = options.barLabelsColor || 'rgb(189,188,187)';
-    self._chartLow = (typeof options.chartLow !== 'undefined') ? options.chartLow : null;
+    self._chartLow = (options.chartLow !== undefined) ? options.chartLow : null;
     self._chartHigh = options.chartHigh || null;
     self._division = options.division || 100;
     self._divisionColor = options.divisionColor || 'rgb(180,180,180)';
@@ -1439,7 +1439,7 @@ function BarChart(options) {
     };
 
     self.drawErrorBars = function(xPos,yPos,variance,barCount) {
-        if (typeof barCount === 'undefined') {
+        if (barCount !== undefined) {
             barCount = 1;
         }
         var ctx = self.context();
