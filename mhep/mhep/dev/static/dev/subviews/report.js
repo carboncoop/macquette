@@ -150,12 +150,13 @@ function report_show(root, template) {
     env = new nunjucks.Environment();
     env.addFilter('likert', filter_comfort_table);
     root.innerHTML = env.renderString(template, get_context_data(scenarios));
+
     const graphs = [
         [ add_heat_loss_summary,         '#heat-loss-summary' ],
         [ add_heat_balance,              '#heat-balance' ],
         [ add_space_heating_demand,      '#space-heating-demand' ],
-        [ add_energy_demand,             '#energy-demand' ],
-        [ add_primary_energy_usage,      '#primary-energy-use' ],
+        [ add_energy_demand,             '#fuel-use' ],
+        [ add_primary_energy_usage,      '#energy-use-intensity' ],
         [ add_carbon_dioxide_per_m2,     '#carbon-dioxide-emissions' ],
         [ add_carbon_dioxide_per_person, '#carbon-dioxide-emissions-per-person' ],
         [ add_energy_costs,              '#estimated-energy-cost-comparison' ],
