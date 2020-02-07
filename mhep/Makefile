@@ -25,7 +25,7 @@ pip-sync:  ## Make the local installed packages reflect the ones in the local re
 docker-up:  ## Bring up our local docker containers
 	docker-compose -f local.yml start
 
-docker-down:  ## Shut down our local docker containers
+docker-down:  ## Shut down our local docker containers
 	docker-compose -f local.yml stop
 
 docker-clean:  ## Clean system volumes (helpful for resetting broken databases)
