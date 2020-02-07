@@ -12,10 +12,10 @@ function commentary_initUI() {
 
     // Add overviews
     for (let s of scenarios) {
-        data = project[s];
+        let scenario = project[s];
         $('#overviews').append('<div id="overview-' + s + '" class="overview"></div>');
         load_view('#overview-' + s, 'topgraphic');
-        $('#overviews #overview-' + s + ' #scenario-name').html(s.charAt(0).toUpperCase() + s.slice(1) + ' - ' + data.scenario_name);
+        $('#overviews #overview-' + s + ' #scenario-name').html(s.charAt(0).toUpperCase() + s.slice(1) + ' - ' + scenario.scenario_name);
         draw_openbem_graphics('#overview-' + s);
     }
 
