@@ -160,6 +160,7 @@ function report_show(root, template) {
         [ add_carbon_dioxide_per_m2,     '#carbon-dioxide-emissions' ],
         [ add_carbon_dioxide_per_person, '#carbon-dioxide-emissions-per-person' ],
         [ add_energy_costs,              '#estimated-energy-cost-comparison' ],
+        [ add_peak_heating_load,         '#peak-heat-load' ],
     ];
 
     for (let [ draw, selector ] of graphs) {
@@ -1146,6 +1147,109 @@ function prepare_data_for_graph(data_source) {
     }
 
     return dataFig;
+}
+
+function add_peak_heating_load(root, scenario_list) {
+    const context = scenario_list.map(scenario_id => {
+        let scenario = project[scenario_id];
+        if (scenario_id === 'master') {
+            name = scenario.scenario_name;
+        } else {
+            const nums = /(\d+)/g;
+            const num = parseInt(scenario_id.match(nums)[0], 10);
+            name = `Scenario ${num}`;
+        }
+
+        const heatloss = scenario.fabric.total_heat_loss_WK;
+        const temp = scenario.temperature.target;
+        const temp_diff = temp - (-5);
+        const peak_heat = heatloss * temp_diff;
+        const area = scenario.TFA;
+        const peak_heat_m2 = peak_heat / area;
+
+        return {
+            name,
+            heatloss,
+            temp,
+            temp_diff,
+            peak_heat: peak_heat / 1000, // in kW instead of W
+            area,
+            peak_heat_m2,
+        };
+    });
+
+    const template = `
+        <table class="simple-table">
+            <tr>
+                <th></th>
+                {% for scenario in scenarios %}
+                    <th style="white-space: nowrap;">{{ scenario.name }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Heat loss per degree of heat difference</td>
+                {% for scenario in scenarios %}
+                    <td>{{ scenario.heatloss | round }} W/K</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>×</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Maximum temperature difference expected between inside and outside<sup>*</sup>
+                </td>
+                {% for scenario in scenarios %}
+                    <td>{{scenario.temp_diff}}°C <sup>†</sup></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>=</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><b>Peak heating load</b></td>
+                {% for scenario in scenarios %}
+                    <td style="white-space: nowrap;"><b>{{ scenario.peak_heat | round(2) }} kW</b></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>÷</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Floor area</td>
+                {% for scenario in scenarios %}
+                    <td>{{ scenario.area | round }} m²</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>=</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><b>Peaking heating load per square metre</b></td>
+                {% for scenario in scenarios %}
+                    <td style="white-space: nowrap;"><b>{{ scenario.peak_heat_m2 | round }} W/m²</b></td>
+                {% endfor %}
+            </tr>
+        </table>
+        <p style="margin-bottom: 0; font-size: 80%; line-height: 1.2">
+            <sup>*</sup> Lowest external temperature assumed to be –5°C<br>
+            <sup>†</sup> 1°C = 1K (Kelvin)
+        </p>`;
+
+    let env = new nunjucks.Environment();
+    root.innerHTML = env.renderString(template, { scenarios: context } );
 }
 
 
