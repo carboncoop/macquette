@@ -1182,7 +1182,7 @@ function measureForCompleteTable(measure) {
 
     return `
         <div class="complete-measures-wrapper">
-            <table class='complete-measures-table break-inside-avoid'>
+            <table class='complete-measures-table'>
                 <tr><th>Measure:</th>              <td>${measure.name}</td></tr>
                 <tr><th>Label/location:</th>       <td>${location}</td></tr>
                 <tr><th>Description:</th>          <td>${measure.description}</td></tr>
