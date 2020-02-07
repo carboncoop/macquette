@@ -67,7 +67,7 @@
 {% block content %}
 
 <div id="openbem">
-    <div id="sidebar">
+    <div id="sidebar" style="background: white">
         <div class="side-block" style="background-color: #EEECE5 !important; padding: 15px;">
             <button id="edit-project-name-and-description" style="float:right">
                 <i class="icon-edit"></i>
@@ -81,7 +81,7 @@
 
         <div class="side-block">
             <div class="side-section">
-                <div class="side-section--header">Input</div>
+                <div class="side-section--header">Assessment</div>
 
                 <ul>
                     <li><a class="project-menu-item" href="#master/householdquestionnaire">Household Questionnaire</a></li>
@@ -100,6 +100,28 @@
                 </ul>
             </div>
 
+            <div class="side-section" style="padding-bottom: 5px">
+                <div class="side-section--header" style="display: flex; justify-content: space-between;">
+                    <div>Scenarios</div>
+                    <div><small>kgCO<sub>2</sub>/m<sup>2</sup></small></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="scenario-list"></div>
+
+        <div class="side-block side-section" style="border-bottom: none">
+            <ul>
+                <li>
+                    <button id="create-new" class="btn">
+                        <i class="icon-plus" style="margin-right: 0.25rem"></i> New scenario
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="side-block" style="margin-bottom: 10px; border-bottom: none">
             <div class="side-section">
                 <div class="side-section--header">Tools & Settings</div>
 
@@ -107,31 +129,6 @@
                     <li><a class="project-menu-item" href="#master/export">Import/Export</a></li>
                     <li><a class="project-menu-item" href="#master/librariesmanager">Libraries manager</a></li>
                     <li><a class="project-menu-item" href="#master/fuelsmanager">Fuels manager</a></li>
-                </ul>
-            </div>
-
-            <div class="side-section">
-                <div class="side-section--header">Scenarios</div>
-            </div>
-
-        </div>
-
-        <div id="scenario-list"></div>
-
-        <div class="side-block">
-            <div id="create-new" class="block-header block-header--clickable" style="display: flex">
-                <i class="icon-plus" style="margin-right: 0.25rem"></i> Create new scenario
-            </div>
-        </div>
-
-        <div class="side-block">
-            <div class="side-section">
-                <div class="side-section--header">Documentation</div>
-
-                <ul>
-                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/MyHomeEnergyPlanner">User guide</a></li>
-                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/ElementLibrary">A Fabric elements Library</a></li>
-                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/readme">Building Energy Modelling</a></li>
                 </ul>
             </div>
         </div>
@@ -630,7 +627,7 @@
 
         return `
         <div class="side-block scenario-block" scenario="${id}">
-            <div class="block-header block-header--clickable" style="height:40px; display: flex; justify-content: space-between;">
+            <div class="block-header block-header--clickable" style="display: flex; justify-content: space-between;">
                 <div>
                     ${title}
                     ${locked ? '<i class="icon-lock"></i>' : ''}
@@ -638,10 +635,7 @@
                     ${created_from_html}
                 </div>
 
-                <div style="text-align: right; font-weight: normal">
-                    <span class="block_emissions"></span>
-                    <small>kgCO<sub>2</sub>/m<sup>2</sup></small>
-                </div>
+                <div style="text-align: right; font-weight: normal" class="block_emissions"></div>
             </div>
 
             <div class="menu-content" class="${menu_class}">
