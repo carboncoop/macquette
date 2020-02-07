@@ -2,12 +2,12 @@
 {% load static i18n %}
 
 {% block extra_head %}
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
+<script src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
+<script src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
 
 <link rel="stylesheet" href="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
 <script src="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
@@ -18,8 +18,8 @@
 </script>
 
 <!-- open floor uvalue calculator -->
-<script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
-<script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC-ui-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openFUVC/openFUVC-ui-helper.js' %}"></script>
 <link rel="stylesheet" href="{% static VERSION|add:'/js/openFUVC/openFUVC.css' %}">
 
 <style>
