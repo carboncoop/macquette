@@ -759,7 +759,7 @@ function add_carbon_dioxide_per_m2(root, scenarios) {
     var CarbonDioxideEmissions = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/m².year', fontSize: 33,
+        yAxisLabel: 'kgCO₂/m².year', fontSize: 33,
         font: 'Work Sans',
         division: 10,
         width: 1200,
@@ -771,11 +771,11 @@ function add_carbon_dioxide_per_m2(root, scenarios) {
         data: carbonDioxideEmissionsData,
         targets: [
             {
-                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m².year', target: datasets.target_values.co2_emission_rate,
+                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO₂/m².year', target: datasets.target_values.co2_emission_rate,
                 color: 'rgb(231,37,57)'
             },
             {
-                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m².year',
+                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO₂/m².year',
                 target: datasets.uk_average_values.co2_emission_rate,
                 color: 'rgb(231,37,57)'
             },
@@ -817,7 +817,7 @@ function add_carbon_dioxide_per_person(root, scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/person/year',
+        yAxisLabel: 'kgCO₂/person/year',
         fontSize: 33,
         font: 'Work Sans',
         division: max < 28000 ? 1000 : 2000,
