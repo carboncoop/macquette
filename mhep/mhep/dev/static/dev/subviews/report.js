@@ -647,11 +647,14 @@ function add_space_heating_demand(root, scenarios) {
     SpaceHeatingDemand.draw(root);
 }
 function add_energy_demand(root, scenarios) {
-    let [energyDemandData, max_value] = getEnergyDemandData(scenarios);
+    let energyDemandData = getEnergyDemandData(scenarios);
     var dataFig = prepare_data_for_graph(energyDemandData);
 
-    // Use intervals of 50 units
-    max_value = Math.floor((max_value + 100) / 50) * 50;
+    const max = getGraphCeil({
+        min: 5000,
+        max: getGraphValuesMax(dataFig),
+        incr: 5000
+    });
 
     var EnergyDemand = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
@@ -662,8 +665,8 @@ function add_energy_demand(root, scenarios) {
         font: 'Work Sans',
         width: 1200,
         chartHeight: 600,
-        division: 50,
-        chartHigh: max_value,
+        division: 5000,
+        chartHigh: max,
         barWidth: 550 / dataFig.length,
         barGutter: 400 / dataFig.length,
         defaultBarColor: 'rgb(231,37,57)',
@@ -780,18 +783,18 @@ function add_carbon_dioxide_per_m2(root, scenarios) {
     CarbonDioxideEmissions.draw(root);
 }
 function add_carbon_dioxide_per_person(root, scenarios) {
-    var carbonDioxideEmissionsPerPersonData = [];
+    var graphData = [];
     if (project['master'] !== undefined && project['master'].annualco2 !== undefined && project['master'].occupancy !== undefined) {
         var array = [{value: project['master'].annualco2 / project['master'].occupancy}];
         // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
         if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualco2 < 0) {
             array.push({value: project['master'].fuel_totals['generation'].annualco2 / project['master'].occupancy});
         }
-        carbonDioxideEmissionsPerPersonData.push({label: 'Your home now', value: array});
+        graphData.push({label: 'Your home now', value: array});
     }
 
     var array = [{value: project['master'].TFA * project['master'].currentenergy.total_co2m2 / project['master'].occupancy}, {value: -data.currentenergy.generation.annual_CO2 / project['master'].occupancy}];
-    carbonDioxideEmissionsPerPersonData.push({label: 'Bills data', value: array});
+    graphData.push({label: 'Bills data', value: array});
 
     scenarios.forEach(function (scenario) {
         if (scenario != 'master') {
@@ -800,15 +803,14 @@ function add_carbon_dioxide_per_person(root, scenarios) {
             if (project[scenario].use_generation == 1 && project[scenario].fuel_totals['generation'].annualco2 < 0) {
                 array.push({value: project[scenario].fuel_totals['generation'].annualco2 / project['master'].occupancy});
             }
-            carbonDioxideEmissionsPerPersonData.push({label: 'Scenario ' + scenario.split('scenario')[1], value: array});
+            graphData.push({label: 'Scenario ' + scenario.split('scenario')[1], value: array});
         }
     });
 
-    var max = 8000;
-    carbonDioxideEmissionsPerPersonData.forEach(function (scenario) {
-        if (scenario.value > max) {
-            max = scenario.value + 1000;
-        }
+    const max = getGraphCeil({
+        min: 8000,
+        max: getGraphValuesMax(graphData),
+        incr: 1000
     });
 
     var CarbonDioxideEmissionsPerPerson = new BarChart({
@@ -822,20 +824,19 @@ function add_carbon_dioxide_per_person(root, scenarios) {
         chartHigh: max,
         width: 1200,
         chartHeight: 600,
-        barWidth: 550 / carbonDioxideEmissionsPerPersonData.length,
-        barGutter: 400 / carbonDioxideEmissionsPerPersonData.length,
+        barWidth: 550 / graphData.length,
+        barGutter: 400 / graphData.length,
         defaultBarColor: 'rgb(157,213,203)', defaultVarianceColor: 'rgb(231,37,57)',
         // barColors: {
         // 	'Space heating': 'rgb(157,213,203)',
         // 	'Pumps, fans, etc.': 'rgb(24,86,62)',
         // 	'Cooking': 'rgb(40,153,139)',         // },
-        data: carbonDioxideEmissionsPerPersonData
+        data: graphData
     });
     CarbonDioxideEmissionsPerPerson.draw(root);
 }
 function add_energy_costs(root, scenarios) {
     var estimatedEnergyCostsData = [];
-    var max = 3500;
     if (project['master'] !== undefined && project['master'].total_cost !== undefined) {
         var array = [{value: project['master'].total_cost}];
         // project[scenario].total_cost has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
@@ -843,9 +844,6 @@ function add_energy_costs(root, scenarios) {
             array.push({value: project['master'].fuel_totals['generation'].annualcost});
         }
         estimatedEnergyCostsData.push({label: 'Your home now', value: array});
-        if (max < project['master'].total_cost + 0.3 * project['master'].total_cost) {
-            max = project['master'].total_cost + 0.3 * project['master'].total_cost;
-        }
     }
 
     var array = [{value: project['master'].currentenergy.total_cost}];
@@ -866,6 +864,12 @@ function add_energy_costs(root, scenarios) {
         }
     });
 
+    const max = getGraphCeil({
+        min: 500,
+        max: getGraphValuesMax(estimatedEnergyCostsData),
+        incr: 500
+    });
+
     var EstimatedEnergyCosts = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
@@ -874,7 +878,7 @@ function add_energy_costs(root, scenarios) {
         fontSize: 33,
         font: 'Work Sans',
         division: 500,
-        //chartHigh: max,
+        chartHigh: max,
         width: 1200,
         chartHeight: 600,
         barWidth: 550 / estimatedEnergyCostsData.length,
@@ -1094,7 +1098,7 @@ function getEnergyDemandData(scenarios) {
         }
     }
 
-    return [ data, max_value ];
+    return data;
 }
 function getPrimaryEnergyUseData(scenarios) {
     let primaryEnergyUseData = {};
@@ -1292,6 +1296,37 @@ function add_peak_heating_load(root, scenario_list) {
 /**
  * Bar Chart Library
  */
+
+/*
+ * We expect data looking like this:
+ * [
+ *     { value: [ { value: X1 }, { value: X2 } ] },
+ *     { value: [ { value: Y2 }, { value: Y2 } ] },
+ * ]
+ *
+ * This function will take the sum of each row's values, and return the highest.
+ */
+function getGraphValuesMax(graphData) {
+    const add = (prev, cur) => prev + cur;
+    const by_row = graphData.map(row =>
+        row.value.map(data => data.value).reduce(add)
+    );
+    return Math.max(...by_row);
+}
+
+/*
+ * This function rounds val up to the nearest roundTo.
+ * e.g. getGraphCeil(1000,    0,  100) = 1000
+ *      getGraphCeil(1000, 1005,  100) = 1100
+ *      getGraphCeil(1000, 1000,  100) = 1000
+ */
+function getGraphCeil({ min, max, incr }) {
+    if (max <= min) {
+        return min;
+    }
+
+    return Math.floor((max + (incr-1)) / incr) * incr;
+}
 
 function BarChart(options) {
 
