@@ -182,9 +182,21 @@ function report_show(root, template) {
         }
     }
 
-    add_measures_summary_tables(scenarios, scenarios_measures_summary);
-    add_measures_complete_tables(scenarios, scenarios_measures_complete);
-    add_comparison_tables(scenarios, scenarios_comparison);
+    add_measures_summary_tables(
+        root.querySelector('#ccop-report-measures-summary-tables'),
+        scenarios,
+        scenarios_measures_summary
+    );
+    add_measures_complete_tables(
+        root.querySelector('#report-measures-complete-tables'),
+        scenarios,
+        scenarios_measures_complete
+    );
+    add_comparison_tables(
+        root.querySelector('#comparison-tables'),
+        scenarios,
+        scenarios_comparison
+    );
 
     let t1 = performance.now();
     console.log('report_show took ' + (t1 - t0) + ' milliseconds.');
@@ -850,8 +862,8 @@ function add_energy_costs(root, scenarios) {
     EstimatedEnergyCosts.draw(root);
 }
 
-function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
-    $('#ccop-report-measures-summary-tables').html('');
+function add_measures_summary_tables(root, scenarios, scenarios_measures_summary) {
+    $(root).html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
     scenarios.forEach(function (scenario, index) {
         if (scenario != 'master') {
@@ -868,12 +880,12 @@ function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
             html += '<div class="measures-table-wrapper">' + scenarios_measures_summary[scenario] + '</div>';
             html += '</div>';
             //html = html.replace('measures-summary-table', 'measures-summary-table no-break');
-            $('#ccop-report-measures-summary-tables').append(html);
+            $(root).append(html);
         }
     });
 }
-function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
-    $('#report-measures-complete-tables').html('');
+function add_measures_complete_tables(root, scenarios, scenarios_measures_complete) {
+    $(root).html('');
 
     scenarios.forEach(function (scenario, index) {
         if (scenario == 'master') {
@@ -900,11 +912,11 @@ function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
             </div>
         `;
 
-        $('#report-measures-complete-tables').append(html);
+        $(root).append(html);
     });
 }
-function add_comparison_tables(scenarios, scenarios_comparison) {
-    $('#comparison-tables').html('');
+function add_comparison_tables(root, scenarios, scenarios_comparison) {
+    $(root).html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
     scenarios.forEach(function (scenario, index) {
         if (scenario != 'master') {
@@ -912,7 +924,7 @@ function add_comparison_tables(scenarios, scenarios_comparison) {
             html += ' <h3>Figure 15' + abc[index - 1] + ' Master/Scenario ' + scenario.split('scenario')[1] + 'Comparison Table</h3>';
             html += '<div class="js-scenario-comparison">' + scenarios_comparison[scenario] + '</div>';
             html += '</section>';
-            $('#comparison-tables').append(html);
+            $(root).append(html);
         }
     });
 }
