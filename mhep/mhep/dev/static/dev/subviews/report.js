@@ -1425,12 +1425,12 @@ function BarChart(options) {
             }
         }
 
+        // append canvas to element
+        self.element().appendChild(self.canvas());
+
         if (self.objectLength(self._barColors)) {
             self.drawKey(self._barColors);
         }
-
-        // append canvas to element
-        self.element().appendChild(self.canvas());
     };
 
 
@@ -1651,51 +1651,24 @@ function BarChart(options) {
 
 
     self.drawKey = function(keyData) {
-        var ctx = self.context();
-        var fontSize = self._fontSize;
-        var maxCols = self.getKeyColumns(keyData);
-        var yPos = self._height - self.getKeyHeight(keyData);
-        var xPos;
-        var col = 0;
+        let keys = Object.entries(keyData).map(([ label, colour ]) => `
+            <div style="display: flex; align-items: center;">
+                <svg viewBox="0 0 1 1" style="width: 1.5rem; height: 1.5rem; margin-right: calc(var(--line-height) / 2)">
+                    <rect y="0" x="0" width="1" height="1" fill="${colour}" />
+                </svg>
+                <span>${label}</span>
+            </div>
+        `);
 
-        ctx.textAlign = 'left';
-        ctx.font = fontSize + 'px ' + self._font;
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <h5 style="color: rgb(112,111,112); margin-bottom: 0.75rem; margin-top: 2rem">Key</h5>
+            <div style="display: grid; grid-gap: 0.25rem; grid-template-columns: 1fr 1fr;">
+                ${keys.join('')}
+            </div>
+        `;
 
-        // draw line
-        yPos += self._fontSize * 4;
-        ctx.beginPath();
-        ctx.moveTo(0, yPos - 0.5);
-        ctx.lineTo(self._width, yPos - 0.5);
-        ctx.strokeStyle = 'rgb(227,19,46)';
-        ctx.lineWidth = 1;
-        ctx.setLineDash([3]);
-        ctx.stroke();
-        ctx.closePath();
-
-        // draw key title
-        yPos += self._fontSize * 1.6;
-        ctx.fillStyle = 'rgb(112,111,112)';
-        ctx.fillText('Key', 0, yPos);
-
-        // draw key items
-        yPos += self._fontSize * 1.6;
-
-        for (var label in keyData) {
-            if (keyData.hasOwnProperty(label)) {
-                xPos = Math.round(col * (self._width / maxCols));
-                ctx.fillStyle = keyData[label];
-                ctx.fillRect(xPos, yPos, fontSize, fontSize);
-                ctx.fillStyle = 'rgb(178,177,176)';
-                ctx.fillText(label, xPos + 45, yPos + (fontSize * 0.9));
-
-                col ++;
-
-                if (col >= maxCols) {
-                    col = 0;
-                    yPos += fontSize * 1.6;
-                }
-            }
-        }
+        self.element().appendChild(div);
     };
 
 
@@ -1849,7 +1822,7 @@ function BarChart(options) {
 
 
     self.getChartBottomPos = function() {
-        return self._height - self.getBarLabelsHeight() - self.getKeyHeight(self._barColors);
+        return self._height - self.getBarLabelsHeight();
     };
 
 
@@ -1923,10 +1896,6 @@ function BarChart(options) {
         return self.widestText(textArray, self.font()) + (fontSize * 2);
     };
 
-    self.getKeyHeight = function(keyData) {
-        return (self.getKeyRows(keyData)) ? (self.getKeyRows(keyData) * self._fontSize * 1.6) + (self._fontSize * 7.2) : 0;
-    };
-
 
     self.getKeyColumns = function(keyData) {
         var colWidth = self.widestText(self.getKeyTextAsArray(keyData), self.font()) + (self._fontSize * 2) + 45;
@@ -1991,7 +1960,7 @@ function BarChart(options) {
 
 
     self.setHeight = function() {
-        self._height = self._chartHeight + self.getChartTitleHeight() + self.getBarLabelsHeight() + self.getKeyHeight(self._barColors);
+        self._height = self._chartHeight + self.getChartTitleHeight() + self.getBarLabelsHeight();
     };
 
 
