@@ -40,8 +40,8 @@ function commentary_initUI() {
         // The current "key" attribute setup doesn't allow for this. Luckily, the logic
         // that sets the model value on change works, so we just have to set the initial
         // value manually.
-        $(root, '.scenario_name').val(scenario.scenario_name);
-        $(root, '.scenario_description').val(scenario.scenario_description);
+        $(root).find('.scenario_name').val(scenario.scenario_name);
+        $(root).find('.scenario_description').val(scenario.scenario_description);
 
         $(root).insertBefore('#scenario-template');
     }
