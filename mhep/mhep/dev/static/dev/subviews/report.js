@@ -660,7 +660,7 @@ function add_energy_demand(root, scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m²·year',
+        yAxisLabel: 'kWh/year',
         fontSize: 33,
         font: 'Work Sans',
         width: 1200,
@@ -1086,17 +1086,6 @@ function getEnergyDemandData(scenarios) {
         }
     }
     data.bills[1].value += project['master'].currentenergy.generation.fraction_used_onsite * project['master'].currentenergy.generation.annual_generation; // We added consumption coming from generation
-
-    // Now normalise by total floor area (TFA)
-    // I'm sorry to whoever comes and tries to understand this function in the future.
-    let max_value = 0;
-    for (let [name, val] of Object.entries(data)) {
-        let floor_area = name === 'bills' ? project.master.TFA : project[name].TFA;
-        for (let datum of val) {
-            datum.value = datum.value / floor_area;
-            max_value = Math.max(datum.value, max_value);
-        }
-    }
 
     return data;
 }
