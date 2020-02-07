@@ -311,6 +311,36 @@ function get_average_humidity() {
     }
 }
 
+function get_pv() {
+    if (typeof project.master.generation.solar_annual_kwh !== 'number' ||
+            project.master.generation.solar_annual_kwh === 0) {
+        return false;
+    }
+
+    return {
+        generation: project.master.generation.solar_annual_kwh, // kWh
+        used_onsite: project.master.generation.solar_fraction_used_onsite * 100,  // %
+    };
+}
+
+function get_used_fuels(scenarios) {
+    let all_fuel_names = new Set();
+
+    for (let scenario_id of scenarios) {
+        let scenario = project[scenario_id];
+        for (let fuel of Object.values(scenario.fuel_totals)) {
+            all_fuel_names.add(fuel.name);
+        }
+    }
+
+    return [...all_fuel_names].map(name => ({
+        name: name,
+        co2factor: project.master.fuels[name].co2factor,
+        standingcharge: project.master.fuels[name].standingcharge / 100,
+        fuelcost: project.master.fuels[name].fuelcost / 100,
+    }));
+}
+
 function get_scenario_list(scenarios) {
     return scenarios
         .filter(id => id !== 'master')
@@ -374,6 +404,7 @@ function get_context_data(scenarios) {
         now: {
             home_type: get_lookup(questionnaire.HOUSE_TYPE, 'house_type'),
             num_bedrooms: hh['house_nr_bedrooms'],
+            floor_area: project.master.TFA,
             construction: {
                 floors: hh['construct_note_floors'],
                 walls: hh['construct_note_walls'],
@@ -458,9 +489,12 @@ function get_context_data(scenarios) {
                 overheating_comments: hh['overheating_note'],
             },
             context_and_other_points: hh['context_and_other_points'],
+            pv: get_pv(),
         },
+        used_fuels: get_used_fuels(scenarios),
         commentary: {
             context: hh['commentary_context'],
+            decisions: hh['commentary_decisions'],
         },
         scenarios: {
             list: get_scenario_list(scenarios),
