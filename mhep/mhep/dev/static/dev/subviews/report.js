@@ -141,16 +141,15 @@ class Report {
 function report_show(root, template) {
     let t0 = performance.now();
 
-    nunjucks.configure({ autoescape: true });
-    env = new nunjucks.Environment();
-    env.addFilter('likert', filter_comfort_table);
-    root.innerHTML = env.renderString(template, get_context_data());
-
     let scenarios = [];
     $('#scenario-choices input:checked').each(function () {
         scenarios.push(this.value);
     });
 
+    nunjucks.configure({ autoescape: true });
+    env = new nunjucks.Environment();
+    env.addFilter('likert', filter_comfort_table);
+    root.innerHTML = env.renderString(template, get_context_data(scenarios));
     const graphs = [
         [ add_heat_loss_summary,         '#heat-loss-summary' ],
         [ add_heat_balance,              '#heat-balance' ],
@@ -312,32 +311,22 @@ function get_average_humidity() {
     }
 }
 
-function get_scenario_list() {
-    let scenarios = [];
-    for (let name of Object.keys(project)) {
-        if (name == 'master') {
-            continue;
-        }
-
-        const scenario = project[name];
-        const nums = /(\d+)/g;
-        const id = parseInt(name.match(nums)[0], 10);
-
-        scenarios.push({
-            id: id,
-            name: name,
-            description: scenario.name,
-            commentary: scenario.description,
-        });
-    }
-    return scenarios;
+function get_scenario_list(scenarios) {
+    return scenarios
+        .filter(id => id !== 'master')
+        .map(scenario_id => ({
+            id: scenario_id,
+            num: parseInt(scenario_id.match(/(\d+)/g)[0], 10),
+            name: project[scenario_id].scenario_name,
+            description: project[scenario_id].scenario_description,
+        }));
 }
 
 function get_lookup(table, key) {
     return table[project.master.household[key]];
 }
 
-function get_context_data() {
+function get_context_data(scenarios) {
     const hh = project.master.household;
 
     return {
@@ -474,7 +463,7 @@ function get_context_data() {
             context: hh['commentary_context'],
         },
         scenarios: {
-            list: get_scenario_list(),
+            list: get_scenario_list(scenarios),
         }
     };
 }
