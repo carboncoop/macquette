@@ -67,6 +67,11 @@ class Report {
     }
 
     draw_organisations() {
+        if (this.organisations.length === 0) {
+            document.querySelector('#organisation-choices').innerHTML = "Reports belong to organisations, and you are not in any organisations, so you can't generate reports.";
+            return;
+        }
+
         this.organisations[0].checked = true;
 
         let html = this.organisations
