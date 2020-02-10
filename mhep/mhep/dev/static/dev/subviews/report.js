@@ -783,30 +783,85 @@ function add_carbon_dioxide_per_m2(root, scenarios) {
         ], });
     CarbonDioxideEmissions.draw(root);
 }
+
+function notenoughdata(root) {
+    $(root).html('<p>Not enough data to generate this graph.</p>');
+}
+
 function add_carbon_dioxide_per_person(root, scenarios) {
-    var graphData = [];
-    if (project['master'] !== undefined && project['master'].annualco2 !== undefined && project['master'].occupancy !== undefined) {
-        var array = [{value: project['master'].annualco2 / project['master'].occupancy}];
-        // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
-        if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualco2 < 0) {
-            array.push({value: project['master'].fuel_totals['generation'].annualco2 / project['master'].occupancy});
-        }
-        graphData.push({label: 'Your home now', value: array});
+    if (!project.master.annualco2 && project.master.occupancy) {
+        return notenoughdata(root);
     }
 
-    var array = [{value: project['master'].TFA * project['master'].currentenergy.total_co2m2 / project['master'].occupancy}, {value: -data.currentenergy.generation.annual_CO2 / project['master'].occupancy}];
-    graphData.push({label: 'Bills data', value: array});
+    let has_generation = false;
 
-    scenarios.forEach(function (scenario) {
-        if (scenario != 'master') {
-            var array = [{value: project[scenario].annualco2 / project['master'].occupancy}];
-            // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
-            if (project[scenario].use_generation == 1 && project[scenario].fuel_totals['generation'].annualco2 < 0) {
-                array.push({value: project[scenario].fuel_totals['generation'].annualco2 / project['master'].occupancy});
-            }
-            graphData.push({label: 'Scenario ' + scenario.split('scenario')[1], value: array});
+    const baseline = project.master;
+    const dataFor = scenario => {
+        let data = [];
+
+        if (baseline.occupancy == 1) {
+            data.push({ value: scenario.annualco2, label: 'Household emissions' });
+        } else {
+            let onePerson = scenario.annualco2 / baseline.occupancy;
+            let others = scenario.annualco2 - onePerson;
+            data.push({ value: onePerson, label: 'One person' });
+            data.push({ value: others, label: 'Other people who live here' });
+        };
+
+        // project[scenario].kgco2perm2 has deducted the savings due to renewables
+        // to make the graph clearer (?) we add the savings as negative to give the
+        // impression of offset
+        if (scenario.use_generation == 1 && scenario.fuel_totals.generation.annualco2 < 0) {
+            data.push({
+                value: scenario.fuel_totals.generation.annualco2 / baseline.occupancy,
+                label: 'Generation (per person)'
+            });
+            has_generation = true;
         }
-    });
+
+        return data;
+    };
+
+    const billsData = () => {
+        let data = [];
+
+        if (baseline.occupancy == 1) {
+            data.push({ value: baseline.TFA * baseline.currentenergy.total_co2m2, label: 'Household emissions' });
+        } else {
+            let onePerson = baseline.TFA * baseline.currentenergy.total_co2m2 / baseline.occupancy;
+            let others = (baseline.TFA * baseline.currentenergy.total_co2m2) - onePerson;
+            data.push({ value: onePerson, label: 'One person' });
+            data.push({ value: others, label: 'Other people who live here' });
+        };
+
+        if (project.master.currentenergy.generation.annual_CO2) {
+            data.push({
+                value: -project.master.currentenergy.generation.annual_CO2 / baseline.occupancy,
+                label: 'Generation (per person)'
+            });
+            has_generation = true;
+        }
+
+        return data;
+    };
+
+    let graphData = [
+        { label: 'Your home now', value: dataFor(baseline) },
+        { label: 'Bills data',    value: billsData()       },
+    ];
+
+    for (let scenario_id of scenarios) {
+        if (scenario_id == 'master') {
+            continue;
+        }
+
+        const scenario = project[scenario_id];
+
+        graphData.push({
+            label: 'Scenario ' + scenario_id.split('scenario')[1],
+            value: dataFor(scenario),
+        });
+    }
 
     const max = getGraphCeil({
         min: 8000,
@@ -818,20 +873,25 @@ function add_carbon_dioxide_per_person(root, scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kgCO₂/person/year',
+        yAxisLabel: 'kgCO₂/year',
         fontSize: 33,
         font: 'Work Sans',
-        division: max < 28000 ? 1000 : 2000,
+        division: max <= 10000 ? 1000 : 2000,
+        chartLow: has_generation ? -1000 : 0,
         chartHigh: max,
         width: 1200,
         chartHeight: 600,
         barWidth: 550 / graphData.length,
         barGutter: 400 / graphData.length,
         defaultBarColor: 'rgb(157,213,203)', defaultVarianceColor: 'rgb(231,37,57)',
-        // barColors: {
-        // 	'Space heating': 'rgb(157,213,203)',
-        // 	'Pumps, fans, etc.': 'rgb(24,86,62)',
-        // 	'Cooking': 'rgb(40,153,139)',         // },
+        barColors: (baseline.occupancy == 1) ? {
+            'Household emissions': 'rgb(66, 134, 244)',
+            'Generation (per person)': 'rgb(24,86,62)',
+        } : {
+            'One person': 'rgb(157,213,203)',
+            'Other people who live here': 'rgb(66, 134, 244)',
+            'Generation (per person)': 'rgb(24,86,62)',
+        },
         data: graphData
     });
     CarbonDioxideEmissionsPerPerson.draw(root);
