@@ -65,7 +65,6 @@ calc.run = function (datain) {
     calc.space_heating(calc.data);
     calc.heating_systems(calc.data);
     calc.fuel_requirements(calc.data);
-    calc.primary_energy_by_requirement(calc.data);
     calc.fabric_energy_efficiency(calc.data);
     calc.SAP(calc.data);
     calc.data.totalWK = calc.data.fabric_total_heat_loss_WK + calc.data.ventilation.average_WK;
@@ -1284,27 +1283,6 @@ calc.fuel_requirements = function (data) {
     return data;
 };
 
-/*---------------------------------------------------------------------------------------------
- // PRIMARY ENERGY USE BY REQUIREMENT
- //
- // Inputs from other modules:
- //      - data.fuel_requirements
- //
- // Global Outputs:
- //	- data.primary_energy_use_by_requirement
- //
- //---------------------------------------------------------------------------------------------*/
-calc.primary_energy_by_requirement = function (data) {
-    for (var req in data.fuel_requirements) {
-        data.primary_energy_use_by_requirement[req] = 0;
-        for (z in data.fuel_requirements[req].list) {
-            var fuel_input = data.fuel_requirements[req].list[z].fuel_input;
-            var fuel = data.fuel_requirements[req].list[z].fuel;
-
-            data.primary_energy_use_by_requirement[req] += fuel_input * data.fuels[fuel].primaryenergyfactor;
-        }
-    }
-};
 
 
 /*---------------------------------------------------------------------------------------------

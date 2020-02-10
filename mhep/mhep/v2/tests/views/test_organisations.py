@@ -70,7 +70,7 @@ class TestListOrganisations(APITestCase):
                             "can_promote_demote_librarians": False,
                         },
                     ),
-                    ("report", {}),
+                    ("report_template", ""),
                 ]
             )
         ]

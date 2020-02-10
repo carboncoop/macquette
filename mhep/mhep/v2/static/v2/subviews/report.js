@@ -1,12 +1,34 @@
+/*
+ * Report generation
+ *
+ * There are two main units of code here:
+ * - the Report class which handles the UI logic, and
+ * - the rest of the file, which contains the logic for generating the actual report
+ *   (this isn't in a class yet but should be)
+ *
+ * The basic concept of a report is that it's a Nunjucks template stored on the
+ * organisation.  We then collect a load of the data from the asessment into a set of
+ * context vars, which are passed through to the report.  This gives us a lot of
+ * flexibility in the report contents between organisations without needing to hack in
+ * lots of special cases.
+ *
+ * The report is rendered in an iframe to give it the maximum freedom of style, and to
+ * avoid clashing with MHEP's own styling.
+ */
+
 console.log('debug report.js');
 
 function report_initUI() {
-    data = project['master'];
+    if (!window.questionnaire) {
+        $.ajax({
+            url: urlHelper.static('subviews/householdquestionnaire.js'),
+            dataType: 'script',
+            async: false,
+            error: handleServerError('loading householdquestionnaire.js'),
+        });
+    }
 
-    add_scenario_options();
-    add_organisation_options();
-
-    if (view_html['compare'] == undefined) {
+    if (!view_html['compare']) {
         $.ajax({
             url: urlHelper.static('subviews/compare.js'),
             async: false,
@@ -15,67 +37,44 @@ function report_initUI() {
         });
     }
 
-    // Add static content
-    add_events();
-    add_prioirities_figure();
-    add_featured_image();
-    add_date();
-    add_address();
-    add_commentary();
+    let __report = new Report();
 }
 
-function report_UpdateUI() {
-    let t0 = performance.now();
+class Report {
+    constructor() {
+        this.element = {
+            generateReport: document.querySelector('#generate-report'),
+            printReport: document.querySelector('#print-report'),
+            reportPreview: document.querySelector('#report-preview'),
+            reportPreviewFrame: document.querySelector('iframe'),
+        };
 
-    let scenarios = [];
-    $('#scenario-choices input:checked').each(function () {
-        scenarios.push(this.value);
-    });
+        this.organsations = [];
+        mhep_helper.list_organisations()
+            .then(orgs => this.organisations = orgs)
+            .then(() => this.draw_organisations());
 
-    let scenarios_comparison = {};
-    let scenarios_measures_summary = {};
-    let scenarios_measures_complete = {};
+        this.draw_scenarios();
 
-    for (let s of scenarios) {
-        if (s != 'master') {
-            scenarios_comparison[s] = compareCarbonCoop(s);
-            scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
-            scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
-        }
+        this.element.generateReport.addEventListener('click', () => {
+            this.render_report();
+        });
+
+        this.element.printReport.addEventListener('click', () => {
+            this.element.reportPreviewFrame.contentWindow.focus();
+            this.element.reportPreviewFrame.contentWindow.print();
+        });
     }
 
-    choose_organisation();
+    draw_organisations() {
+        if (this.organisations.length === 0) {
+            document.querySelector('#organisation-choices').innerHTML = "Reports belong to organisations, and you are not in any organisations, so you can't generate reports.";
+            return;
+        }
 
-    add_scenario_names(scenarios);
-    add_performance_summary_figure(scenarios);
-    add_heat_loss_summary_figure(scenarios);
-    add_heat_balance_figure(scenarios);
-    add_space_heating_demand_figure(scenarios);
-    add_energy_demand_figure(scenarios);
-    add_primary_energy_usage_figure(scenarios);
-    add_carbon_dioxide_per_m2_figure(scenarios);
-    add_carbon_dioxide_per_person_figure(scenarios);
-    add_energy_costs_figure(scenarios);
-    add_comfort_tables(scenarios);
-    add_health_data(scenarios);
-    add_measures_summary_tables(scenarios, scenarios_measures_summary);
-    add_measures_complete_tables(scenarios, scenarios_measures_complete);
-    add_comparison_tables(scenarios, scenarios_comparison);
+        this.organisations[0].checked = true;
 
-    let t1 = performance.now();
-    console.log('report_UpdateUI took ' + (t1 - t0) + ' milliseconds.');
-}
-
-let report_organisations = null;
-
-// Add reports for each organisation we can access
-function add_organisation_options() {
-    mhep_helper.list_organisations().then(organisations => {
-        report_organisations = organisations;
-
-        noneOrg = { id: '__none', name: 'None', checked: true };
-
-        let html = [noneOrg, ...organisations]
+        let html = this.organisations
             .map(org =>`
                 <li>
                     <input type="radio"
@@ -89,360 +88,418 @@ function add_organisation_options() {
             .join('');
 
         document.querySelector('#organisation-choices').innerHTML = html;
-        choose_organisation();
-    });
-}
-
-const defaultOrg = {
-    'name': 'SAMPLE REPORT',
-    'report': {
-        'logo': '',
-        'colour': 'black',
-        'highlight_colour': '#ddd',
-    }
-};
-
-function choose_organisation() {
-    const selected = document.querySelector('input[name=report-organisation]:checked');
-    if (!selected) {
-        return;
     }
 
-    const selected_id = selected.value;
-    const org = report_organisations.find(e => e.id === selected_id) || defaultOrg;
-    const report = Object.assign({}, defaultOrg.report, org.report);
+    draw_scenarios() {
+        let scenarioOpts = '<li><input type="checkbox" checked disabled class="big-checkbox" value="master"> Master</li>';
 
-    $('.report-org-name').html(org.name);
+        for (let scenario_id in project) {
+            if (scenario_id == 'master') {
+                continue;
+            }
 
-    document.documentElement.style.setProperty('--report-primary-colour', report.colour);
-    document.documentElement.style.setProperty('--report-highlight-colour', report.highlight_colour);
+            const idx = scenario_id.split('scenario')[1];
+            const name = project[scenario_id].scenario_name;
+            const is_checked = (
+                scenario_id == 'scenario1'
+                || scenario_id == 'scenario2'
+                || scenario_id == 'scenario3'
+            );
 
-    $('#contact-for-questions').html(report.text_contact);
-    $('#section-3-text').html(report.text_section3);
-
-    const frontMatterContainer = document.querySelector('#report-front-matter-container');
-    if (report.text_front) {
-        $('#report-front-matter').html(report.text_front);
-        frontMatterContainer.removeAttribute('style');
-    } else {
-        // We set the style attribute directly, because we want to hide the element.
-        // If you use jQuery's show() and hide(), then when you call show() it sets
-        // the element's display CSS property to "block"... when we want it to be
-        // "flex".
-        frontMatterContainer.setAttribute('style', 'display:none;');
-    }
-
-    if (report.logo) {
-        $('#report-logo').attr('src', report.logo).show();
-    } else {
-        $('#report-logo').hide();
-    }
-}
-
-// Initialize choices scenario check boxes
-function add_scenario_options() {
-    let scenarioOpts = '<li><input type="checkbox" checked disabled class="big-checkbox" value="master"> Master</li>';
-
-    for (let scenario_id in project) {
-        if (scenario_id == 'master') {
-            continue;
+            scenarioOpts += `
+                <li>
+                    <input type="checkbox"
+                           ${is_checked ? 'checked' : ''}
+                           value="${scenario_id}"
+                           class="big-checkbox"
+                           id="check-${scenario_id}">
+                    <label class="d-i" for="check-${scenario_id}">Scenario ${idx}: ${name}</label>
+                </li>`;
         }
 
-        const idx = scenario_id.split('scenario')[1];
-        const name = project[scenario_id].scenario_name;
-        const is_checked = (
-            scenario_id == 'scenario1'
-            || scenario_id == 'scenario2'
-            || scenario_id == 'scenario3'
-        );
-
-        scenarioOpts += `
-            <li>
-                <input type="checkbox"
-                       ${is_checked ? 'checked' : ''}
-                       value="${scenario_id}"
-                       class="big-checkbox"
-                       id="check-${scenario_id}">
-                <label class="d-i" for="check-${scenario_id}">Scenario ${idx}: ${name}</label>
-            </li>`;
+        document.querySelector('#scenario-choices').innerHTML = scenarioOpts;
     }
 
-    document.querySelector('#scenario-choices').innerHTML = scenarioOpts;
+    render_report() {
+        const selected = document.querySelector('input[name=report-organisation]:checked');
+        if (!selected) {
+            return;
+        }
+
+        const selected_id = selected.value;
+        const org = this.organisations.find(e => e.id === selected_id);
+        if (!org) {
+            this.element.reportPreview.style.display = 'none';
+        } else {
+            this.element.reportPreview.style.display = 'block';
+            report_show(
+                this.element.reportPreviewFrame.contentDocument.querySelector('body'),
+                org.report_template
+            );
+        }
+    }
 }
 
-function add_events() {
-    window.onbeforeprint = function () {
-        $('#report-exit-print-mode').show();
 
-        // Because the 'Work Sans' font loads asyncronously, it often finishes loading after
-        // the JS has been executed, and thus after the diagams have been drawn.
-        // So we update the UI here to ensure that the diagrams are using the correct
-        // font.
-        report_UpdateUI();
+/**** REPORT GENERATION ****/
 
-        printmode = true;
-        hide_sidebar();
-    };
+function report_show(root, template) {
+    let t0 = performance.now();
 
-    $('body').on('click', '#report-exit-print-mode', _ => {
-        printmode = false;
-        show_sidebar();
+    let scenarios = [];
+    $('#scenario-choices input:checked').each(function () {
+        scenarios.push(this.value);
     });
 
-    $('body').on('click', '#report-apply', function () {
-        report_UpdateUI();
-    });
+    nunjucks.configure({ autoescape: true });
+    env = new nunjucks.Environment();
+    env.addFilter('likert', filter_comfort_table);
+    root.innerHTML = env.renderString(template, get_context_data(scenarios));
+
+    const graphs = [
+        [ add_heat_loss_summary,         '#heat-loss-summary' ],
+        [ add_heat_balance,              '#heat-balance' ],
+        [ add_space_heating_demand,      '#space-heating-demand' ],
+        [ add_energy_demand,             '#fuel-use' ],
+        [ add_primary_energy_usage,      '#energy-use-intensity' ],
+        [ add_carbon_dioxide_per_m2,     '#carbon-dioxide-emissions' ],
+        [ add_carbon_dioxide_per_person, '#carbon-dioxide-emissions-per-person' ],
+        [ add_energy_costs,              '#estimated-energy-cost-comparison' ],
+        [ add_peak_heating_load,         '#peak-heat-load' ],
+    ];
+
+    for (let [ draw, selector ] of graphs) {
+        const elem = root.querySelector(selector);
+        if (elem) {
+            draw(elem, scenarios);
+        }
+    }
+
+    let scenarios_comparison = {};
+    let scenarios_measures_summary = {};
+    let scenarios_measures_complete = {};
+
+    for (let s of scenarios) {
+        if (s != 'master') {
+            scenarios_comparison[s] = compareCarbonCoop(s);
+            scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
+            scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
+        }
+    }
+
+    add_measures_summary_tables(
+        root.querySelector('#ccop-report-measures-summary-tables'),
+        scenarios,
+        scenarios_measures_summary
+    );
+    add_measures_complete_tables(
+        root.querySelector('#report-measures-complete-tables'),
+        scenarios,
+        scenarios_measures_complete
+    );
+    add_comparison_tables(
+        root.querySelector('#comparison-tables'),
+        scenarios,
+        scenarios_comparison
+    );
+
+    let t1 = performance.now();
+    console.log('report_show took ' + (t1 - t0) + ' milliseconds.');
 }
-function add_featured_image() {
+
+function filter_comfort_table(selected, left, right) {
+    return new nunjucks.runtime.SafeString(`
+        <div style="width: 7em; text-align: right; margin-right: 0.5em;">${left}</div>
+        <svg viewBox="0 0 92 32" class="comfort-table">
+            <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'LOW' ? 'red' : 'white'}"></rect>
+            <rect y="1" x="31" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'MID' ? 'green' : 'white'}"></rect>
+            <rect y="1" x="61" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'HIGH' ? 'red' : 'white'}"></rect>
+        </svg>
+        <div style="width: 7em; margin-left: 0.5em;">${right}</div>`);
+}
+
+function get_featured_image() {
     let featuredImage = p.images.find(e => e.is_featured);
     if (featuredImage) {
-        $('.home-image').attr('src', featuredImage.url);
+        return featuredImage.url;
+    } else {
+        return '';
     }
 }
-function add_address() {
+
+function get_front_address() {
     let address = [
-        data.household['1a_addressline1'],
-        data.household['1a_addressline2'],
-        data.household['1a_addressline3'],
-        data.household['1a_towncity'],
-        data.household['1a_postcode'],
+        project.master.household['address_1'] || '',
+        project.master.household['address_2'] || '',
+        project.master.household['address_3'] || '',
+        project.master.household['address_town'] || '',
+        project.master.household['address_postcode'] || '',
     ];
 
-    let joinedHTML = address.filter(e => e != '').join('<br>');
-    $('#report_address').html(joinedHTML);
+    return address.filter(e => e != '').join('\n');
 }
-function add_date() {
-    var date = new Date();
-    var months_numbers = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    $('#report_date').html(date.getDate() + '-' + months_numbers[date.getMonth()] + '-' + date.getFullYear());
-}
-function add_prioirities_figure() {
-    //  Shows retrofit priorities - in order - identifying whether interested in retrofit for cost, comfort or carbon reasons etc.
 
-    var priorities = {};
-    var household = project['master'].household;
-    var prioritiesPossibilities = [
-        '7b_carbon',
-        '7b_money',
-        '7b_comfort',
-        '7b_airquality',
-        '7b_modernisation',
-        '7b_health',
-    ];
-    if (household != undefined) {
-        if (typeof household['7b_carbon'] != 'undefined') {
-            priorities.carbon = {
-                title: 'Save carbon',
-                order: household['7b_carbon']
-            };
-        }
-
-        if (typeof household['7b_money'] != 'undefined') {
-            priorities.money = {
-                title: 'Save money',
-                order: household['7b_money'],
-            };
-        }
-
-        if (typeof household['7b_comfort'] != 'undefined') {
-            priorities.comfort = {
-                title: 'Improve comfort',
-                order: household['7b_comfort'],
-            };
-        }
-
-        if (typeof household['7b_airquality'] != 'undefined') {
-            priorities.airquality = {
-                title: 'Improve indoor air quality',
-                order: household['7b_airquality']
-            };
-        }
-
-        if (typeof household['7b_modernisation'] != 'undefined') {
-            priorities.modernisation = {
-                title: 'General modernisation',
-                order: household['7b_modernisation'],
-            };
-        }
-
-        if (typeof household['7b_health'] != 'undefined') {
-            priorities.health = {
-                title: 'Improve health',
-                order: household['7b_health'],
-            };
-        }
-
-        var sortedPriorities = [];
-        for (var priority in priorities) {
-            sortedPriorities.push([priority, priorities[priority]['order'], priorities[priority]['title']]);
-        }
-        sortedPriorities.sort(function (a, b) {
-            return parseInt(a[1]) - parseInt(b[1]);
-        });
-
-        $('#retrofit-priorities').html('');
-        for (var priority_order = 1; priority_order <= 3; priority_order++) {
-            for (var i = 0; i < sortedPriorities.length; i++) {
-                if (sortedPriorities[i][1] == priority_order) {
-                    $('#retrofit-priorities').append('<li>' + sortedPriorities[i][2] + '</li>');
-                }
-            }
-        }
-    }
-}
-function add_scenario_names(scenarios) {
-    $('.scenarios-list').html('');
-    scenarios.forEach(function (scenario) {
-        if (scenario != 'master') {
-            $('.scenarios-list').append('<li>Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</li>');
-        }
-    });
-}
-function add_performance_summary_figure(scenarios) {
-    // Quick overview/summary - Benchmarking Bar Charts. Need to ensure that all scenarios displayed, not just one as on current graph.
-    // Space Heating Demand (kWh/m2.a)
-    // Primary Energy Demand (kWh/m2.a)
-    // CO2 emission rate (kgCO2/m2.a)
-    // CO2 emission rate - per person (kgCO2/m2.a)
-
-    var values = [];
-    for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].space_heating_demand_m2 != 'undefined') {
-            values[i] = Math.round(project[scenarios[i]].space_heating_demand_m2);
-        } else {
-            values[i] = 0;
-        }
-    }
-
-    colors = [
-        'rgb(236, 157, 163)',
-        'rgb(164, 211, 226)',
-        'rgb(184, 237, 234)',
-        'rgb(251, 212, 139)',
-        'rgb(236, 157, 100)',
-        'rgb(164, 211, 100)',
-        'rgb(184, 237, 100)',
-        'rgb(251, 212, 100)',
-        'rgb(236, 157, 0)',
-        'rgb(164, 211, 0)',
-        'rgb(184, 237, 0)',
-        'rgb(251, 212, 0)'
-    ];
-
-    var options = {
-        name: 'Space heating demand',
-        font: 'Work Sans',
-        colors: colors,
-        value: Math.round(data.space_heating_demand_m2),
-        values: values,
-        units: 'kWh/m' + String.fromCharCode(178) + '.a', //String.fromCharCode(178) = 2 superscript
-        targets: {
-            'Min Target': datasets.target_values.space_heating_demand_lower,
-            'Max Target': datasets.target_values.space_heating_demand_upper,
-            'UK average': datasets.uk_average_values.space_heating_demand
+function get_priorities() {
+    let household = project.master.household;
+    let priorities = [
+        {
+            title: 'Save carbon',
+            order: parseInt(household['priority_carbon'], 10)
         },
-        targetRange: [datasets.target_values.space_heating_demand_lower, datasets.target_values.space_heating_demand_upper]
-    };
-    targetbarCarboncoop('space-heating-demand', options);
-    // ---------------------------------------------------------------------------------
-    var values = [];
-    for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].primary_energy_use_m2 != 'undefined') {
-            values[i] = Math.round(project[scenarios[i]].primary_energy_use_m2);
-        } else {
-            values[i] = 0;
+        {
+            title: 'Save money',
+            order: parseInt(household['priority_money'], 10),
+        },
+        {
+            title: 'Improve comfort',
+            order: parseInt(household['priority_comfort'], 10),
+        },
+        {
+            title: 'Improve indoor air quality',
+            order: parseInt(household['priority_airquality'], 10)
+        },
+        {
+            title: 'General modernisation',
+            order: parseInt(household['priority_modernisation'], 10),
+        },
+        {
+            title: 'Improve health',
+            order: parseInt(household['priority_health'], 10),
         }
-    }
+    ];
 
-    var options = {
-        name: 'Primary energy demand',
-        value: Math.round(data.primary_energy_use_m2),
-        colors: colors,
-        values: values,
-        units: 'kWh/m' + String.fromCharCode(178) + '.a', //String.fromCharCode(178) = 2 superscript
-        targets: {
-            // "Passivhaus": 120,
-            'Carbon Coop 2050 target (inc. renewables)': datasets.target_values.primary_energy_demand,
-            'UK Average': datasets.uk_average_values.primary_energy_demand
-        }
-    };
-    targetbarCarboncoop('primary-energy', options);
-    // ---------------------------------------------------------------------------------
+    return priorities
+        .filter(elem => !isNaN(elem.order))
+        .sort(function (a, b) {
+            if (a.order < b.order) {
+                return -1;
+            } else if (a.order > b.order) {
+                return 1;
+            } else {
+                return 0;
+            }
+        })
+        .map(elem => elem.title)
+        .slice(0, 3);
+}
 
-    var values = [];
-    for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].kgco2perm2 != 'undefined') {
-            values[i] = Math.round(project[scenarios[i]].kgco2perm2);
-        } else {
-            values[i] = 0;
-        }
-    }
-
-    var options = {
-        name: "CO<sub>2</sub> Emission rate <i class='icon-question-sign' title='Carbon emissions and number of homes: DECC (2014) \"United Kindgdom Housing Energy Fact File: 2013\", 28 January 2014, accessed at http://www.gov.uk/government/statistics/united-kingdom-housing-energy-fact-file-2013\n\n"
-                + 'Average Floor Area: National Statistics, (2016), "English Housing Survey 2014 to 2015: Headline Report", 18 Feb 2016, accessed at http://www.gov.uk/government/statistics/english-housing-survey-2014-to-2015-headline-report \n\n'
-                + "CO<sub>2</sub> emissions factors are 15 year ones, based on figures published by BRE at http://www.bre.co.uk/filelibrary/SAP/2012/Emission-and-primary-factors-2013-2027.pdf' />",
-        value: Math.round(data.kgco2perm2),
-        colors: colors,
-        values: values,
-        units: 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.a', //String.fromCharCode(178) = 2 superscript
-        targets: {
-            'Carbon Coop 2050 target': datasets.target_values.co2_emission_rate,
-            'UK Average': datasets.uk_average_values.co2_emission_rate,
-        }
-    };
-    targetbarCarboncoop('co2-emission-rate', options);
-
-
-    // ---------------------------------------------------------------------------------
-
-    //    var values = [];
-    // for (var i = 0 ; i < scenarios.length ; i++){
-    // 	if (typeof project[scenarios[i]] != "undefined" && project[scenarios[i]].kwhdpp != "undefined"){
-    // 		values[i] =  Math.round(project[scenarios[i]].kwhdpp.toFixed(1));
-    // 	} else {
-    // 		values[i] = 0;
-    // 	}
-    // }
-
-    // var options = {
-    //     name: "Per person energy use",
-    //     value: data.kwhdpp.toFixed(1),
-    //     colors: colors,
-    //     values: values,
-    //     units: "kWh/day",
-    //     targets: {
-    //         "70% heating saving": 8.6,
-    //         "UK Average": 19.6
-    //     }
-    // };
-    // targetbarCarboncoop("energy-use-per-person", options);
-
-    $('#performance-summary-key').html('');
-    for (var i = 0; i < scenarios.length; i++) {
-        let name;
-
-        if (scenarios[i] == 'master') {
-            name = 'Your home now';
-        } else {
-            name = 'Scenario ' + scenarios[i].split('scenario')[1] + ': ' + project[scenarios[i]].scenario_name;
-        }
-
-
-        $('#performance-summary-key').append(`
-            <li class="mb-0">
-                <svg viewBox="1 1 15 15" height="15" width="15">
-                    <rect y="1" x="1" width="15" height="15" fill="${colors[i]}"></rect>
-                </svg>
-                ${name}
-            </li>`);
+function get_average_temperature() {
+    temps = [ project.master.household.reading_temp1, project.master.household.reading_temp2 ].filter(e => e ? true : false);
+    if (temps.length === 0) {
+        return null;
+    } else if (temps.length === 1) {
+        return temps[0];
+    } else {
+        return (temps[0] + temps[1]) / 2;
     }
 }
-function add_heat_loss_summary_figure(scenarios) {
-    $('.js-house-heatloss-diagrams-wrapper').html("<ul class='js-house-heatloss-diagram-picker house-heatloss-diagram-picker'></ul>");
 
-    // Add the diagrams
-    scenarios.forEach(function (scenario) {
+function get_average_humidity() {
+    temps = [ project.master.household.reading_humidity1, project.master.household.reading_humidity2 ].filter(e => e ? true : false);
+    if (temps.length === 0) {
+        return null;
+    } else if (temps.length === 1) {
+        return temps[0];
+    } else {
+        return (temps[0] + temps[1]) / 2;
+    }
+}
+
+function get_pv() {
+    if (typeof project.master.generation.solar_annual_kwh !== 'number' ||
+            project.master.generation.solar_annual_kwh === 0) {
+        return false;
+    }
+
+    return {
+        generation: project.master.generation.solar_annual_kwh, // kWh
+        used_onsite: project.master.generation.solar_fraction_used_onsite * 100,  // %
+    };
+}
+
+function get_used_fuels(scenarios) {
+    let all_fuel_names = new Set();
+
+    for (let scenario_id of scenarios) {
+        let scenario = project[scenario_id];
+        for (let fuel of Object.values(scenario.fuel_totals)) {
+            all_fuel_names.add(fuel.name);
+        }
+    }
+
+    return [...all_fuel_names].map(name => ({
+        name: name,
+        co2factor: project.master.fuels[name].co2factor,
+        standingcharge: project.master.fuels[name].standingcharge / 100,
+        fuelcost: project.master.fuels[name].fuelcost / 100,
+    }));
+}
+
+function get_scenario_list(scenarios) {
+    return scenarios
+        .filter(id => id !== 'master')
+        .map(scenario_id => ({
+            id: scenario_id,
+            num: parseInt(scenario_id.match(/(\d+)/g)[0], 10),
+            name: project[scenario_id].scenario_name,
+            description: project[scenario_id].scenario_description,
+        }));
+}
+
+function get_lookup(table, key) {
+    return table[project.master.household[key]];
+}
+
+function get_context_data(scenarios) {
+    const hh = project.master.household;
+
+    return {
+        front: {
+            image_url: get_featured_image(),
+            name: hh['householder_name'],
+            address: get_front_address(),
+            local_authority: hh['address_la'],
+            survey_date: hh['assessment_date'],
+            report_date: hh['report_date'],
+            report_version: hh['report_version'],
+            mhep_version: VERSION,
+            assessor_name: hh['assessor_name'],
+        },
+        aims: {
+            future: {
+                occupancy_actual: get_lookup(questionnaire.OCCUPANCY_ACTUAL, 'occupancy_actual'),
+                occupancy_planned: get_lookup(questionnaire.OCCUPANCY_EXPECTED, 'occupancy_expected'),
+                occupancy_notes: hh['occupancy_expected_note'],
+                lifestyle_change: hh['expected_lifestyle_change'] === 'YES',
+                lifestyle_change_notes: hh['expected_lifestyle_change_note'],
+                other_works: hh['expected_other_works'] === 'YES',
+                other_works_notes: hh['expected_other_works_note'],
+                works_start: get_lookup(questionnaire.WORKS_START, 'expected_start'),
+                works_start_notes: hh['expected_start_note'],
+            },
+            priorities: get_priorities(),
+            qual_criteria: hh['priority_qualitative_note'],
+            aesthetics: {
+                internal: hh['aesthetics_external'] === 'YES',
+                external: hh['aesthetics_internal'] === 'YES',
+                note: hh['aesthetics_note'],
+            },
+            logistics: {
+                packaging: get_lookup(questionnaire.LOGISTICS_PACKAGING, 'logistics_packaging'),
+                can_diy: hh['logistics_diy'] === 'YES',
+                diy_note: hh['logistics_diy_note'],
+                disruption: get_lookup(questionnaire.LOGISTICS_DISRUPTION, 'logistics_disruption'),
+                disruption_comment: hh['logistics_disruption_note'],
+                has_budget: hh['logistics_budget'] === 'YES',
+                budget_comment: hh['logistics_budget_note'],
+                brief: hh['commentary_brief'],
+            }
+        },
+        now: {
+            home_type: get_lookup(questionnaire.HOUSE_TYPE, 'house_type'),
+            num_bedrooms: hh['house_nr_bedrooms'],
+            floor_area: project.master.TFA,
+            construction: {
+                floors: hh['construct_note_floors'],
+                walls: hh['construct_note_walls'],
+                roof: hh['construct_note_roof'],
+                openings: hh['construct_note_openings'],
+                drainage: hh['construct_note_drainage'],
+                ventiliation: hh['construct_note_ventiliation'],
+                ingress: hh['construct_note_ingress'],
+            },
+            previous_works: hh['previous_works'],
+            structural: {
+                you_said: hh['structural_issues'],
+                we_noted: hh['structural_issues_note'],
+            },
+            damp: {
+                you_said: hh['damp'],
+                we_noted: hh['damp_note'],
+            },
+            space_heating: hh['space_heating_provided'],
+            space_heating_controls: hh['space_heating_controls'],
+            hot_water: hh['hot_water_provided'],
+            utility: {
+                electricity: hh['mains_electricity'],
+                gas: hh['mains_gas'],
+                water: hh['mains_water'],
+                sewer: hh['mains_sewer'],
+            },
+            ventilation: {
+                system_name: project.master.ventilation.ventilation_name,
+                ventilation_suggestion: get_lookup(questionnaire.VENTILATION_SUGGESTION, 'ventilation_suggestion'),
+                avg_humidity: get_average_humidity(),
+                adequate_paths: hh['ventilation_adequate_paths'] === 'YES',
+                purge_vents: hh['ventilation_purge_vents'] === 'YES',
+                gaps: hh['ventilation_gaps'] === 'YES',
+                note: hh['ventilation_note'],
+                fuel_burner: hh['fuel_burner'],
+                fuel_burner_note: hh['fuel_burner_note'],
+            },
+            laundry_habits: hh['laundry'],
+            radon_chance: get_lookup(questionnaire.RADON_RISK, 'radon_risk'),
+            experience: {
+                thermal: {
+                    temperature_winter: hh['comfort_temperature_winter'],
+                    temperature_summer: hh['comfort_temperature_summer'],
+                    airquality_winter: hh['comfort_airquality_winter'],
+                    airquality_summer: hh['comfort_airquality_summer'],
+                    draughts_winter: hh['comfort_draughts_winter'],
+                    draughts_summer: hh['comfort_draughts_summer'],
+                    avg_temp: get_average_temperature(),
+                    problems: hh['thermal_comfort_problems'],
+                    note: hh['thermal_comfort_note'],
+                },
+                daylight: {
+                    amount: hh['daylight'],
+                    problems: hh['daylight_problems'] === 'YES',
+                    note: hh['daylight_note'],
+                },
+                noise: {
+                    problems: hh['noise_problems'] === 'YES',
+                    note: hh['noise_note'],
+                },
+                rooms: {
+                    favourite: hh['rooms_favourite'],
+                    unloved: hh['rooms_unloved'],
+                }
+            },
+            historic: {
+                when_built: hh['historic_age_precise']
+                    ? hh['historic_age_precise']
+                    : get_lookup(questionnaire.HISTORIC_AGE_BAND, 'historic_age_band'),
+                conservation: hh['historic_conserved'] === 'YES',
+                listed: hh['historic_listed'] === 'NO'
+                    ? false
+                    : get_lookup(questionnaire.HISTORIC_LISTED, 'historic_listed'),
+                comments: hh['historic_note'],
+            },
+            theworldisburning: {
+                flooding_history: hh['flooding_history'] === 'YES',
+                flooding_rivers_sea: get_lookup(questionnaire.FLOODING_RISK, 'flooding_rivers_sea'),
+                flooding_surface_water: get_lookup(questionnaire.FLOODING_RISK, 'flooding_surface_water'),
+                flooding_comments: hh['flooding_note'],
+                overheating_comments: hh['overheating_note'],
+            },
+            context_and_other_points: hh['context_and_other_points'],
+            pv: get_pv(),
+        },
+        used_fuels: get_used_fuels(scenarios),
+        commentary: {
+            context: hh['commentary_context'],
+            decisions: hh['commentary_decisions'],
+        },
+        scenarios: {
+            list: get_scenario_list(scenarios),
+        }
+    };
+}
+
+function add_heat_loss_summary(root, scenarios) {
+    $(root).html('');
+
+    for (let scenario of scenarios) {
         let house_markup = generateHouseMarkup(heatlossData(scenario));
         let name = scenario == 'master' ? 'Your home now' : 'Scenario ' + scenario.split('scenario')[1];
         let html = `
@@ -451,25 +508,11 @@ function add_heat_loss_summary_figure(scenarios) {
                 ${house_markup}
             </div>`;
 
-        $('.js-house-heatloss-diagrams-wrapper').append(html);
-    });
-
-    // Events
-    $('body').on('click', '.js-house-heatloss-diagram-picker li', function (e) {
-        var scenario = $(this).data('scenario');
-        $('.js-house-heatloss-diagram-picker li').removeClass('selected');
-        $(this).addClass('selected');
-        $('.js-house-heatloss-diagrams-wrapper .centered-house').css({
-            'display': 'none'
-        });
-        $("div[data-scenario-diagram='" + scenario + "']").css('display', 'block');
-    });
-
-    // Show the diagram for the master scenario
-    $('.js-house-heatloss-diagram-picker [data-scenario=master]').click();
-
+        $(root).append(html);
+    }
 }
-function add_heat_balance_figure(scenarios) {
+
+function add_heat_balance(root, scenarios) {
     // Heat transfer per year by element. The gains and losses here need to balance.
     var dataFig4 = [];
     var max_value = 250; // used to set the height of the chart
@@ -480,7 +523,7 @@ function add_heat_balance_figure(scenarios) {
         } else {
             var label = 'Scenario ' + scenario.split('scenario')[1];
         }
-        if (typeof project[scenario] != 'undefined' && typeof project[scenario].annual_useful_gains_kWh_m2 != 'undefined') {
+        if (project[scenario] !== undefined && project[scenario].annual_useful_gains_kWh_m2 !== undefined) {
             dataFig4.push({
                 label: label,
                 value: [
@@ -501,7 +544,7 @@ function add_heat_balance_figure(scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
+        yAxisLabel: 'kWh/m².year',
         fontSize: 33,
         width: 1200.35,
         chartHeight: 600,
@@ -521,16 +564,15 @@ function add_heat_balance_figure(scenarios) {
         },
         data: dataFig4,
     });
-    $('#heat-balance').html('');
-    HeatBalance.draw('heat-balance');
+    HeatBalance.draw(root);
 }
-function add_space_heating_demand_figure(scenarios) {
+function add_space_heating_demand(root, scenarios) {
     var dataFig = [];
     var max_value = 250; // used to set the height of the chart
     var label = '';
     var value = 0;
     for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].space_heating_demand_m2 != 'undefined') {
+        if (project[scenarios[i]].space_heating_demand_m2 !== undefined) {
             value = Math.round(project[scenarios[i]].space_heating_demand_m2);
             if (scenarios[i] == 'master') {
                 label = 'Your home now';
@@ -550,7 +592,7 @@ function add_space_heating_demand_figure(scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
+        yAxisLabel: 'kWh/m²·year',
         fontSize: 33,
         font: 'Work Sans',
         division: 50,
@@ -596,47 +638,52 @@ function add_space_heating_demand_figure(scenarios) {
         ],
         data: dataFig
     });
-    $('#fig-5-space-heating-demand').html('');
-    SpaceHeatingDemand.draw('fig-5-space-heating-demand');
+    SpaceHeatingDemand.draw(root);
 }
-function add_energy_demand_figure(scenarios) {
-    max_value = 40000;
-    var energyDemandData = getEnergyDemandData(scenarios);
+function add_energy_demand(root, scenarios) {
+    let energyDemandData = getEnergyDemandData(scenarios);
     var dataFig = prepare_data_for_graph(energyDemandData);
+
+    const max = getGraphCeil({
+        min: 5000,
+        max: getGraphValuesMax(dataFig),
+        incr: 5000
+    });
+
     var EnergyDemand = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
-        yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
+        yAxisLabelColor: 'rgb(87, 77, 86)',
+        barLabelsColor: 'rgb(87, 77, 86)',
         yAxisLabel: 'kWh/year',
         fontSize: 33,
         font: 'Work Sans',
         width: 1200,
         chartHeight: 600,
         division: 5000,
-        chartHigh: max_value,
+        chartHigh: max,
         barWidth: 550 / dataFig.length,
         barGutter: 400 / dataFig.length,
-        defaultBarColor: 'rgb(231,37,57)', defaultVarianceColor: 'rgb(2,37,57)',
+        defaultBarColor: 'rgb(231,37,57)',
+        defaultVarianceColor: 'rgb(2,37,57)',
         barColors: {
             'Gas': 'rgb(236,102,79)',
             'Electric': 'rgb(240,212,156)',
             'Other': 'rgb(24,86,62)',
-        }, data: dataFig
+        },
+        data: dataFig
     });
-    $('#energy-demand').html('');
-    EnergyDemand.draw('energy-demand');
+    EnergyDemand.draw(root);
 }
-function add_primary_energy_usage_figure(scenarios) {
-    var primaryEnergyUseData = getPrimaryEnergyUseData(scenarios);
-    var max = primaryEnergyUseData.max;
-    var min = primaryEnergyUseData.min - 50;
-    delete primaryEnergyUseData.max;
-    delete primaryEnergyUseData.min;
+function add_primary_energy_usage(root, scenarios) {
+    let [ primaryEnergyUseData, min, max ] = getPrimaryEnergyUseData(scenarios);
+    min -= 50;
+
     var dataGraph = prepare_data_for_graph(primaryEnergyUseData);
     var primaryEneryUse = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
+        yAxisLabel: 'kWh/m².year',
         fontSize: 33,
         font: 'Work Sans',
         width: 1200,
@@ -652,29 +699,30 @@ function add_primary_energy_usage_figure(scenarios) {
             'Space Heating': 'rgb(66, 134, 244)',
             'Cooking': 'rgb(24,86,62)',
             'Appliances': 'rgb(240,212,156)',
-            'Lighting': 'rgb(236,102,79)', 'Fans and Pumps': 'rgb(246, 167, 7)', 'Non categorized': 'rgb(131, 51, 47)',
+            'Lighting': 'rgb(236,102,79)',
+            'Fans and Pumps': 'rgb(246, 167, 7)',
+            'Non categorized': 'rgb(131, 51, 47)',
             // 'Generation': 'rgb(200,213,203)'
         },
         data: dataGraph,
         targets: [
             {
-                label: 'UK Average 360 kWh/m' + String.fromCharCode(178) + '.a',
+                label: 'UK Average 360 kWh/m².a',
                 target: 360,
                 color: 'rgb(231,37,57)'
             }, {
-                label: 'Carbon Coop Target 120 kWh/m' + String.fromCharCode(178) + '.a',
+                label: 'Carbon Coop Target 120 kWh/m².a',
                 target: 120,
                 color: 'rgb(231,37,57)'
             }
         ],
     });
-    $('#primary-energy-use').html('');
-    primaryEneryUse.draw('primary-energy-use');
+    primaryEneryUse.draw(root);
 }
-function add_carbon_dioxide_per_m2_figure(scenarios) {
+function add_carbon_dioxide_per_m2(root, scenarios) {
     var carbonDioxideEmissionsData = [];
     var max = 100;
-    if (typeof project['master'] !== 'undefined' && typeof project['master'].kgco2perm2 !== 'undefined') {
+    if (project['master'] !== undefined && project['master'].kgco2perm2 !== undefined) {
         var array = [{value: project['master'].kgco2perm2}];
         // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
         if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualco2 < 0) {
@@ -705,7 +753,7 @@ function add_carbon_dioxide_per_m2_figure(scenarios) {
     var CarbonDioxideEmissions = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year', fontSize: 33,
+        yAxisLabel: 'kgCO₂/m².year', fontSize: 33,
         font: 'Work Sans',
         division: 10,
         width: 1200,
@@ -717,87 +765,139 @@ function add_carbon_dioxide_per_m2_figure(scenarios) {
         data: carbonDioxideEmissionsData,
         targets: [
             {
-                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year', target: datasets.target_values.co2_emission_rate,
+                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO₂/m².year', target: datasets.target_values.co2_emission_rate,
                 color: 'rgb(231,37,57)'
             },
             {
-                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year',
+                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO₂/m².year',
                 target: datasets.uk_average_values.co2_emission_rate,
                 color: 'rgb(231,37,57)'
             },
         ], });
-    $('#carbon-dioxide-emissions').html('');
-    CarbonDioxideEmissions.draw('carbon-dioxide-emissions');
+    CarbonDioxideEmissions.draw(root);
 }
-function add_carbon_dioxide_per_person_figure(scenarios) {
-    var carbonDioxideEmissionsPerPersonData = [];
-    if (typeof project['master'] != 'undefined' && typeof project['master'].annualco2 !== 'undefined' && typeof project['master'].occupancy !== 'undefined') {
-        var array = [{value: project['master'].annualco2 / project['master'].occupancy}];
-        // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
-        if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualco2 < 0) {
-            array.push({value: project['master'].fuel_totals['generation'].annualco2 / project['master'].occupancy});
-        }
-        carbonDioxideEmissionsPerPersonData.push({label: 'Your home now', value: array});
+
+function notenoughdata(root) {
+    $(root).html('<p>Not enough data to generate this graph.</p>');
+}
+
+function add_carbon_dioxide_per_person(root, scenarios) {
+    if (!project.master.annualco2 && project.master.occupancy) {
+        return notenoughdata(root);
     }
 
-    var array = [{value: project['master'].TFA * project['master'].currentenergy.total_co2m2 / project['master'].occupancy}, {value: -data.currentenergy.generation.annual_CO2 / project['master'].occupancy}];
-    carbonDioxideEmissionsPerPersonData.push({label: 'Bills data', value: array});
+    let has_generation = false;
 
-    scenarios.forEach(function (scenario) {
-        if (scenario != 'master') {
-            var array = [{value: project[scenario].annualco2 / project['master'].occupancy}];
-            // project[scenario].kgco2perm2 has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
-            if (project[scenario].use_generation == 1 && project[scenario].fuel_totals['generation'].annualco2 < 0) {
-                array.push({value: project[scenario].fuel_totals['generation'].annualco2 / project['master'].occupancy});
-            }
-            carbonDioxideEmissionsPerPersonData.push({label: 'Scenario ' + scenario.split('scenario')[1], value: array});
-        }
-    });
+    const baseline = project.master;
+    const dataFor = scenario => {
+        let data = [];
 
-    var max = 8000;
-    carbonDioxideEmissionsPerPersonData.forEach(function (scenario) {
-        if (scenario.value > max) {
-            max = scenario.value + 1000;
+        if (baseline.occupancy == 1) {
+            data.push({ value: scenario.annualco2, label: 'Household emissions' });
+        } else {
+            let onePerson = scenario.annualco2 / baseline.occupancy;
+            let others = scenario.annualco2 - onePerson;
+            data.push({ value: onePerson, label: 'One person' });
+            data.push({ value: others, label: 'Other people who live here' });
+        };
+
+        // project[scenario].kgco2perm2 has deducted the savings due to renewables
+        // to make the graph clearer (?) we add the savings as negative to give the
+        // impression of offset
+        if (scenario.use_generation == 1 && scenario.fuel_totals.generation.annualco2 < 0) {
+            data.push({
+                value: scenario.fuel_totals.generation.annualco2 / baseline.occupancy,
+                label: 'Generation (per person)'
+            });
+            has_generation = true;
         }
+
+        return data;
+    };
+
+    const billsData = () => {
+        let data = [];
+
+        if (baseline.occupancy == 1) {
+            data.push({ value: baseline.TFA * baseline.currentenergy.total_co2m2, label: 'Household emissions' });
+        } else {
+            let onePerson = baseline.TFA * baseline.currentenergy.total_co2m2 / baseline.occupancy;
+            let others = (baseline.TFA * baseline.currentenergy.total_co2m2) - onePerson;
+            data.push({ value: onePerson, label: 'One person' });
+            data.push({ value: others, label: 'Other people who live here' });
+        };
+
+        if (project.master.currentenergy.generation.annual_CO2) {
+            data.push({
+                value: -project.master.currentenergy.generation.annual_CO2 / baseline.occupancy,
+                label: 'Generation (per person)'
+            });
+            has_generation = true;
+        }
+
+        return data;
+    };
+
+    let graphData = [
+        { label: 'Your home now', value: dataFor(baseline) },
+        { label: 'Bills data',    value: billsData()       },
+    ];
+
+    for (let scenario_id of scenarios) {
+        if (scenario_id == 'master') {
+            continue;
+        }
+
+        const scenario = project[scenario_id];
+
+        graphData.push({
+            label: 'Scenario ' + scenario_id.split('scenario')[1],
+            value: dataFor(scenario),
+        });
+    }
+
+    const max = getGraphCeil({
+        min: 8000,
+        max: getGraphValuesMax(graphData),
+        incr: 1000
     });
 
     var CarbonDioxideEmissionsPerPerson = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/person/year',
+        yAxisLabel: 'kgCO₂/year',
         fontSize: 33,
         font: 'Work Sans',
-        division: max < 28000 ? 1000 : 2000,
+        division: max <= 10000 ? 1000 : 2000,
+        chartLow: has_generation ? -1000 : 0,
         chartHigh: max,
         width: 1200,
         chartHeight: 600,
-        barWidth: 550 / carbonDioxideEmissionsPerPersonData.length,
-        barGutter: 400 / carbonDioxideEmissionsPerPersonData.length,
+        barWidth: 550 / graphData.length,
+        barGutter: 400 / graphData.length,
         defaultBarColor: 'rgb(157,213,203)', defaultVarianceColor: 'rgb(231,37,57)',
-        // barColors: {
-        // 	'Space heating': 'rgb(157,213,203)',
-        // 	'Pumps, fans, etc.': 'rgb(24,86,62)',
-        // 	'Cooking': 'rgb(40,153,139)',         // },
-        data: carbonDioxideEmissionsPerPersonData
+        barColors: (baseline.occupancy == 1) ? {
+            'Household emissions': 'rgb(66, 134, 244)',
+            'Generation (per person)': 'rgb(24,86,62)',
+        } : {
+            'One person': 'rgb(157,213,203)',
+            'Other people who live here': 'rgb(66, 134, 244)',
+            'Generation (per person)': 'rgb(24,86,62)',
+        },
+        data: graphData
     });
-    $('#carbon-dioxide-emissions-per-person').html('');
-    CarbonDioxideEmissionsPerPerson.draw('carbon-dioxide-emissions-per-person');
-
+    CarbonDioxideEmissionsPerPerson.draw(root);
 }
-function add_energy_costs_figure(scenarios) {
+function add_energy_costs(root, scenarios) {
     var estimatedEnergyCostsData = [];
-    var max = 3500;
-    if (typeof project['master'] != 'undefined' && typeof project['master'].total_cost !== 'undefined') {
+    if (project['master'] !== undefined && project['master'].total_cost !== undefined) {
         var array = [{value: project['master'].total_cost}];
         // project[scenario].total_cost has deducted the savings due to renewables, to make the graph clearer we add the savings as negative to give the impression of offset
         if (project['master'].use_generation == 1 && project['master'].fuel_totals['generation'].annualcost < 0) {
             array.push({value: project['master'].fuel_totals['generation'].annualcost});
         }
         estimatedEnergyCostsData.push({label: 'Your home now', value: array});
-        if (max < project['master'].total_cost + 0.3 * project['master'].total_cost) {
-            max = project['master'].total_cost + 0.3 * project['master'].total_cost;
-        }
     }
 
     var array = [{value: project['master'].currentenergy.total_cost}];
@@ -818,6 +918,12 @@ function add_energy_costs_figure(scenarios) {
         }
     });
 
+    const max = getGraphCeil({
+        min: 500,
+        max: getGraphValuesMax(estimatedEnergyCostsData),
+        incr: 500
+    });
+
     var EstimatedEnergyCosts = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
@@ -826,7 +932,7 @@ function add_energy_costs_figure(scenarios) {
         fontSize: 33,
         font: 'Work Sans',
         division: 500,
-        //chartHigh: max,
+        chartHigh: max,
         width: 1200,
         chartHeight: 600,
         barWidth: 550 / estimatedEnergyCostsData.length,
@@ -834,189 +940,11 @@ function add_energy_costs_figure(scenarios) {
         defaultBarColor: 'rgb(157,213,203)',
         data: estimatedEnergyCostsData
     });
-    $('#estimated-energy-cost-comparison').html('');
-    EstimatedEnergyCosts.draw('estimated-energy-cost-comparison');
+    EstimatedEnergyCosts.draw(root);
 }
-function add_comfort_tables(scenarios) {
-    // Temperature in Winter
-    if (project.master.household == undefined
-            || project.master.household['6a_temperature_winter'] == undefined
-            || project.master.household['6a_airquality_winter'] == undefined
-            || project.master.household['6a_airquality_summer'] == undefined
-            || project.master.household['6a_temperature_summer'] == undefined
-            || project.master.household['6b_daylightamount'] == undefined
-            || project.master.household['6b_artificallightamount'] == undefined) {
-        $('.comfort-tables').html('<p>There is not enough information, please check section 6 in Household Questionnaire. </p>');
-    } else {
-        var options = [{
-            title: 'Too cold', color: 'red',
-        }, {
-            title: 'Just right',
-            color: 'green',
-        }, {
-            title: 'Too hot', color: 'red'
-        }
-        ];
-        createComforTable(options, 'comfort-table-winter-temp', project.master.household['6a_temperature_winter']);
-        // Air quality
-        var options = [
-            {
-                title: 'Too dry', color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {title: 'Too stuffy',
-                color: 'red'
-            }];
-        createComforTable(options, 'comfort-table-winter-air', project.master.household['6a_airquality_winter']);
-        createComforTable(options, 'comfort-table-summer-air', project.master.household['6a_airquality_summer']);
-        // Temperature in Summer
-        var options = [
-            {
-                title: 'Too cold', color: 'red',
-            }, {
-                title: 'Just right', color: 'green',
-            }, {
-                title: 'Too hot',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-summer-temp', project.master.household['6a_temperature_summer']);
-        // Air quality in Summer
-        var options = [
-            {
-                title: 'Too dry', color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too stuffy',
-                color: 'red'
-            }];
-        createComforTable(options, 'comfort-table-summer-air', project.master.household['6a_airquality_summer']);
-        var options = [
-            {
-                title: 'Too little',
-                color: 'red',
-            }, {title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too much',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-daylight-amount', project.master.household['6b_daylightamount']);
-        var options = [
-            {
-                title: 'Too little',
-                color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too much',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-artificial-light-amount', project.master.household['6b_artificallightamount']);
-        var options = [
-            {
-                title: 'Too draughty',
-                color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too still',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-draughts-summer', project.master.household['6a_draughts_summer']);
-        var options = [
-            {
-                title: 'Too draughty',
-                color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too still',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-draughts-winter', project.master.household['6a_draughts_winter']);
-    }
-}
-function add_health_data(scenarios) {
-    // Humidity Data
-    if (data.household != undefined) {
-        if (data.household.reading_humidity1 == undefined && data.household.reading_humidity2 == undefined) {
-            $('.js-average-humidity').html('There is not enough information, please check section 3 in Household Questionnaire.');
-        } else if (data.household.reading_humidity1 != undefined && data.household.reading_humidity2 == undefined) {
-            $('.js-average-humidity').html('When we visited, the relative humidity was ' + data.household.reading_humidity1 + ' %. (The ideal range is 40-60%).');
-        } else if (data.household.reading_humidity1 == undefined && data.household.reading_humidity2 != undefined) {
-            $('.js-average-humidity').html(' When we visited, the relative humidity was ' + data.household.reading_humidity2 + '%. (The ideal range is 40-60%).');
-        } else {
-            var averageHumidity = 0.5 * (data.household.reading_humidity1 + data.household.reading_humidity2);
-            $('.js-average-humidity').html('When we visited, the relative humidity was ' + averageHumidity + '%. (The ideal range is 40-60%).');
-        }
-    }
 
-    // Temperature Data
-    if (data.household != undefined) {
-        if (data.household.reading_temp1 == undefined && data.household.reading_temp2 == undefined) {
-            $('.js-average-temp').html('There is not enough information, please check section 3 in Household Questionnaire.');
-        } else if (data.household.reading_temp1 != undefined && data.household.reading_temp2 == undefined) {
-            $('.js-average-temp').html('When we visited, the temperature was ' + data.household.reading_temp1 + ' °C.<br />(It is recommended that living spaces are at 16<sup>o</sup>C as a minium.');
-        } else if (data.household.reading_temp1 == undefined && data.household.reading_temp2 != undefined) {
-            $('.js-average-temp').html(' When we visited, the temperature was ' + data.household.reading_temp2 + '°C.<br />(It is recommended that living spaces are at 16<sup>o</sup>C as a minium.');
-        } else {
-            var averageHumidity = 0.5 * (data.household.reading_temp1 + data.household.reading_temp2);
-            $('.js-average-temp').html('When we visited, the temperature was ' + averageHumidity + '°C.<br />(It is recommended that living spaces are at 16<sup>o</sup>C as a minium (World Health Organisation).');
-        }
-    }
-
-    // You also told us...
-    if (data.household != undefined) {
-        data.household['6c_noise_comment'] == undefined ? $('.js-noise_comment').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-noise_comment').html(data.household['6c_noise_comment']);
-        data.household['6b_problem_locations'] == undefined || data.household['6b_problem_locations'] === '' ? $('.js-problem_locations_daylight').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-problem_locations_daylight').html(data.household['6b_problem_locations']);
-        data.household['6a_problem_locations'] == undefined || data.household['6a_problem_locations'] == '' ? $('.js-problem_locations').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-problem_locations').html(data.household['6a_problem_locations']);
-        data.household['6d_favourite_room'] == undefined || data.household['6d_favourite_room'] == '' ? $('.js-favourite_room').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-favourite_room').html(data.household['6d_favourite_room']);
-        data.household['6d_unloved_rooms'] == undefined || data.household['6d_unloved_rooms'] == '' ? $('.js-unloved_rooms').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-unloved_rooms').html(data.household['6d_unloved_rooms']);
-
-        var laundryHabits = '';
-        if (typeof data.household['4b_drying_outdoorline'] != 'undefined' && data.household['4b_drying_outdoorline']) {
-            laundryHabits += 'outdoor clothes line, ';
-        }
-        if (typeof data.household['4b_drying_indoorrack'] != 'undefined' && data.household['4b_drying_indoorrack']) {
-            laundryHabits += 'indoor clothes racks, ';
-        }
-        if (typeof data.household['4b_drying_airingcupboard'] != 'undefined' && data.household['4b_drying_airingcupboard']) {
-            laundryHabits += 'airing cupboard, ';
-        }
-        if (typeof data.household['4b_drying_tumbledryer'] != 'undefined' && data.household['4b_drying_tumbledryer']) {
-            laundryHabits += 'tumble dryer, ';
-        }
-        if (typeof data.household['4b_drying_washerdryer'] != 'undefined' && data.household['4b_drying_washerdryer']) {
-            laundryHabits += 'washer/dryer, ';
-        }
-        if (typeof data.household['4b_drying_radiators'] != 'undefined' && data.household['4b_drying_radiators']) {
-            laundryHabits += 'radiators, ';
-        }
-        if (typeof data.household['4b_drying_electricmaiden'] != 'undefined' && data.household['4b_drying_electricmaiden']) {
-            laundryHabits += 'electric maiden, ';
-        }
-
-        if (laundryHabits.length === 0) {
-            laundryHabits = 'There is not enough information, please check section 4 in Household Questionnaire.';
-        } else {
-            var laundryHabits = laundryHabits.slice(0, -2);
-        }
-        $('.js-laundry-habits').html(laundryHabits);
-    }
-}
-function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
-    $('#ccop-report-measures-summary-tables').html('');
+function add_measures_summary_tables(root, scenarios, scenarios_measures_summary) {
+    $(root).html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
     scenarios.forEach(function (scenario, index) {
         if (scenario != 'master') {
@@ -1026,25 +954,19 @@ function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
                 var html = '<div class="break-before-always">';
             }
             html += '<h4 class="top-border-title title-margin-bottom">Figure 13' + abc[index - 1] + ' - Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</h4>';
-            if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
+            if (project[scenario].created_from !== undefined && project[scenario].created_from != 'master') {
                 html += '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
             }
             html += '<p>Total cost of the scenario £' + Math.round(measures_costs(scenario) / 10) * 10 + ' </p>';
             html += '<div class="measures-table-wrapper">' + scenarios_measures_summary[scenario] + '</div>';
             html += '</div>';
             //html = html.replace('measures-summary-table', 'measures-summary-table no-break');
-            $('#ccop-report-measures-summary-tables').append(html);
+            $(root).append(html);
         }
     });
 }
-function add_commentary() {
-    if (data.household != undefined && data.household.commentary != undefined) {
-        var commentary = data.household.commentary.replace(/\n/gi, '<br />');
-        $('#commentary').html(commentary);
-    }
-}
-function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
-    $('#report-measures-complete-tables').html('');
+function add_measures_complete_tables(root, scenarios, scenarios_measures_complete) {
+    $(root).html('');
 
     scenarios.forEach(function (scenario, index) {
         if (scenario == 'master') {
@@ -1056,7 +978,7 @@ function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
         let totalCost = Math.round(measures_costs(scenario) / 10) * 10;
         let createdFrom = '';
 
-        if (project[scenario].created_from != undefined && project[scenario].created_from != 'master') {
+        if (project[scenario].created_from !== undefined && project[scenario].created_from != 'master') {
             createdFrom = '<p>This scenario assumes the measures in Scenario ' + project[scenario].created_from.split('scenario')[1] + ' have already been carried out and adds to them</p>';
         }
 
@@ -1071,11 +993,11 @@ function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
             </div>
         `;
 
-        $('#report-measures-complete-tables').append(html);
+        $(root).append(html);
     });
 }
-function add_comparison_tables(scenarios, scenarios_comparison) {
-    $('#comparison-tables').html('');
+function add_comparison_tables(root, scenarios, scenarios_comparison) {
+    $(root).html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
     scenarios.forEach(function (scenario, index) {
         if (scenario != 'master') {
@@ -1083,7 +1005,7 @@ function add_comparison_tables(scenarios, scenarios_comparison) {
             html += ' <h3>Figure 15' + abc[index - 1] + ' Master/Scenario ' + scenario.split('scenario')[1] + 'Comparison Table</h3>';
             html += '<div class="js-scenario-comparison">' + scenarios_comparison[scenario] + '</div>';
             html += '</section>';
-            $('#comparison-tables').append(html);
+            $(root).append(html);
         }
     });
 }
@@ -1091,7 +1013,7 @@ function add_comparison_tables(scenarios, scenarios_comparison) {
 /*****************************************************************/
 
 function heatlossData(scenario) {
-    if (typeof project[scenario] != 'undefined' && typeof project[scenario].fabric != 'undefined') {
+    if (project[scenario] !== undefined && project[scenario].fabric !== undefined) {
         return {
             floorwk: Math.round(project[scenario].fabric.total_floor_WK),
             ventilationwk: Math.round(project[scenario].ventilation.average_ventilation_WK),
@@ -1172,45 +1094,41 @@ function generateHouseMarkup(heatlossData) {
 function getEnergyDemandData(scenarios) {
     var data = {};
     for (var i = 0; i < scenarios.length; i++) {
-        data[scenarios[i]] = [];
+        const scenario_id = scenarios[i];
+        const scenario = project[scenario_id];
+        if (!scenario) {
+            console.log("Scenario doesn't exist");
+            continue;
+        }
+
+        data[scenario_id] = [];
+
         var electric = 0;
         var gas = 0;
         var other = 0;
-        if (typeof project[scenarios[i]] !== 'undefined') {
-            if (typeof project[scenarios[i]].fuel_totals !== 'undefined') {
-                for (var fuel in project[scenarios[i]].fuel_totals) {
-                    if (project[scenarios[i]].fuels[fuel].category == 'Electricity') {
-                        electric += project[scenarios[i]].fuel_totals[fuel].quantity;
-                    } else if (project[scenarios[i]].fuels[fuel].category == 'Gas') {
-                        gas += project[scenarios[i]].fuel_totals[fuel].quantity;
-                    } else if (fuel != 'generation') {
-                        other += project[scenarios[i]].fuel_totals[fuel].quantity;
-                    }
+
+        if (scenario.fuel_totals !== undefined) {
+            for (var fuel in scenario.fuel_totals) {
+                if (scenario.fuels[fuel].category == 'Electricity') {
+                    electric += scenario.fuel_totals[fuel].quantity;
+                } else if (scenario.fuels[fuel].category == 'Gas') {
+                    gas += scenario.fuel_totals[fuel].quantity;
+                } else if (fuel != 'generation') {
+                    other += scenario.fuel_totals[fuel].quantity;
                 }
-                data[scenarios[i]].push({value: gas, label: 'Gas', variance: gas * 0.3});
-                data[scenarios[i]].push({value: electric, label: 'Electric', variance: electric * 0.3});
-                data[scenarios[i]].push({value: other, label: 'Other', variance: other * 0.3});
             }
-        }
-        if (max_value < (gas + electric + other)) {
-            max_value = gas + electric + other + 5000;
+            data[scenario_id].push({value: gas, label: 'Gas', variance: gas * 0.3});
+            data[scenario_id].push({value: electric, label: 'Electric', variance: electric * 0.3});
+            data[scenario_id].push({value: other, label: 'Other', variance: other * 0.3});
         }
     }
 
-
     data.bills = [
-        {
-            value: 0,
-            label: 'Gas',
-        },
-        {value: 0,
-            label: 'Electric',
-        },
-        {
-            value: 0,
-            label: 'Other'
-        }
+        { value: 0, label: 'Gas', },
+        { value: 0, label: 'Electric', },
+        { value: 0, label: 'Other' }
     ];
+
     for (var fuel in project['master'].currentenergy.use_by_fuel) {
         var f_use = project['master'].currentenergy.use_by_fuel[fuel];
         if (project['master'].fuels[fuel].category == 'Gas') {
@@ -1222,99 +1140,76 @@ function getEnergyDemandData(scenarios) {
         }
     }
     data.bills[1].value += project['master'].currentenergy.generation.fraction_used_onsite * project['master'].currentenergy.generation.annual_generation; // We added consumption coming from generation
-    if (max_value < (data.bills[0].value + data.bills[1].value + 1.0 * data.bills[2].value)) {
-        max_value = data.bills[0].value + data.bills[1].value + 1.0 * data.bills[2].value + 5000;
-    }
+
     return data;
 }
 function getPrimaryEnergyUseData(scenarios) {
-    var primaryEnergyUseData = {};
-    primaryEnergyUseData.max = 500;
-    primaryEnergyUseData.min = 0;
+    let primaryEnergyUseData = {};
+    let min = 0;
+    let max = 500;
+
     for (var i = 0; i < scenarios.length; i++) {
-        primaryEnergyUseData[scenarios[i]] = [];
-        if (typeof project[scenarios[i]] !== 'undefined') {
-            if (typeof project[scenarios[i]].primary_energy_use_by_requirement !== 'undefined') {
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['waterheating'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['waterheating'] / data.TFA, label: 'Water Heating'});
-                }
+        const scenario_id = scenarios[i];
+        const scenario = project[scenario_id];
 
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['space_heating'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['space_heating'] / data.TFA, label: 'Space Heating'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['cooking'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['cooking'] / data.TFA, label: 'Cooking'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['appliances'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['appliances'] / data.TFA, label: 'Appliances'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['lighting'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['lighting'] / data.TFA, label: 'Lighting'});
-                }
-
-                if (typeof project[scenarios[i]].primary_energy_use_by_requirement['fans_and_pumps'] !== 'undefined') {
-                    primaryEnergyUseData[scenarios[i]].push({value: project[scenarios[i]].primary_energy_use_by_requirement['fans_and_pumps'] / data.TFA, label: 'Fans and Pumps'});
-                }
-                if (project[scenarios[i]].use_generation == 1 && project[scenarios[i]].fuel_totals['generation'].primaryenergy < 0) { // we offset the stack displacing it down for the amount of renewables
-                    var renewable_left = -project[scenarios[i]].fuel_totals['generation'].primaryenergy / data.TFA; // fuel_totals['generation'].primaryenergy is negative
-                    primaryEnergyUseData[scenarios[i]].forEach(function (use) {
-                        if (use.value <= renewable_left) {
-                            renewable_left -= use.value;
-                            use.value = -use.value;
-                        }
-                        if (use.value > renewable_left) {
-                            primaryEnergyUseData[scenarios[i]].push({value: use.value - renewable_left, label: use.label}); // we create another bar with the same color than current use with the amount that is still positive
-                            use.value = -renewable_left; // the amount offseted
-                            renewable_left = 0;
-                        }
-                    });
-                }
+        const val = (label, key) => {
+            if (scenario.fuel_requirements[key] !== undefined) {
+                primaryEnergyUseData[scenario_id].push({
+                    label: label,
+                    value: scenario.fuel_requirements[key].quantity / data.TFA,
+                });
             }
+        };
+
+        primaryEnergyUseData[scenario_id] = [];
+        val('Water Heating',  'waterheating');
+        val('Space Heating',  'space_heating');
+        val('Cooking',        'cooking');
+        val('Appliances',     'appliances');
+        val('Lighting',       'lighting');
+        val('Fans and Pumps', 'fans_and_pumps');
+
+        // we offset the stack displacing it down function() {}or the amount of renewables
+        if (scenario.use_generation == 1 && scenario.fuel_totals['generation'].primaryenergy < 0) {
+            // fuel_totals['generation'].primaryenergy is negative
+            var renewable_left = -scenario.fuel_totals['generation'].primaryenergy / data.TFA;
+
+            primaryEnergyUseData[scenario_id].forEach(function (use) {
+                if (use.value <= renewable_left) {
+                    renewable_left -= use.value;
+                    use.value = -use.value;
+                } else {
+                    primaryEnergyUseData[scenario_id].push({value: use.value - renewable_left, label: use.label}); // we create another bar with the same color than current use with the amount that is still positive
+                    use.value = -renewable_left; // the amount offseted
+                    renewable_left = 0;
+                }
+            });
         }
-        if (typeof project[scenarios[i]] !== 'undefined' && project[scenarios[i]].primary_energy_use_m2 > primaryEnergyUseData.max) {
-            primaryEnergyUseData.max = project[scenarios[i]].primary_energy_use_m2;
+
+        if (scenario.primary_energy_use_m2 > max) {
+            max = scenario.primary_energy_use_m2;
         }
+
         // fuel_totals['generation'] is negative
-        if (typeof project[scenarios[i]] !== 'undefined' && project[scenarios[i]].use_generation == 1 && project[scenarios[i]].fuel_totals['generation'].primaryenergy / project[scenarios[i]].TFA < primaryEnergyUseData.min) {
-            primaryEnergyUseData.min = project[scenarios[i]].fuel_totals['generation'].primaryenergy / project[scenarios[i]].TFA;
+        if (scenario.use_generation == 1 && scenario.fuel_totals['generation'].primaryenergy / scenario.TFA < min) {
+            min = scenario.fuel_totals['generation'].primaryenergy / scenario.TFA;
         }
     }
 
     primaryEnergyUseData.bills = [
         {
             value: data.currentenergy.primaryenergy_annual_kwhm2,
-            label: 'Non categorized'},
+            label: 'Non categorized'
+        },
         {
             value: -data.currentenergy.generation.primaryenergy / data.TFA,
-            label: 'Non categorized'}
+            label: 'Non categorized'
+        }
     ];
 
-    return primaryEnergyUseData;
+    return [ primaryEnergyUseData, min, max ];
 }
 
-function createComforTable(options, tableID, chosenValue) {
-    const leftText = options[0].title;
-    const rightText = options[2].title;
-
-    let cells = options.map(opt => ({
-        text: opt.title,
-        selected: chosenValue === opt.title
-    }));
-
-    let html = `
-        <div class="text-right" style="width: 6em; margin-right: 0.5em;"><small>${leftText}</small></div>
-        <svg viewBox="0 0 94 32" height="32" width="94">
-            <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[0].selected ? 'red' : 'white'}"></rect>
-            <rect y="1" x="32" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[1].selected ? 'green' : 'white'}"></rect>
-            <rect y="1" x="63" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[2].selected ? 'red' : 'white'}"></rect>
-        </svg>
-        <div style="width: 6em; margin-left: 0.5em;"><small>${rightText}</small></div>`;
-
-    document.getElementById(tableID).innerHTML = html;
-}
 function prepare_data_for_graph(data_source) {
     var dataFig = [];
 
@@ -1335,3 +1230,812 @@ function prepare_data_for_graph(data_source) {
 
     return dataFig;
 }
+
+function add_peak_heating_load(root, scenario_list) {
+    const context = scenario_list.map(scenario_id => {
+        let scenario = project[scenario_id];
+        if (scenario_id === 'master') {
+            name = scenario.scenario_name;
+        } else {
+            const nums = /(\d+)/g;
+            const num = parseInt(scenario_id.match(nums)[0], 10);
+            name = `Scenario ${num}`;
+        }
+
+        const heatloss = scenario.fabric.total_heat_loss_WK;
+        const temp = scenario.temperature.target;
+        const temp_diff = temp - (-5);
+        const peak_heat = heatloss * temp_diff;
+        const area = scenario.TFA;
+        const peak_heat_m2 = peak_heat / area;
+
+        return {
+            name,
+            heatloss,
+            temp,
+            temp_diff,
+            peak_heat: peak_heat / 1000, // in kW instead of W
+            area,
+            peak_heat_m2,
+        };
+    });
+
+    const template = `
+        <table class="simple-table">
+            <tr>
+                <th></th>
+                {% for scenario in scenarios %}
+                    <th style="white-space: nowrap;">{{ scenario.name }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Heat loss per degree of heat difference</td>
+                {% for scenario in scenarios %}
+                    <td>{{ scenario.heatloss | round }} W/K</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>×</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>
+                    Maximum temperature difference expected between inside and outside<sup>*</sup>
+                </td>
+                {% for scenario in scenarios %}
+                    <td>{{scenario.temp_diff}}°C <sup>†</sup></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>=</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><b>Peak heating load</b></td>
+                {% for scenario in scenarios %}
+                    <td style="white-space: nowrap;"><b>{{ scenario.peak_heat | round(2) }} kW</b></td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>÷</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td>Floor area</td>
+                {% for scenario in scenarios %}
+                    <td>{{ scenario.area | round }} m²</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td></td>
+                {% for scenario in scenarios %}
+                    <td>=</td>
+                {% endfor %}
+            </tr>
+            <tr>
+                <td><b>Peaking heating load per square metre</b></td>
+                {% for scenario in scenarios %}
+                    <td style="white-space: nowrap;"><b>{{ scenario.peak_heat_m2 | round }} W/m²</b></td>
+                {% endfor %}
+            </tr>
+        </table>
+        <p style="margin-bottom: 0; font-size: 80%; line-height: 1.2">
+            <sup>*</sup> Lowest external temperature assumed to be –5°C<br>
+            <sup>†</sup> 1°C = 1K (Kelvin)
+        </p>`;
+
+    let env = new nunjucks.Environment();
+    root.innerHTML = env.renderString(template, { scenarios: context } );
+}
+
+
+
+/**
+ * Bar Chart Library
+ */
+
+/*
+ * We expect data looking like this:
+ * [
+ *     { value: [ { value: X1 }, { value: X2 } ] },
+ *     { value: [ { value: Y2 }, { value: Y2 } ] },
+ * ]
+ *
+ * This function will take the sum of each row's values, and return the highest.
+ */
+function getGraphValuesMax(graphData) {
+    const add = (prev, cur) => prev + cur;
+    const by_row = graphData.map(row =>
+        row.value.map(data => data.value).reduce(add)
+    );
+    return Math.max(...by_row);
+}
+
+/*
+ * This function rounds val up to the nearest roundTo.
+ * e.g. getGraphCeil(1000,    0,  100) = 1000
+ *      getGraphCeil(1000, 1005,  100) = 1100
+ *      getGraphCeil(1000, 1000,  100) = 1000
+ */
+function getGraphCeil({ min, max, incr }) {
+    if (max <= min) {
+        return min;
+    }
+
+    return Math.floor((max + (incr-1)) / incr) * incr;
+}
+
+function BarChart(options) {
+
+    var self = this;
+    options = options || {};
+
+    self._data = options.data || null;
+    self._defaultBarColor = options.defaultBarColor || 'rgb(245,30,30)';
+    self._barColors = options.barColors || {};
+    self._barWidth = options.barWidth || null;
+    self._barGutter = options.barGutter || 0;
+    self._barDivisionType = options.barDivisionType || 'stack';
+    self._element = (options.elementId) ? this.element(options.elementId) : null;
+    self._canvas = null;
+    self._width = options.width || 600;
+    self._chartHeight = options.chartHeight || 400;
+    self._ranges = options.ranges || [];
+    self._defaultRangeColor = options._defaultRangeColor || 'rgb(254,204,204)';
+    self._targets = options.targets || [];
+    self._defaultTargetColor = options._defaultTargetColor || 'rgb(236,102,79)';
+    self._defaultVarianceColor = options.defaultVarianceColor || 'rgb(0,0,0)';
+    self._font = options.font || 'Arial';
+    self._fontSize = options.fontSize || 14;
+    self._barLabelsColor = options.barLabelsColor || 'rgb(189,188,187)';
+    self._chartLow = (options.chartLow !== undefined) ? options.chartLow : null;
+    self._chartHigh = options.chartHigh || null;
+    self._division = options.division || 100;
+    self._divisionColor = options.divisionColor || 'rgb(180,180,180)';
+    self._divisionLabelsColor = options.divisionLabelsColor || 'rgb(104,103,103)';
+    self._yAxisLabel = options.yAxisLabel || 50;
+    self._yAxisLabelBackgroundColor = options.yAxisLabelBackgroundColor || 'rgb(236,236,236)';
+    self._yAxisLabelColor = options.yAxisLabelColor || 'rgb(191,190,190)';
+    self._yAxisTextAlign = options.yAxisTextAlign || 'center';
+    self._chartTitle = options.chartTitle || null;
+    self._chartTitleTextAlign = options.chartTitleTextAlign || 'left';
+    self._chartTitleColor = options.chartTitleColor || 'rgb(195,194,194)';
+    self._backgroundColor = options.backgroundColor || 'rgb(255,255,255)';
+
+    /**
+     * Sets canvas to `cvs` if provided, or resturns the canvas element
+     */
+    self.canvas = function(cvs) {
+        if (!cvs && !self._canvas) {
+            cvs = document.createElement('canvas');
+            cvs.width = self._width;
+            cvs.height = self._height;
+            cvs.style.maxWidth = '100%';
+            var ctx = cvs.getContext('2d');
+            ctx.fillStyle = self._backgroundColor;
+            ctx.fillRect(0, 0, self._width, self._height);
+        }
+
+        if (cvs) {
+            self._canvas = cvs;
+        }
+
+        return self._canvas;
+    };
+
+
+    self.context = function() {
+        return self.canvas().getContext('2d');
+    };
+
+
+    self.element = function(element) {
+        if (element) {
+            self._element = element;
+        }
+
+        return self._element;
+    };
+
+    self.draw = function(element) {
+        if (element) {
+            self.element(element);
+        }
+
+        if (!self.element()) {
+            console.error(`Couldn't draw graph onto ${elementId}`);
+            return;
+        }
+
+        // draw chart elements
+
+        if (self._chartTitle) {
+            self.drawChartTitle();
+        }
+
+        if (self._ranges && self._ranges.length) {
+            for (var i = 0, len = self._ranges.length; i < len; i ++) {
+                self.drawRange(self._ranges[i].low, self._ranges[i].high, self._ranges[i].label, self._ranges[i].color);
+            }
+        }
+
+        self.drawScale();
+        self.drawYAxisLabel();
+        self.drawBars();
+        self.drawBarLabels();
+
+        // Targets should be above bars, so draw them after drawing the bars.
+
+        if (self._targets && self._targets.length) {
+            for (var i = 0, len = self._targets.length; i < len; i ++) {
+                self.drawTarget(self._targets[i].target, self._targets[i].label, self._targets[i].color);
+            }
+        }
+
+        // append canvas to element
+        self.element().appendChild(self.canvas());
+
+        if (self.objectLength(self._barColors)) {
+            self.drawKey(self._barColors);
+        }
+    };
+
+
+    self.drawChartTitle = function() {
+        if (!self._chartTitle) {
+            return false;
+        }
+
+        var ctx = self.context();
+        ctx.fillStyle = self._chartTitleColor;
+        ctx.font = self.font();
+        ctx.textAlign = self._chartTitleTextAlign;
+
+        if (self._chartTitleTextAlign === 'left') {
+            ctx.fillText(self._chartTitle, 0, self._fontSize * 2);
+        } else if (self._chartTitleTextAlign === 'center') {
+            ctx.fillText(self._chartTitle, self._width / 2, self._fontSize * 2);
+        } else if (self._chartTitleTextAlign === 'right') {
+            ctx.fillText(self._chartTitle, self._width, self._fontSize * 2);
+        }
+    };
+
+
+    self.drawYAxisLabel = function() {
+        var ctx = self.context();
+        ctx.font = self.font();
+        ctx.save();
+        ctx.translate(self.getYAxisLabelWidth() / 2, (self.getChartHeight() / 2) + self.getChartTitleHeight());
+        ctx.rotate(-Math.PI/2);
+        ctx.fillStyle = self._yAxisLabelBackgroundColor;
+        ctx.fillRect((self.getChartHeight() / 2) * -1, (self.getYAxisLabelWidth() / 2) * -1, self.getChartHeight(), self._fontSize * 3);
+        ctx.textAlign = self._yAxisTextAlign;
+        ctx.fillStyle = self._yAxisLabelColor;
+        ctx.fillText(self._yAxisLabel, 0, 0);
+        ctx.restore();
+    };
+
+
+    self.drawScale = function() {
+
+        if (self._division === 'auto') {
+            var x = Math.floor(self.chartHigh() / 10);
+            var every = Math.round(x / 15) * 10;
+        } else {
+            var every = self._division;
+        }
+
+        var low = Math.ceil(self.chartLow() / every) * every;
+        var high = self.chartHigh();
+
+        var ctx = self.context();
+        ctx.strokeStyle = self._divisionColor;
+        ctx.lineWidth = 1;
+        ctx.font = self.font();
+        ctx.textAlign = 'right';
+        ctx.fillStyle = self._divisionLabelsColor;
+
+        for (var i = low; i <= high; i += every) {
+            const x = self.horizontalPixelPosition(0);
+            const y = self.verticalPixelPosition(i);
+
+            ctx.beginPath();
+            ctx.moveTo(x, y - 0.5);
+            ctx.lineTo(self.getChartRightPos(), y - 0.5);
+            ctx.stroke();
+            ctx.closePath();
+            ctx.fillText(i, x - (self._fontSize / 2), y + (self._fontSize / 4));
+        }
+    };
+
+
+    self.drawBars = function() {
+        var ctx = self.context();
+        var data = self._data;
+        var barGutter = self._barGutter;
+        var barWidth = self._barWidth;
+        var barColor;
+
+        for (var i = 0, len = data.length; i < len; i ++) {
+            if (isNaN(data[i].value)) {
+                if (self._barDivisionType === 'group') {
+                    var rawHorizontalPosition = i * (barWidth + barGutter) + barGutter;
+
+                    for (var i2 = 0, len2 = data[i].value.length; i2 < len2; i2 ++) {
+                        barColor = self._defaultBarColor;
+
+                        if (self.getLabelColor(data[i].value[i2].label)) {
+                            barColor = self.getLabelColor(data[i].value[i2].label);
+                        } else if (self.getLabelColor(data[i].label)) {
+                            barColor = self.getLabelColor(data[i].label);
+                        }
+
+                        ctx.fillStyle = barColor;
+                        ctx.fillRect(
+                            self.horizontalPixelPosition(rawHorizontalPosition),
+                            self.verticalPixelPosition(0),
+                            barWidth / data[i].value.length,
+                            self.valueToPixels(data[i].value[i2].value) * -1
+                        );
+
+                        if (data[i].value[i2].variance !== undefined) {
+                            self.drawErrorBars(rawHorizontalPosition,data[i].value[i2].value,data[i].value[i2].variance,data[i].value.length);
+                        }
+
+                        rawHorizontalPosition += barWidth / data[i].value.length;
+                    }
+                } else {
+                    var verticalPos = self.verticalPixelPosition(self.barLow(data[i]));
+                    var orderedData = [];
+
+
+                    for (var i2 = 0, len2 = data[i].value.length; i2 < len2; i2 ++) {
+                        if (data[i].value[i2].value < 0) {
+                            orderedData.push({
+                                value: data[i].value[i2].value * -1,
+                                label: data[i].value[i2].label
+                            });
+                        }
+                    }
+
+                    for (var i2 = 0, len2 = data[i].value.length; i2 < len2; i2 ++) {
+                        if (data[i].value[i2].value > 0) {
+                            orderedData.push(data[i].value[i2]);
+                        }
+                    }
+
+                    for (var i2 = 0, len2 = orderedData.length; i2 < len2; i2 ++) {
+                        barColor = self._defaultBarColor;
+
+                        if (self.getLabelColor(orderedData[i2].label)) {
+                            barColor = self.getLabelColor(orderedData[i2].label);
+                        } else if (self.getLabelColor(data[i].label)) {
+                            barColor = self.getLabelColor(data[i].label);
+                        }
+
+                        ctx.fillStyle = barColor;
+                        ctx.fillRect(
+                            self.horizontalPixelPosition(i * (barWidth + barGutter) + barGutter),
+                            verticalPos,
+                            barWidth,
+                            self.valueToPixels(orderedData[i2].value) * -1
+                        );
+
+                        verticalPos -= self.valueToPixels(orderedData[i2].value);
+
+                    }
+                }
+            } else {
+                barColor = self._defaultBarColor;
+
+                if (self.getLabelColor(data[i].label)) {
+                    barColor = self.getLabelColor(data[i].label);
+                }
+
+
+                ctx.fillStyle = barColor;
+                ctx.fillRect(
+                    self.horizontalPixelPosition(i * (barWidth + barGutter) + barGutter),
+                    self.verticalPixelPosition(0),
+                    barWidth,
+                    self.valueToPixels(data[i].value) * -1
+                );
+
+                if (data[i].variance !== undefined) {
+                    self.drawErrorBars((i * (barWidth + barGutter) + barGutter),(data[i].value),data[i].variance);
+                }
+            }
+        }
+    };
+
+    self.drawErrorBars = function(xPos,yPos,variance,barCount) {
+        if (barCount !== undefined) {
+            barCount = 1;
+        }
+        var ctx = self.context();
+        var barWidth = self._barWidth / barCount;
+        var barHeight = yPos;
+        var errorVariance = (variance / 100) * barHeight;
+
+        ctx.strokeStyle = self._defaultVarianceColor;
+        ctx.lineWidth = 2;
+
+        if ( yPos !== 0 ) {
+            ctx.beginPath();
+            // Vertical Line
+            ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth / 2)), self.verticalPixelPosition((yPos) - errorVariance));
+            ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth / 2)), self.verticalPixelPosition((yPos) + errorVariance));
+            // Top Horizontal Line
+            ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth * .65)),self.verticalPixelPosition((yPos) + errorVariance));
+            ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth * .35)),self.verticalPixelPosition((yPos) + errorVariance));
+            // Bottom Horizontal Line
+            ctx.moveTo(self.horizontalPixelPosition(xPos + (barWidth * .65)),self.verticalPixelPosition((yPos) - errorVariance));
+            ctx.lineTo(self.horizontalPixelPosition(xPos + (barWidth * .35)),self.verticalPixelPosition((yPos) - errorVariance));
+            ctx.stroke();
+            ctx.closePath();
+        }
+
+    };
+
+    self.drawBarLabels = function() {
+        var ctx = self.context();
+        var barGutter = self._barGutter;
+        var barWidth = self._barWidth;
+        var data = self._data;
+        var fontSize = self.getXAxisLabelFontSize();
+
+        ctx.fillStyle = self._barLabelsColor;
+
+        for (var i = 0, len = data.length; i < len; i ++) {
+            ctx.save();
+            ctx.translate(self.horizontalPixelPosition(i * (barWidth + barGutter) + barGutter + (barWidth / 2) + (fontSize / 4)), self.getChartHeight() + (fontSize * 2)  + self.getChartTitleHeight());
+            ctx.rotate(-Math.PI/2);
+            ctx.textAlign = 'right';
+            ctx.fillText(data[i].label, 0, 0);
+            ctx.restore();
+        }
+    };
+
+
+    self.drawKey = function(keyData) {
+        let keys = Object.entries(keyData).map(([ label, colour ]) => `
+            <div style="display: flex; align-items: center;">
+                <svg viewBox="0 0 1 1" style="width: 1.5rem; height: 1.5rem; margin-right: calc(var(--line-height) / 2)">
+                    <rect y="0" x="0" width="1" height="1" fill="${colour}" />
+                </svg>
+                <span>${label}</span>
+            </div>
+        `);
+
+        let div = document.createElement('div');
+        div.innerHTML = `
+            <h5 style="color: rgb(112,111,112); margin-bottom: 0.75rem; margin-top: 2rem">Key</h5>
+            <div style="display: grid; grid-gap: 0.25rem; grid-template-columns: 1fr 1fr;">
+                ${keys.join('')}
+            </div>
+        `;
+
+        self.element().appendChild(div);
+    };
+
+
+    self.drawRange = function(low, high, label, color) {
+        var ctx = self.context();
+        ctx.fillStyle = color || self._defaultRangeColor;
+        ctx.fillRect(
+            self.horizontalPixelPosition(0),
+            self.verticalPixelPosition(low),
+            self._width,
+            self.valueToPixels(low - high)
+        );
+
+        if (label !== undefined) {
+            ctx.font = self.font();
+            ctx.textAlign = 'right';
+            ctx.fillStyle = color || self._defaultRangeColor;
+            ctx.fillText(label, self.getChartRightPos(), self.verticalPixelPosition(high) - (self._fontSize * 0.5));
+        }
+    };
+
+    self.drawTarget = function(target, label, color) {
+        var ctx = self.context();
+        ctx.strokeStyle = color || self._defaultTargetColor;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([3]);
+        ctx.beginPath();
+        ctx.moveTo(self.horizontalPixelPosition(0), self.verticalPixelPosition(target) - 0.5);
+        ctx.lineTo(self.getChartRightPos(), self.verticalPixelPosition(target) - 0.5);
+        ctx.stroke();
+        ctx.closePath();
+        ctx.setLineDash([1]);
+
+        if (label !== undefined) {
+            ctx.font = self.font();
+            ctx.textAlign = 'right';
+            ctx.fillStyle = color || self._defaultTargetColor;
+            ctx.fillText(label, self.getChartRightPos(), self.verticalPixelPosition(target) - (self._fontSize * 0.5));
+        }
+    };
+
+    self.chartLow = function() {
+        if (self._chartLow === null) {
+            var values = [];
+
+            for (var i = 0, len = self._data.length; i < len; i ++) {
+                values.push(self.barLow(self._data[i]));
+            }
+
+            self._chartLow = Math.min.apply(Math, values);
+            self._chartLow = (self._chartLow < 0) ? self._chartLow : 0;
+        }
+
+        return self._chartLow;
+    };
+
+
+    self.chartHigh = function() {
+        if (!self._chartHigh) {
+            var values = [];
+
+            for (var i = 0, len = self._data.length; i < len; i ++) {
+                // if (self._data[i].variance !== undefined) {
+
+                //  var errorVariance = (self._data[i].variance / 100) * self._data[i].value;
+                //  self._data[i].value = self._data[i].value + errorVariance;
+
+                //  values.push(self.barTotal(self._data[i]));
+
+                // } else {
+                values.push(self.barTotal(self._data[i]));
+                // }
+            }
+
+            var maxValue = Math.max.apply(Math, values);
+            self._chartHigh = maxValue + (~~(maxValue / 10));
+
+        }
+
+        return self._chartHigh;
+    };
+
+
+    /**
+     * For stacked bars, returns the sum of all negative values,
+     * otherwise returns zero.
+     */
+    self.barLow = function(bar) {
+        if (!isNaN(bar.value)) {
+            return bar.value;
+        }
+
+        var barLow = 0;
+
+        for (var i = 0, len = bar.value.length; i < len; i ++) {
+            if (bar.value[i].value < 0) {
+                barLow += bar.value[i].value;
+            }
+        }
+
+        return barLow;
+    };
+
+
+    /**
+     * Returns the total value of the bar if positive, or zero
+     */
+    self.barHigh = function(bar) {
+        return (self.barTotal(bar) > 0) ? self.barTotal(bar) : 0;
+    };
+
+
+    /**
+     * Returns the sum of values in a bar
+     */
+    self.barTotal = function(bar) {
+        if (!isNaN(bar.value)) {
+            return bar.value;
+        }
+
+        var barTotal = 0;
+
+        for (var i = 0, len = bar.value.length; i < len; i ++) {
+            barTotal += bar.value[i].value;
+        }
+
+        return barTotal;
+    };
+
+
+    self.valueToPixels = function(value) {
+        var chartRange = self.chartHigh() - self.chartLow();
+        var valueAsPercentage = value / chartRange;
+        var pixels = (self.getChartHeight() * valueAsPercentage);
+        return Math.round(pixels);
+    };
+
+
+    self.verticalPixelOffset = function() {
+        var offset = self.chartLow() * -1;
+        var chartRange = self.chartHigh() - self.chartLow();
+        var offsetAsPercentage = offset / chartRange;
+        var pixelOffset = (self.getChartHeight() * offsetAsPercentage);
+        return pixelOffset;
+    };
+
+
+    self.verticalPixelPosition = function(value) {
+        return self.getChartBottomPos() - self.verticalPixelOffset() - self.valueToPixels(value);
+    };
+
+
+    self.getChartBottomPos = function() {
+        return self._height - self.getBarLabelsHeight();
+    };
+
+
+    self.getChartHeight = function() {
+        return self.getChartBottomPos() - self.getChartTitleHeight();
+    };
+
+
+    self.getChartTitleHeight = function() {
+        return (self._chartTitle) ? self._fontSize * 8 : self._fontSize * 0.5;
+    };
+
+
+    self.horizontalPixelPosition = function(chartPos) {
+        return self.getChartLeftPos() + chartPos;
+    };
+
+
+    self.getChartWidth = function() {
+        return self._width - self.getChartLeftPos();
+    };
+
+
+    self.getChartRightPos = function() {
+        return self._width;
+    };
+
+
+    self.getChartLeftPos = function() {
+        return self.getYAxisLabelWidth() + self.getYAxisScaleWidth();
+    };
+
+
+    self.getYAxisLabelWidth = function() {
+        if (self._yAxisLabel) {
+            return self._fontSize * 3.5;
+        }
+
+        return 0;
+    };
+
+
+    self.getYAxisScaleWidth = function() {
+        if (self._division === 'auto') {
+            var every = Math.floor(self.chartHigh() / 10);
+        } else {
+            var every = self._division;
+        }
+
+        var low = Math.ceil(self.chartLow() / every) * every;
+        var high = self.chartHigh();
+        var textArray = [];
+
+        for (var i = low; i <= high; i += every) {
+            textArray.push(i);
+        }
+
+        return self.widestText(textArray, self.font()) + (self._fontSize / 2);
+    };
+
+
+    self.getBarLabelsHeight = function() {
+        var data = self._data;
+        var fontSize = self.getXAxisLabelFontSize();
+        var textArray = [];
+
+        for (var i = 0, len = data.length; i < len; i ++) {
+            textArray.push(data[i].label);
+        }
+
+        return self.widestText(textArray, self.font()) + (fontSize * 2);
+    };
+
+
+    self.getKeyColumns = function(keyData) {
+        var colWidth = self.widestText(self.getKeyTextAsArray(keyData), self.font()) + (self._fontSize * 2) + 45;
+        return Math.floor(self._width / colWidth);
+    };
+
+
+    self.getKeyRows = function(keyData) {
+        return Math.ceil(self.getKeyTextAsArray(keyData).length / self.getKeyColumns(keyData));
+    };
+
+
+    self.getKeyTextAsArray = function(keyData) {
+        var textArray = [];
+
+        for (var label in keyData) {
+            if (keyData.hasOwnProperty(label)) {
+                textArray.push(label);
+            }
+        }
+
+        return textArray;
+    };
+
+
+    self.getXAxisLabelFontSize = function() {
+        return self._fontSize;
+    };
+
+
+    let widestCache = {};
+
+    self.widestText = function(textArray, font) {
+        // This was a significant performance bottleneck.
+        let cacheKey = JSON.stringify({ 'textArray': textArray, 'font': font });
+        if (widestCache[cacheKey]) {
+            return widestCache[cacheKey];
+        }
+
+        var cvs = document.createElement('canvas');
+        cvs.width = 2000;
+        cvs.height = 2000;
+        var ctx = cvs.getContext('2d');
+        ctx.font = font;
+
+        let widths = textArray.map(str => ctx.measureText(str).width);
+        let max = Math.max(...widths);
+
+        widestCache[cacheKey] = max;
+        return max;
+    };
+
+
+    self.font = function() {
+        return self._fontSize + 'px ' + self._font;
+    };
+
+
+    self.getLabelColor = function(label) {
+        return (self._barColors[label]) ? self._barColors[label] : null;
+    };
+
+
+    self.setHeight = function() {
+        self._height = self._chartHeight + self.getChartTitleHeight() + self.getBarLabelsHeight();
+    };
+
+
+    self.objectLength = function(obj) {
+        var count = 0;
+
+        for (var i in obj) {
+            if (obj.hasOwnProperty(i)) {
+                count ++;
+            }
+        }
+
+        return count;
+    };
+
+
+    self.setHeight();
+
+    if (!self._barWidth) {
+        self._barWidth = ((self.getChartWidth() - self._barGutter) / self._data.length) - self._barGutter;
+    }
+
+
+    return self;
+};
