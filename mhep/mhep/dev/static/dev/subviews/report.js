@@ -278,18 +278,6 @@ function get_priorities() {
         .slice(0, 3);
 }
 
-function get_improvements() {
-    const options = [
-        { key: '5_improv_loftconversion',     text: 'a loft conversion' },
-        { key: '5_improv_extension',          text: 'an extension' },
-        { key: '5_improv_insulation',         text: 'insulation' },
-        { key: '5_improv_windows',            text: 'windows' },
-        { key: '5_improv_heatinghotwater',    text: 'heating and hot water system' },
-    ];
-
-    return options.filter(opt => project.master.household[opt.key] ? true : false).map(opt => opt.text);
-}
-
 function get_average_temperature() {
     temps = [ project.master.household.reading_temp1, project.master.household.reading_temp2 ].filter(e => e ? true : false);
     if (temps.length === 0) {
