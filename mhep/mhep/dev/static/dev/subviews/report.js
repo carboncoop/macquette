@@ -1,12 +1,34 @@
+/*
+ * Report generation
+ *
+ * There are two main units of code here:
+ * - the Report class which handles the UI logic, and
+ * - the rest of the file, which contains the logic for generating the actual report
+ *   (this isn't in a class yet but should be)
+ *
+ * The basic concept of a report is that it's a Nunjucks template stored on the
+ * organisation.  We then collect a load of the data from the asessment into a set of
+ * context vars, which are passed through to the report.  This gives us a lot of
+ * flexibility in the report contents between organisations without needing to hack in
+ * lots of special cases.
+ *
+ * The report is rendered in an iframe to give it the maximum freedom of style, and to
+ * avoid clashing with MHEP's own styling.
+ */
+
 console.log('debug report.js');
 
 function report_initUI() {
-    data = project['master'];
+    if (!window.questionnaire) {
+        $.ajax({
+            url: urlHelper.static('subviews/householdquestionnaire.js'),
+            dataType: 'script',
+            async: false,
+            error: handleServerError('loading householdquestionnaire.js'),
+        });
+    }
 
-    add_scenario_options();
-    add_organisation_options();
-
-    if (view_html['compare'] == undefined) {
+    if (!view_html['compare']) {
         $.ajax({
             url: urlHelper.static('subviews/compare.js'),
             async: false,
@@ -15,67 +37,39 @@ function report_initUI() {
         });
     }
 
-    // Add static content
-    add_events();
-    add_prioirities_figure();
-    add_featured_image();
-    add_date();
-    add_address();
-    add_commentary();
+    let __report = new Report();
 }
 
-function report_UpdateUI() {
-    let t0 = performance.now();
+class Report {
+    constructor() {
+        this.element = {
+            generateReport: document.querySelector('#generate-report'),
+            printReport: document.querySelector('#print-report'),
+            reportPreview: document.querySelector('#report-preview'),
+            reportPreviewFrame: document.querySelector('iframe'),
+        };
 
-    let scenarios = [];
-    $('#scenario-choices input:checked').each(function () {
-        scenarios.push(this.value);
-    });
+        this.organsations = [];
+        mhep_helper.list_organisations()
+            .then(orgs => this.organisations = orgs)
+            .then(() => this.draw_organisations());
 
-    let scenarios_comparison = {};
-    let scenarios_measures_summary = {};
-    let scenarios_measures_complete = {};
+        this.draw_scenarios();
 
-    for (let s of scenarios) {
-        if (s != 'master') {
-            scenarios_comparison[s] = compareCarbonCoop(s);
-            scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
-            scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
-        }
+        this.element.generateReport.addEventListener('click', () => {
+            this.render_report();
+        });
+
+        this.element.printReport.addEventListener('click', () => {
+            this.element.reportPreviewFrame.contentWindow.focus();
+            this.element.reportPreviewFrame.contentWindow.print();
+        });
     }
 
-    choose_organisation();
+    draw_organisations() {
+        this.organisations[0].checked = true;
 
-    add_scenario_names(scenarios);
-    add_performance_summary_figure(scenarios);
-    add_heat_loss_summary_figure(scenarios);
-    add_heat_balance_figure(scenarios);
-    add_space_heating_demand_figure(scenarios);
-    add_energy_demand_figure(scenarios);
-    add_primary_energy_usage_figure(scenarios);
-    add_carbon_dioxide_per_m2_figure(scenarios);
-    add_carbon_dioxide_per_person_figure(scenarios);
-    add_energy_costs_figure(scenarios);
-    add_comfort_tables(scenarios);
-    add_health_data(scenarios);
-    add_measures_summary_tables(scenarios, scenarios_measures_summary);
-    add_measures_complete_tables(scenarios, scenarios_measures_complete);
-    add_comparison_tables(scenarios, scenarios_comparison);
-
-    let t1 = performance.now();
-    console.log('report_UpdateUI took ' + (t1 - t0) + ' milliseconds.');
-}
-
-let report_organisations = null;
-
-// Add reports for each organisation we can access
-function add_organisation_options() {
-    mhep_helper.list_organisations().then(organisations => {
-        report_organisations = organisations;
-
-        noneOrg = { id: '__none', name: 'None', checked: true };
-
-        let html = [noneOrg, ...organisations]
+        let html = this.organisations
             .map(org =>`
                 <li>
                     <input type="radio"
@@ -89,360 +83,393 @@ function add_organisation_options() {
             .join('');
 
         document.querySelector('#organisation-choices').innerHTML = html;
-        choose_organisation();
+    }
+
+    draw_scenarios() {
+        let scenarioOpts = '<li><input type="checkbox" checked disabled class="big-checkbox" value="master"> Master</li>';
+
+        for (let scenario_id in project) {
+            if (scenario_id == 'master') {
+                continue;
+            }
+
+            const idx = scenario_id.split('scenario')[1];
+            const name = project[scenario_id].scenario_name;
+            const is_checked = (
+                scenario_id == 'scenario1'
+                || scenario_id == 'scenario2'
+                || scenario_id == 'scenario3'
+            );
+
+            scenarioOpts += `
+                <li>
+                    <input type="checkbox"
+                           ${is_checked ? 'checked' : ''}
+                           value="${scenario_id}"
+                           class="big-checkbox"
+                           id="check-${scenario_id}">
+                    <label class="d-i" for="check-${scenario_id}">Scenario ${idx}: ${name}</label>
+                </li>`;
+        }
+
+        document.querySelector('#scenario-choices').innerHTML = scenarioOpts;
+    }
+
+    render_report() {
+        const selected = document.querySelector('input[name=report-organisation]:checked');
+        if (!selected) {
+            return;
+        }
+
+        const selected_id = selected.value;
+        const org = this.organisations.find(e => e.id === selected_id);
+        if (!org) {
+            this.element.reportPreview.style.display = 'none';
+        } else {
+            this.element.reportPreview.style.display = 'block';
+            report_show(
+                this.element.reportPreviewFrame.contentDocument.querySelector('body'),
+                org.report_template
+            );
+        }
+    }
+}
+
+
+/**** REPORT GENERATION ****/
+
+function report_show(root, template) {
+    let t0 = performance.now();
+
+    nunjucks.configure({ autoescape: true });
+    env = new nunjucks.Environment();
+    env.addFilter('likert', filter_comfort_table);
+    root.innerHTML = env.renderString(template, get_context_data());
+
+    let scenarios = [];
+    $('#scenario-choices input:checked').each(function () {
+        scenarios.push(this.value);
     });
+
+    const graphs = [
+        [ add_heat_loss_summary_figure,         '#heat-loss-summary' ],
+        [ add_heat_balance_figure,              '#heat-balance' ],
+        [ add_space_heating_demand_figure,      '#space-heating-demand' ],
+        [ add_energy_demand_figure,             '#energy-demand' ],
+        [ add_primary_energy_usage_figure,      '#primary-energy-use' ],
+        [ add_carbon_dioxide_per_m2_figure,     '#carbon-dioxide-emissions' ],
+        [ add_carbon_dioxide_per_person_figure, '#carbon-dioxide-emissions-per-person' ],
+        [ add_energy_costs_figure,              '#estimated-energy-cost-comparison' ],
+    ];
+
+    for (let [ draw, selector ] of graphs) {
+        const elem = root.querySelector(selector);
+        if (elem) {
+            draw(elem, scenarios);
+        }
+    }
+
+    let scenarios_comparison = {};
+    let scenarios_measures_summary = {};
+    let scenarios_measures_complete = {};
+
+    for (let s of scenarios) {
+        if (s != 'master') {
+            scenarios_comparison[s] = compareCarbonCoop(s);
+            scenarios_measures_summary[s] = getMeasuresSummaryTable(s);
+            scenarios_measures_complete[s] = getMeasuresCompleteTables(s);
+        }
+    }
+
+    add_measures_summary_tables(scenarios, scenarios_measures_summary);
+    add_measures_complete_tables(scenarios, scenarios_measures_complete);
+    add_comparison_tables(scenarios, scenarios_comparison);
+
+    let t1 = performance.now();
+    console.log('report_show took ' + (t1 - t0) + ' milliseconds.');
 }
 
-const defaultOrg = {
-    'name': 'SAMPLE REPORT',
-    'report': {
-        'logo': '',
-        'colour': 'black',
-        'highlight_colour': '#ddd',
-    }
-};
+function filter_comfort_table(selected, left, right) {
+    return new nunjucks.runtime.SafeString(`
+        <div class="text-right" style="width: 6em; margin-right: 0.5em;"><small>${left}</small></div>
+        <svg viewBox="0 0 92 32" height="32" width="94">
+            <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'LOW' ? 'red' : 'white'}"></rect>
+            <rect y="1" x="31" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'MID' ? 'green' : 'white'}"></rect>
+            <rect y="1" x="61" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'HIGH' ? 'red' : 'white'}"></rect>
+        </svg>
+        <div style="width: 6em; margin-left: 0.5em;"><small>${right}</small></div>`);
+}
 
-function choose_organisation() {
-    const selected = document.querySelector('input[name=report-organisation]:checked');
-    if (!selected) {
-        return;
-    }
-
-    const selected_id = selected.value;
-    const org = report_organisations.find(e => e.id === selected_id) || defaultOrg;
-    const report = Object.assign({}, defaultOrg.report, org.report);
-
-    $('.report-org-name').html(org.name);
-
-    document.documentElement.style.setProperty('--report-primary-colour', report.colour);
-    document.documentElement.style.setProperty('--report-highlight-colour', report.highlight_colour);
-
-    $('#contact-for-questions').html(report.text_contact);
-    $('#section-3-text').html(report.text_section3);
-
-    const frontMatterContainer = document.querySelector('#report-front-matter-container');
-    if (report.text_front) {
-        $('#report-front-matter').html(report.text_front);
-        frontMatterContainer.removeAttribute('style');
+function get_featured_image() {
+    let featuredImage = p.images.find(e => e.is_featured);
+    if (featuredImage) {
+        return featuredImage.url;
     } else {
-        // We set the style attribute directly, because we want to hide the element.
-        // If you use jQuery's show() and hide(), then when you call show() it sets
-        // the element's display CSS property to "block"... when we want it to be
-        // "flex".
-        frontMatterContainer.setAttribute('style', 'display:none;');
-    }
-
-    if (report.logo) {
-        $('#report-logo').attr('src', report.logo).show();
-    } else {
-        $('#report-logo').hide();
+        return '';
     }
 }
 
-// Initialize choices scenario check boxes
-function add_scenario_options() {
-    let scenarioOpts = '<li><input type="checkbox" checked disabled class="big-checkbox" value="master"> Master</li>';
+function get_front_address() {
+    let address = [
+        project.master.household['address_1'] || '',
+        project.master.household['address_2'] || '',
+        project.master.household['address_3'] || '',
+        project.master.household['address_town'] || '',
+        project.master.household['address_postcode'] || '',
+    ];
 
-    for (let scenario_id in project) {
-        if (scenario_id == 'master') {
+    return address.filter(e => e != '').join('\n');
+}
+
+function get_priorities() {
+    let household = project.master.household;
+    let priorities = [
+        {
+            title: 'Save carbon',
+            order: parseInt(household['priority_carbon'], 10)
+        },
+        {
+            title: 'Save money',
+            order: parseInt(household['priority_money'], 10),
+        },
+        {
+            title: 'Improve comfort',
+            order: parseInt(household['priority_comfort'], 10),
+        },
+        {
+            title: 'Improve indoor air quality',
+            order: parseInt(household['priority_airquality'], 10)
+        },
+        {
+            title: 'General modernisation',
+            order: parseInt(household['priority_modernisation'], 10),
+        },
+        {
+            title: 'Improve health',
+            order: parseInt(household['priority_health'], 10),
+        }
+    ];
+
+    return priorities
+        .filter(elem => !isNaN(elem.order))
+        .sort(function (a, b) {
+            if (a.order < b.order) {
+                return -1;
+            } else if (a.order > b.order) {
+                return 1;
+            } else {
+                return 0;
+            }
+        })
+        .map(elem => elem.title)
+        .slice(0, 3);
+}
+
+function get_improvements() {
+    const options = [
+        { key: '5_improv_loftconversion',     text: 'a loft conversion' },
+        { key: '5_improv_extension',          text: 'an extension' },
+        { key: '5_improv_insulation',         text: 'insulation' },
+        { key: '5_improv_windows',            text: 'windows' },
+        { key: '5_improv_heatinghotwater',    text: 'heating and hot water system' },
+    ];
+
+    return options.filter(opt => project.master.household[opt.key] ? true : false).map(opt => opt.text);
+}
+
+function get_average_temperature() {
+    temps = [ project.master.household.reading_temp1, project.master.household.reading_temp2 ].filter(e => e ? true : false);
+    if (temps.length === 0) {
+        return null;
+    } else if (temps.length === 1) {
+        return temps[0];
+    } else {
+        return (temps[0] + temps[1]) / 2;
+    }
+}
+
+function get_average_humidity() {
+    temps = [ project.master.household.reading_humidity1, project.master.household.reading_humidity2 ].filter(e => e ? true : false);
+    if (temps.length === 0) {
+        return null;
+    } else if (temps.length === 1) {
+        return temps[0];
+    } else {
+        return (temps[0] + temps[1]) / 2;
+    }
+}
+
+function get_scenario_list() {
+    let scenarios = [];
+    for (let name of Object.keys(project)) {
+        if (name == 'master') {
             continue;
         }
 
-        const idx = scenario_id.split('scenario')[1];
-        const name = project[scenario_id].scenario_name;
-        const is_checked = (
-            scenario_id == 'scenario1'
-            || scenario_id == 'scenario2'
-            || scenario_id == 'scenario3'
-        );
+        const scenario = project[name];
+        const nums = /(\d+)/g;
+        const id = parseInt(name.match(nums)[0], 10);
 
-        scenarioOpts += `
-            <li>
-                <input type="checkbox"
-                       ${is_checked ? 'checked' : ''}
-                       value="${scenario_id}"
-                       class="big-checkbox"
-                       id="check-${scenario_id}">
-                <label class="d-i" for="check-${scenario_id}">Scenario ${idx}: ${name}</label>
-            </li>`;
-    }
-
-    document.querySelector('#scenario-choices').innerHTML = scenarioOpts;
-}
-
-function add_events() {
-    window.onbeforeprint = function () {
-        $('#report-exit-print-mode').show();
-
-        // Because the 'Work Sans' font loads asyncronously, it often finishes loading after
-        // the JS has been executed, and thus after the diagams have been drawn.
-        // So we update the UI here to ensure that the diagrams are using the correct
-        // font.
-        report_UpdateUI();
-
-        printmode = true;
-        hide_sidebar();
-    };
-
-    $('body').on('click', '#report-exit-print-mode', _ => {
-        printmode = false;
-        show_sidebar();
-    });
-
-    $('body').on('click', '#report-apply', function () {
-        report_UpdateUI();
-    });
-}
-function add_featured_image() {
-    let featuredImage = p.images.find(e => e.is_featured);
-    if (featuredImage) {
-        $('.home-image').attr('src', featuredImage.url);
-    }
-}
-function add_address() {
-    let address = [
-        data.household['1a_addressline1'],
-        data.household['1a_addressline2'],
-        data.household['1a_addressline3'],
-        data.household['1a_towncity'],
-        data.household['1a_postcode'],
-    ];
-
-    let joinedHTML = address.filter(e => e != '').join('<br>');
-    $('#report_address').html(joinedHTML);
-}
-function add_date() {
-    var date = new Date();
-    var months_numbers = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'];
-    $('#report_date').html(date.getDate() + '-' + months_numbers[date.getMonth()] + '-' + date.getFullYear());
-}
-function add_prioirities_figure() {
-    //  Shows retrofit priorities - in order - identifying whether interested in retrofit for cost, comfort or carbon reasons etc.
-
-    var priorities = {};
-    var household = project['master'].household;
-    var prioritiesPossibilities = [
-        '7b_carbon',
-        '7b_money',
-        '7b_comfort',
-        '7b_airquality',
-        '7b_modernisation',
-        '7b_health',
-    ];
-    if (household != undefined) {
-        if (typeof household['7b_carbon'] != 'undefined') {
-            priorities.carbon = {
-                title: 'Save carbon',
-                order: household['7b_carbon']
-            };
-        }
-
-        if (typeof household['7b_money'] != 'undefined') {
-            priorities.money = {
-                title: 'Save money',
-                order: household['7b_money'],
-            };
-        }
-
-        if (typeof household['7b_comfort'] != 'undefined') {
-            priorities.comfort = {
-                title: 'Improve comfort',
-                order: household['7b_comfort'],
-            };
-        }
-
-        if (typeof household['7b_airquality'] != 'undefined') {
-            priorities.airquality = {
-                title: 'Improve indoor air quality',
-                order: household['7b_airquality']
-            };
-        }
-
-        if (typeof household['7b_modernisation'] != 'undefined') {
-            priorities.modernisation = {
-                title: 'General modernisation',
-                order: household['7b_modernisation'],
-            };
-        }
-
-        if (typeof household['7b_health'] != 'undefined') {
-            priorities.health = {
-                title: 'Improve health',
-                order: household['7b_health'],
-            };
-        }
-
-        var sortedPriorities = [];
-        for (var priority in priorities) {
-            sortedPriorities.push([priority, priorities[priority]['order'], priorities[priority]['title']]);
-        }
-        sortedPriorities.sort(function (a, b) {
-            return parseInt(a[1]) - parseInt(b[1]);
+        scenarios.push({
+            id: id,
+            name: name,
+            description: scenario.name,
+            commentary: scenario.description,
         });
-
-        $('#retrofit-priorities').html('');
-        for (var priority_order = 1; priority_order <= 3; priority_order++) {
-            for (var i = 0; i < sortedPriorities.length; i++) {
-                if (sortedPriorities[i][1] == priority_order) {
-                    $('#retrofit-priorities').append('<li>' + sortedPriorities[i][2] + '</li>');
-                }
-            }
-        }
     }
+    return scenarios;
 }
-function add_scenario_names(scenarios) {
-    $('.scenarios-list').html('');
-    scenarios.forEach(function (scenario) {
-        if (scenario != 'master') {
-            $('.scenarios-list').append('<li>Scenario ' + scenario.split('scenario')[1] + ': ' + project[scenario].scenario_name + '</li>');
-        }
-    });
+
+function get_lookup(table, key) {
+    return table[project.master.household[key]];
 }
-function add_performance_summary_figure(scenarios) {
-    // Quick overview/summary - Benchmarking Bar Charts. Need to ensure that all scenarios displayed, not just one as on current graph.
-    // Space Heating Demand (kWh/m2.a)
-    // Primary Energy Demand (kWh/m2.a)
-    // CO2 emission rate (kgCO2/m2.a)
-    // CO2 emission rate - per person (kgCO2/m2.a)
 
-    var values = [];
-    for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].space_heating_demand_m2 != 'undefined') {
-            values[i] = Math.round(project[scenarios[i]].space_heating_demand_m2);
-        } else {
-            values[i] = 0;
-        }
-    }
+function get_context_data() {
+    const hh = project.master.household;
 
-    colors = [
-        'rgb(236, 157, 163)',
-        'rgb(164, 211, 226)',
-        'rgb(184, 237, 234)',
-        'rgb(251, 212, 139)',
-        'rgb(236, 157, 100)',
-        'rgb(164, 211, 100)',
-        'rgb(184, 237, 100)',
-        'rgb(251, 212, 100)',
-        'rgb(236, 157, 0)',
-        'rgb(164, 211, 0)',
-        'rgb(184, 237, 0)',
-        'rgb(251, 212, 0)'
-    ];
-
-    var options = {
-        name: 'Space heating demand',
-        font: 'Work Sans',
-        colors: colors,
-        value: Math.round(data.space_heating_demand_m2),
-        values: values,
-        units: 'kWh/m' + String.fromCharCode(178) + '.a', //String.fromCharCode(178) = 2 superscript
-        targets: {
-            'Min Target': datasets.target_values.space_heating_demand_lower,
-            'Max Target': datasets.target_values.space_heating_demand_upper,
-            'UK average': datasets.uk_average_values.space_heating_demand
+    return {
+        front: {
+            image_url: get_featured_image(),
+            name: hh['householder_name'],
+            address: get_front_address(),
+            local_authority: hh['address_la'],
+            survey_date: hh['assessment_date'],
+            report_date: hh['report_date'],
+            report_version: hh['report_version'],
+            mhep_version: VERSION,
+            assessor_name: hh['assessor_name'],
         },
-        targetRange: [datasets.target_values.space_heating_demand_lower, datasets.target_values.space_heating_demand_upper]
+        aims: {
+            future: {
+                occupancy_actual: get_lookup(questionnaire.OCCUPANCY_ACTUAL, 'occupancy_actual'),
+                occupancy_planned: get_lookup(questionnaire.OCCUPANCY_EXPECTED, 'occupancy_expected'),
+                occupancy_notes: hh['occupancy_expected_note'],
+                lifestyle_change: hh['expected_lifestyle_change'] === 'YES',
+                lifestyle_change_notes: hh['expected_lifestyle_change_note'],
+                other_works: hh['expected_other_works'] === 'YES',
+                other_works_notes: hh['expected_other_works_note'],
+                works_start: get_lookup(questionnaire.WORKS_START, 'expected_start'),
+                works_start_notes: hh['expected_start_note'],
+            },
+            priorities: get_priorities(),
+            qual_criteria: hh['priority_qualitative_note'],
+            aesthetics: {
+                internal: hh['aesthetics_external'] === 'YES',
+                external: hh['aesthetics_internal'] === 'YES',
+                note: hh['aesthetics_note'],
+            },
+            logistics: {
+                packaging: get_lookup(questionnaire.LOGISTICS_PACKAGING, 'logistics_packaging'),
+                can_diy: hh['logistics_diy'] === 'YES',
+                diy_note: hh['logistics_diy_note'],
+                disruption: get_lookup(questionnaire.LOGISTICS_DISRUPTION, 'logistics_disruption'),
+                disruption_comment: hh['logistics_disruption_note'],
+                has_budget: hh['logistics_budget'] === 'YES',
+                budget_comment: hh['logistics_budget_note'],
+                brief: hh['commentary_brief'],
+            }
+        },
+        now: {
+            home_type: get_lookup(questionnaire.HOUSE_TYPE, 'house_type'),
+            num_bedrooms: hh['house_nr_bedrooms'],
+            construction: {
+                floors: hh['construct_note_floors'],
+                walls: hh['construct_note_walls'],
+                roof: hh['construct_note_roof'],
+                openings: hh['construct_note_openings'],
+                drainage: hh['construct_note_drainage'],
+                ventiliation: hh['construct_note_ventiliation'],
+                ingress: hh['construct_note_ingress'],
+            },
+            previous_works: hh['previous_works'],
+            structural: {
+                you_said: hh['structural_issues'],
+                we_noted: hh['structural_issues_note'],
+            },
+            damp: {
+                you_said: hh['damp'],
+                we_noted: hh['damp_note'],
+            },
+            space_heating: hh['space_heating_provided'],
+            space_heating_controls: hh['space_heating_controls'],
+            hot_water: hh['hot_water_provided'],
+            utility: {
+                electricity: hh['mains_electricity'],
+                gas: hh['mains_gas'],
+                water: hh['mains_water'],
+                sewer: hh['mains_sewer'],
+            },
+            ventilation: {
+                system_name: project.master.ventilation.ventilation_name,
+                ventilation_suggestion: get_lookup(questionnaire.VENTILATION_SUGGESTION, 'ventilation_suggestion'),
+                avg_humidity: get_average_humidity(),
+                adequate_paths: hh['ventilation_adequate_paths'] === 'YES',
+                purge_vents: hh['ventilation_purge_vents'] === 'YES',
+                gaps: hh['ventilation_gaps'] === 'YES',
+                note: hh['ventilation_note'],
+                fuel_burner: hh['fuel_burner'],
+                fuel_burner_note: hh['fuel_burner_note'],
+            },
+            laundry_habits: hh['laundry'],
+            radon_chance: get_lookup(questionnaire.RADON_RISK, 'radon_risk'),
+            experience: {
+                thermal: {
+                    temperature_winter: hh['comfort_temperature_winter'],
+                    temperature_summer: hh['comfort_temperature_summer'],
+                    airquality_winter: hh['comfort_airquality_winter'],
+                    airquality_summer: hh['comfort_airquality_summer'],
+                    draughts_winter: hh['comfort_draughts_winter'],
+                    draughts_summer: hh['comfort_draughts_summer'],
+                    avg_temp: get_average_temperature(),
+                    problems: hh['thermal_comfort_problems'],
+                    note: hh['thermal_comfort_note'],
+                },
+                daylight: {
+                    amount: hh['daylight'],
+                    problems: hh['daylight_problems'] === 'YES',
+                    note: hh['daylight_note'],
+                },
+                noise: {
+                    problems: hh['noise_problems'] === 'YES',
+                    note: hh['noise_note'],
+                },
+                rooms: {
+                    favourite: hh['rooms_favourite'],
+                    unloved: hh['rooms_unloved'],
+                }
+            },
+            historic: {
+                when_built: hh['historic_age_precise']
+                    ? hh['historic_age_precise']
+                    : get_lookup(questionnaire.HISTORIC_AGE_BAND, 'historic_age_band'),
+                conservation: hh['historic_conserved'] === 'YES',
+                listed: hh['historic_listed'] === 'NO'
+                    ? false
+                    : get_lookup(questionnaire.HISTORIC_LISTED, 'historic_listed'),
+                comments: hh['historic_note'],
+            },
+            theworldisburning: {
+                flooding_history: hh['flooding_history'] === 'YES',
+                flooding_rivers_sea: get_lookup(questionnaire.FLOODING_RISK, 'flooding_rivers_sea'),
+                flooding_surface_water: get_lookup(questionnaire.FLOODING_RISK, 'flooding_surface_water'),
+                flooding_comments: hh['flooding_note'],
+                overheating_comments: hh['overheating_note'],
+            },
+            context_and_other_points: hh['context_and_other_points'],
+        },
+        commentary: {
+            context: hh['commentary_context'],
+        },
+        scenarios: {
+            list: get_scenario_list(),
+        }
     };
-    targetbarCarboncoop('space-heating-demand', options);
-    // ---------------------------------------------------------------------------------
-    var values = [];
-    for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].primary_energy_use_m2 != 'undefined') {
-            values[i] = Math.round(project[scenarios[i]].primary_energy_use_m2);
-        } else {
-            values[i] = 0;
-        }
-    }
-
-    var options = {
-        name: 'Primary energy demand',
-        value: Math.round(data.primary_energy_use_m2),
-        colors: colors,
-        values: values,
-        units: 'kWh/m' + String.fromCharCode(178) + '.a', //String.fromCharCode(178) = 2 superscript
-        targets: {
-            // "Passivhaus": 120,
-            'Carbon Coop 2050 target (inc. renewables)': datasets.target_values.primary_energy_demand,
-            'UK Average': datasets.uk_average_values.primary_energy_demand
-        }
-    };
-    targetbarCarboncoop('primary-energy', options);
-    // ---------------------------------------------------------------------------------
-
-    var values = [];
-    for (var i = 0; i < scenarios.length; i++) {
-        if (typeof project[scenarios[i]] != 'undefined' && project[scenarios[i]].kgco2perm2 != 'undefined') {
-            values[i] = Math.round(project[scenarios[i]].kgco2perm2);
-        } else {
-            values[i] = 0;
-        }
-    }
-
-    var options = {
-        name: "CO<sub>2</sub> Emission rate <i class='icon-question-sign' title='Carbon emissions and number of homes: DECC (2014) \"United Kindgdom Housing Energy Fact File: 2013\", 28 January 2014, accessed at http://www.gov.uk/government/statistics/united-kingdom-housing-energy-fact-file-2013\n\n"
-                + 'Average Floor Area: National Statistics, (2016), "English Housing Survey 2014 to 2015: Headline Report", 18 Feb 2016, accessed at http://www.gov.uk/government/statistics/english-housing-survey-2014-to-2015-headline-report \n\n'
-                + "CO<sub>2</sub> emissions factors are 15 year ones, based on figures published by BRE at http://www.bre.co.uk/filelibrary/SAP/2012/Emission-and-primary-factors-2013-2027.pdf' />",
-        value: Math.round(data.kgco2perm2),
-        colors: colors,
-        values: values,
-        units: 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.a', //String.fromCharCode(178) = 2 superscript
-        targets: {
-            'Carbon Coop 2050 target': datasets.target_values.co2_emission_rate,
-            'UK Average': datasets.uk_average_values.co2_emission_rate,
-        }
-    };
-    targetbarCarboncoop('co2-emission-rate', options);
-
-
-    // ---------------------------------------------------------------------------------
-
-    //    var values = [];
-    // for (var i = 0 ; i < scenarios.length ; i++){
-    // 	if (typeof project[scenarios[i]] != "undefined" && project[scenarios[i]].kwhdpp != "undefined"){
-    // 		values[i] =  Math.round(project[scenarios[i]].kwhdpp.toFixed(1));
-    // 	} else {
-    // 		values[i] = 0;
-    // 	}
-    // }
-
-    // var options = {
-    //     name: "Per person energy use",
-    //     value: data.kwhdpp.toFixed(1),
-    //     colors: colors,
-    //     values: values,
-    //     units: "kWh/day",
-    //     targets: {
-    //         "70% heating saving": 8.6,
-    //         "UK Average": 19.6
-    //     }
-    // };
-    // targetbarCarboncoop("energy-use-per-person", options);
-
-    $('#performance-summary-key').html('');
-    for (var i = 0; i < scenarios.length; i++) {
-        let name;
-
-        if (scenarios[i] == 'master') {
-            name = 'Your home now';
-        } else {
-            name = 'Scenario ' + scenarios[i].split('scenario')[1] + ': ' + project[scenarios[i]].scenario_name;
-        }
-
-
-        $('#performance-summary-key').append(`
-            <li class="mb-0">
-                <svg viewBox="1 1 15 15" height="15" width="15">
-                    <rect y="1" x="1" width="15" height="15" fill="${colors[i]}"></rect>
-                </svg>
-                ${name}
-            </li>`);
-    }
 }
-function add_heat_loss_summary_figure(scenarios) {
-    $('.js-house-heatloss-diagrams-wrapper').html("<ul class='js-house-heatloss-diagram-picker house-heatloss-diagram-picker'></ul>");
 
-    // Add the diagrams
-    scenarios.forEach(function (scenario) {
+function add_heat_loss_summary_figure(root, scenarios) {
+    $(root).html('');
+
+    for (let scenario of scenarios) {
         let house_markup = generateHouseMarkup(heatlossData(scenario));
         let name = scenario == 'master' ? 'Your home now' : 'Scenario ' + scenario.split('scenario')[1];
         let html = `
@@ -451,25 +478,11 @@ function add_heat_loss_summary_figure(scenarios) {
                 ${house_markup}
             </div>`;
 
-        $('.js-house-heatloss-diagrams-wrapper').append(html);
-    });
-
-    // Events
-    $('body').on('click', '.js-house-heatloss-diagram-picker li', function (e) {
-        var scenario = $(this).data('scenario');
-        $('.js-house-heatloss-diagram-picker li').removeClass('selected');
-        $(this).addClass('selected');
-        $('.js-house-heatloss-diagrams-wrapper .centered-house').css({
-            'display': 'none'
-        });
-        $("div[data-scenario-diagram='" + scenario + "']").css('display', 'block');
-    });
-
-    // Show the diagram for the master scenario
-    $('.js-house-heatloss-diagram-picker [data-scenario=master]').click();
-
+        $(root).append(html);
+    }
 }
-function add_heat_balance_figure(scenarios) {
+
+function add_heat_balance_figure(root, scenarios) {
     // Heat transfer per year by element. The gains and losses here need to balance.
     var dataFig4 = [];
     var max_value = 250; // used to set the height of the chart
@@ -501,7 +514,7 @@ function add_heat_balance_figure(scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
+        yAxisLabel: 'kWh/m².year',
         fontSize: 33,
         width: 1200.35,
         chartHeight: 600,
@@ -521,10 +534,9 @@ function add_heat_balance_figure(scenarios) {
         },
         data: dataFig4,
     });
-    $('#heat-balance').html('');
-    HeatBalance.draw('heat-balance');
+    HeatBalance.draw(root);
 }
-function add_space_heating_demand_figure(scenarios) {
+function add_space_heating_demand_figure(root, scenarios) {
     var dataFig = [];
     var max_value = 250; // used to set the height of the chart
     var label = '';
@@ -550,7 +562,7 @@ function add_space_heating_demand_figure(scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
+        yAxisLabel: 'kWh/m²·year',
         fontSize: 33,
         font: 'Work Sans',
         division: 50,
@@ -596,36 +608,40 @@ function add_space_heating_demand_figure(scenarios) {
         ],
         data: dataFig
     });
-    $('#fig-5-space-heating-demand').html('');
-    SpaceHeatingDemand.draw('fig-5-space-heating-demand');
+    SpaceHeatingDemand.draw(root);
 }
-function add_energy_demand_figure(scenarios) {
-    max_value = 40000;
-    var energyDemandData = getEnergyDemandData(scenarios);
+function add_energy_demand_figure(root, scenarios) {
+    let [energyDemandData, max_value] = getEnergyDemandData(scenarios);
     var dataFig = prepare_data_for_graph(energyDemandData);
+
+    // Use intervals of 50 units
+    max_value = Math.floor((max_value + 100) / 50) * 50;
+
     var EnergyDemand = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
-        yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/year',
+        yAxisLabelColor: 'rgb(87, 77, 86)',
+        barLabelsColor: 'rgb(87, 77, 86)',
+        yAxisLabel: 'kWh/m²·year',
         fontSize: 33,
         font: 'Work Sans',
         width: 1200,
         chartHeight: 600,
-        division: 5000,
+        division: 50,
         chartHigh: max_value,
         barWidth: 550 / dataFig.length,
         barGutter: 400 / dataFig.length,
-        defaultBarColor: 'rgb(231,37,57)', defaultVarianceColor: 'rgb(2,37,57)',
+        defaultBarColor: 'rgb(231,37,57)',
+        defaultVarianceColor: 'rgb(2,37,57)',
         barColors: {
             'Gas': 'rgb(236,102,79)',
             'Electric': 'rgb(240,212,156)',
             'Other': 'rgb(24,86,62)',
-        }, data: dataFig
+        },
+        data: dataFig
     });
-    $('#energy-demand').html('');
-    EnergyDemand.draw('energy-demand');
+    EnergyDemand.draw(root);
 }
-function add_primary_energy_usage_figure(scenarios) {
+function add_primary_energy_usage_figure(root, scenarios) {
     var primaryEnergyUseData = getPrimaryEnergyUseData(scenarios);
     var max = primaryEnergyUseData.max;
     var min = primaryEnergyUseData.min - 50;
@@ -636,7 +652,7 @@ function add_primary_energy_usage_figure(scenarios) {
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kWh/m' + String.fromCharCode(178) + '.year',
+        yAxisLabel: 'kWh/m².year',
         fontSize: 33,
         font: 'Work Sans',
         width: 1200,
@@ -658,20 +674,19 @@ function add_primary_energy_usage_figure(scenarios) {
         data: dataGraph,
         targets: [
             {
-                label: 'UK Average 360 kWh/m' + String.fromCharCode(178) + '.a',
+                label: 'UK Average 360 kWh/m².a',
                 target: 360,
                 color: 'rgb(231,37,57)'
             }, {
-                label: 'Carbon Coop Target 120 kWh/m' + String.fromCharCode(178) + '.a',
+                label: 'Carbon Coop Target 120 kWh/m².a',
                 target: 120,
                 color: 'rgb(231,37,57)'
             }
         ],
     });
-    $('#primary-energy-use').html('');
-    primaryEneryUse.draw('primary-energy-use');
+    primaryEneryUse.draw(root);
 }
-function add_carbon_dioxide_per_m2_figure(scenarios) {
+function add_carbon_dioxide_per_m2_figure(root, scenarios) {
     var carbonDioxideEmissionsData = [];
     var max = 100;
     if (typeof project['master'] !== 'undefined' && typeof project['master'].kgco2perm2 !== 'undefined') {
@@ -705,7 +720,7 @@ function add_carbon_dioxide_per_m2_figure(scenarios) {
     var CarbonDioxideEmissions = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)', barLabelsColor: 'rgb(87, 77, 86)',
-        yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year', fontSize: 33,
+        yAxisLabel: 'kgCO' + String.fromCharCode(8322) + '/m².year', fontSize: 33,
         font: 'Work Sans',
         division: 10,
         width: 1200,
@@ -717,19 +732,18 @@ function add_carbon_dioxide_per_m2_figure(scenarios) {
         data: carbonDioxideEmissionsData,
         targets: [
             {
-                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year', target: datasets.target_values.co2_emission_rate,
+                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m².year', target: datasets.target_values.co2_emission_rate,
                 color: 'rgb(231,37,57)'
             },
             {
-                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m' + String.fromCharCode(178) + '.year',
+                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO' + String.fromCharCode(8322) + '/m².year',
                 target: datasets.uk_average_values.co2_emission_rate,
                 color: 'rgb(231,37,57)'
             },
         ], });
-    $('#carbon-dioxide-emissions').html('');
-    CarbonDioxideEmissions.draw('carbon-dioxide-emissions');
+    CarbonDioxideEmissions.draw(root);
 }
-function add_carbon_dioxide_per_person_figure(scenarios) {
+function add_carbon_dioxide_per_person_figure(root, scenarios) {
     var carbonDioxideEmissionsPerPersonData = [];
     if (typeof project['master'] != 'undefined' && typeof project['master'].annualco2 !== 'undefined' && typeof project['master'].occupancy !== 'undefined') {
         var array = [{value: project['master'].annualco2 / project['master'].occupancy}];
@@ -781,11 +795,9 @@ function add_carbon_dioxide_per_person_figure(scenarios) {
         // 	'Cooking': 'rgb(40,153,139)',         // },
         data: carbonDioxideEmissionsPerPersonData
     });
-    $('#carbon-dioxide-emissions-per-person').html('');
-    CarbonDioxideEmissionsPerPerson.draw('carbon-dioxide-emissions-per-person');
-
+    CarbonDioxideEmissionsPerPerson.draw(root);
 }
-function add_energy_costs_figure(scenarios) {
+function add_energy_costs_figure(root, scenarios) {
     var estimatedEnergyCostsData = [];
     var max = 3500;
     if (typeof project['master'] != 'undefined' && typeof project['master'].total_cost !== 'undefined') {
@@ -834,187 +846,9 @@ function add_energy_costs_figure(scenarios) {
         defaultBarColor: 'rgb(157,213,203)',
         data: estimatedEnergyCostsData
     });
-    $('#estimated-energy-cost-comparison').html('');
-    EstimatedEnergyCosts.draw('estimated-energy-cost-comparison');
+    EstimatedEnergyCosts.draw(root);
 }
-function add_comfort_tables(scenarios) {
-    // Temperature in Winter
-    if (project.master.household == undefined
-            || project.master.household['6a_temperature_winter'] == undefined
-            || project.master.household['6a_airquality_winter'] == undefined
-            || project.master.household['6a_airquality_summer'] == undefined
-            || project.master.household['6a_temperature_summer'] == undefined
-            || project.master.household['6b_daylightamount'] == undefined
-            || project.master.household['6b_artificallightamount'] == undefined) {
-        $('.comfort-tables').html('<p>There is not enough information, please check section 6 in Household Questionnaire. </p>');
-    } else {
-        var options = [{
-            title: 'Too cold', color: 'red',
-        }, {
-            title: 'Just right',
-            color: 'green',
-        }, {
-            title: 'Too hot', color: 'red'
-        }
-        ];
-        createComforTable(options, 'comfort-table-winter-temp', project.master.household['6a_temperature_winter']);
-        // Air quality
-        var options = [
-            {
-                title: 'Too dry', color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {title: 'Too stuffy',
-                color: 'red'
-            }];
-        createComforTable(options, 'comfort-table-winter-air', project.master.household['6a_airquality_winter']);
-        createComforTable(options, 'comfort-table-summer-air', project.master.household['6a_airquality_summer']);
-        // Temperature in Summer
-        var options = [
-            {
-                title: 'Too cold', color: 'red',
-            }, {
-                title: 'Just right', color: 'green',
-            }, {
-                title: 'Too hot',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-summer-temp', project.master.household['6a_temperature_summer']);
-        // Air quality in Summer
-        var options = [
-            {
-                title: 'Too dry', color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too stuffy',
-                color: 'red'
-            }];
-        createComforTable(options, 'comfort-table-summer-air', project.master.household['6a_airquality_summer']);
-        var options = [
-            {
-                title: 'Too little',
-                color: 'red',
-            }, {title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too much',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-daylight-amount', project.master.household['6b_daylightamount']);
-        var options = [
-            {
-                title: 'Too little',
-                color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too much',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-artificial-light-amount', project.master.household['6b_artificallightamount']);
-        var options = [
-            {
-                title: 'Too draughty',
-                color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too still',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-draughts-summer', project.master.household['6a_draughts_summer']);
-        var options = [
-            {
-                title: 'Too draughty',
-                color: 'red',
-            }, {
-                title: 'Just right',
-                color: 'green',
-            }, {
-                title: 'Too still',
-                color: 'red'
-            }
-        ];
-        createComforTable(options, 'comfort-table-draughts-winter', project.master.household['6a_draughts_winter']);
-    }
-}
-function add_health_data(scenarios) {
-    // Humidity Data
-    if (data.household != undefined) {
-        if (data.household.reading_humidity1 == undefined && data.household.reading_humidity2 == undefined) {
-            $('.js-average-humidity').html('There is not enough information, please check section 3 in Household Questionnaire.');
-        } else if (data.household.reading_humidity1 != undefined && data.household.reading_humidity2 == undefined) {
-            $('.js-average-humidity').html('When we visited, the relative humidity was ' + data.household.reading_humidity1 + ' %. (The ideal range is 40-60%).');
-        } else if (data.household.reading_humidity1 == undefined && data.household.reading_humidity2 != undefined) {
-            $('.js-average-humidity').html(' When we visited, the relative humidity was ' + data.household.reading_humidity2 + '%. (The ideal range is 40-60%).');
-        } else {
-            var averageHumidity = 0.5 * (data.household.reading_humidity1 + data.household.reading_humidity2);
-            $('.js-average-humidity').html('When we visited, the relative humidity was ' + averageHumidity + '%. (The ideal range is 40-60%).');
-        }
-    }
 
-    // Temperature Data
-    if (data.household != undefined) {
-        if (data.household.reading_temp1 == undefined && data.household.reading_temp2 == undefined) {
-            $('.js-average-temp').html('There is not enough information, please check section 3 in Household Questionnaire.');
-        } else if (data.household.reading_temp1 != undefined && data.household.reading_temp2 == undefined) {
-            $('.js-average-temp').html('When we visited, the temperature was ' + data.household.reading_temp1 + ' °C.<br />(It is recommended that living spaces are at 16<sup>o</sup>C as a minium.');
-        } else if (data.household.reading_temp1 == undefined && data.household.reading_temp2 != undefined) {
-            $('.js-average-temp').html(' When we visited, the temperature was ' + data.household.reading_temp2 + '°C.<br />(It is recommended that living spaces are at 16<sup>o</sup>C as a minium.');
-        } else {
-            var averageHumidity = 0.5 * (data.household.reading_temp1 + data.household.reading_temp2);
-            $('.js-average-temp').html('When we visited, the temperature was ' + averageHumidity + '°C.<br />(It is recommended that living spaces are at 16<sup>o</sup>C as a minium (World Health Organisation).');
-        }
-    }
-
-    // You also told us...
-    if (data.household != undefined) {
-        data.household['6c_noise_comment'] == undefined ? $('.js-noise_comment').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-noise_comment').html(data.household['6c_noise_comment']);
-        data.household['6b_problem_locations'] == undefined || data.household['6b_problem_locations'] === '' ? $('.js-problem_locations_daylight').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-problem_locations_daylight').html(data.household['6b_problem_locations']);
-        data.household['6a_problem_locations'] == undefined || data.household['6a_problem_locations'] == '' ? $('.js-problem_locations').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-problem_locations').html(data.household['6a_problem_locations']);
-        data.household['6d_favourite_room'] == undefined || data.household['6d_favourite_room'] == '' ? $('.js-favourite_room').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-favourite_room').html(data.household['6d_favourite_room']);
-        data.household['6d_unloved_rooms'] == undefined || data.household['6d_unloved_rooms'] == '' ? $('.js-unloved_rooms').html('There is not enough information, please check section 6 in Household Questionnaire.') : $('.js-unloved_rooms').html(data.household['6d_unloved_rooms']);
-
-        var laundryHabits = '';
-        if (typeof data.household['4b_drying_outdoorline'] != 'undefined' && data.household['4b_drying_outdoorline']) {
-            laundryHabits += 'outdoor clothes line, ';
-        }
-        if (typeof data.household['4b_drying_indoorrack'] != 'undefined' && data.household['4b_drying_indoorrack']) {
-            laundryHabits += 'indoor clothes racks, ';
-        }
-        if (typeof data.household['4b_drying_airingcupboard'] != 'undefined' && data.household['4b_drying_airingcupboard']) {
-            laundryHabits += 'airing cupboard, ';
-        }
-        if (typeof data.household['4b_drying_tumbledryer'] != 'undefined' && data.household['4b_drying_tumbledryer']) {
-            laundryHabits += 'tumble dryer, ';
-        }
-        if (typeof data.household['4b_drying_washerdryer'] != 'undefined' && data.household['4b_drying_washerdryer']) {
-            laundryHabits += 'washer/dryer, ';
-        }
-        if (typeof data.household['4b_drying_radiators'] != 'undefined' && data.household['4b_drying_radiators']) {
-            laundryHabits += 'radiators, ';
-        }
-        if (typeof data.household['4b_drying_electricmaiden'] != 'undefined' && data.household['4b_drying_electricmaiden']) {
-            laundryHabits += 'electric maiden, ';
-        }
-
-        if (laundryHabits.length === 0) {
-            laundryHabits = 'There is not enough information, please check section 4 in Household Questionnaire.';
-        } else {
-            var laundryHabits = laundryHabits.slice(0, -2);
-        }
-        $('.js-laundry-habits').html(laundryHabits);
-    }
-}
 function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
     $('#ccop-report-measures-summary-tables').html('');
     var abc = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r'];
@@ -1036,12 +870,6 @@ function add_measures_summary_tables(scenarios, scenarios_measures_summary) {
             $('#ccop-report-measures-summary-tables').append(html);
         }
     });
-}
-function add_commentary() {
-    if (data.household != undefined && data.household.commentary != undefined) {
-        var commentary = data.household.commentary.replace(/\n/gi, '<br />');
-        $('#commentary').html(commentary);
-    }
 }
 function add_measures_complete_tables(scenarios, scenarios_measures_complete) {
     $('#report-measures-complete-tables').html('');
@@ -1172,45 +1000,41 @@ function generateHouseMarkup(heatlossData) {
 function getEnergyDemandData(scenarios) {
     var data = {};
     for (var i = 0; i < scenarios.length; i++) {
-        data[scenarios[i]] = [];
+        const scenario_id = scenarios[i];
+        const scenario = project[scenario_id];
+        if (!scenario) {
+            console.log("Scenario doesn't exist");
+            continue;
+        }
+
+        data[scenario_id] = [];
+
         var electric = 0;
         var gas = 0;
         var other = 0;
-        if (typeof project[scenarios[i]] !== 'undefined') {
-            if (typeof project[scenarios[i]].fuel_totals !== 'undefined') {
-                for (var fuel in project[scenarios[i]].fuel_totals) {
-                    if (project[scenarios[i]].fuels[fuel].category == 'Electricity') {
-                        electric += project[scenarios[i]].fuel_totals[fuel].quantity;
-                    } else if (project[scenarios[i]].fuels[fuel].category == 'Gas') {
-                        gas += project[scenarios[i]].fuel_totals[fuel].quantity;
-                    } else if (fuel != 'generation') {
-                        other += project[scenarios[i]].fuel_totals[fuel].quantity;
-                    }
+
+        if (typeof scenario.fuel_totals !== 'undefined') {
+            for (var fuel in scenario.fuel_totals) {
+                if (scenario.fuels[fuel].category == 'Electricity') {
+                    electric += scenario.fuel_totals[fuel].quantity;
+                } else if (scenario.fuels[fuel].category == 'Gas') {
+                    gas += scenario.fuel_totals[fuel].quantity;
+                } else if (fuel != 'generation') {
+                    other += scenario.fuel_totals[fuel].quantity;
                 }
-                data[scenarios[i]].push({value: gas, label: 'Gas', variance: gas * 0.3});
-                data[scenarios[i]].push({value: electric, label: 'Electric', variance: electric * 0.3});
-                data[scenarios[i]].push({value: other, label: 'Other', variance: other * 0.3});
             }
-        }
-        if (max_value < (gas + electric + other)) {
-            max_value = gas + electric + other + 5000;
+            data[scenario_id].push({value: gas, label: 'Gas', variance: gas * 0.3});
+            data[scenario_id].push({value: electric, label: 'Electric', variance: electric * 0.3});
+            data[scenario_id].push({value: other, label: 'Other', variance: other * 0.3});
         }
     }
 
-
     data.bills = [
-        {
-            value: 0,
-            label: 'Gas',
-        },
-        {value: 0,
-            label: 'Electric',
-        },
-        {
-            value: 0,
-            label: 'Other'
-        }
+        { value: 0, label: 'Gas', },
+        { value: 0, label: 'Electric', },
+        { value: 0, label: 'Other' }
     ];
+
     for (var fuel in project['master'].currentenergy.use_by_fuel) {
         var f_use = project['master'].currentenergy.use_by_fuel[fuel];
         if (project['master'].fuels[fuel].category == 'Gas') {
@@ -1222,10 +1046,19 @@ function getEnergyDemandData(scenarios) {
         }
     }
     data.bills[1].value += project['master'].currentenergy.generation.fraction_used_onsite * project['master'].currentenergy.generation.annual_generation; // We added consumption coming from generation
-    if (max_value < (data.bills[0].value + data.bills[1].value + 1.0 * data.bills[2].value)) {
-        max_value = data.bills[0].value + data.bills[1].value + 1.0 * data.bills[2].value + 5000;
+
+    // Now normalise by total floor area (TFA)
+    // I'm sorry to whoever comes and tries to understand this function in the future.
+    let max_value = 0;
+    for (let [name, val] of Object.entries(data)) {
+        let floor_area = name === 'bills' ? project.master.TFA : project[name].TFA;
+        for (let datum of val) {
+            datum.value = datum.value / floor_area;
+            max_value = Math.max(datum.value, max_value);
+        }
     }
-    return data;
+
+    return [ data, max_value ];
 }
 function getPrimaryEnergyUseData(scenarios) {
     var primaryEnergyUseData = {};
@@ -1295,26 +1128,6 @@ function getPrimaryEnergyUseData(scenarios) {
     return primaryEnergyUseData;
 }
 
-function createComforTable(options, tableID, chosenValue) {
-    const leftText = options[0].title;
-    const rightText = options[2].title;
-
-    let cells = options.map(opt => ({
-        text: opt.title,
-        selected: chosenValue === opt.title
-    }));
-
-    let html = `
-        <div class="text-right" style="width: 6em; margin-right: 0.5em;"><small>${leftText}</small></div>
-        <svg viewBox="0 0 94 32" height="32" width="94">
-            <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[0].selected ? 'red' : 'white'}"></rect>
-            <rect y="1" x="32" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[1].selected ? 'green' : 'white'}"></rect>
-            <rect y="1" x="63" width="30" height="30" stroke-width="1" stroke="#777" fill="${cells[2].selected ? 'red' : 'white'}"></rect>
-        </svg>
-        <div style="width: 6em; margin-left: 0.5em;"><small>${rightText}</small></div>`;
-
-    document.getElementById(tableID).innerHTML = html;
-}
 function prepare_data_for_graph(data_source) {
     var dataFig = [];
 

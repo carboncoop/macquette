@@ -13,7 +13,11 @@
 
 <link rel="stylesheet" href="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
 <script src="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+<script src="{% static VERSION|add:'/js/nunjucks-3.2.0.min.js' %}"></script>
 <script src="{% static VERSION|add:'/js/papaparse-5.0.2.min.js' %}"></script>
+<script>
+    const VERSION = "{{ VERSION }}";
+</script>
 
 <!-- open floor uvalue calculator -->
 <script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
@@ -252,7 +256,6 @@
     var changelog = "";
     var selected_library = -1;
     var selected_library_tag = "Wall";
-    var printmode = false;
     var page = undefined;
     var locked = {{ locked_javascript }}; // populated via Django template
     scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
@@ -801,9 +804,6 @@
         }
     }
     function show_sidebar() {
-        if (printmode)
-            return;
-
         var width = $(window).width();
         sidebar_visible = true;
 
