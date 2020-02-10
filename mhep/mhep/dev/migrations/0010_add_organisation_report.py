@@ -2,8 +2,6 @@
 import django.contrib.postgres.fields.jsonb
 from django.db import migrations
 
-import mhep.dev.validators
-
 
 class Migration(migrations.Migration):
 
@@ -14,11 +12,7 @@ class Migration(migrations.Migration):
             model_name="organisation",
             name="report",
             field=django.contrib.postgres.fields.jsonb.JSONField(
-                default=dict,
-                validators=[
-                    mhep.dev.validators.validate_dict,
-                    mhep.dev.validators.validate_report,
-                ],
+                default=dict, validators=[],
             ),
         )
     ]

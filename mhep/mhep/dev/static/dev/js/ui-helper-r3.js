@@ -153,6 +153,8 @@ function InitUI() {
         $('.scenario-name').html('Household Questionnaire');
     } else if (page == 'commentary') {
         $('.scenario-name').html('Commentary');
+    } else if (page == 'report') {
+        $('.scenario-name').html('Generate Report');
     } else {
         $('.scenario-name').html(scenario.charAt(0).toUpperCase() + scenario.slice(1) + ' - ' + data.scenario_name);
     }

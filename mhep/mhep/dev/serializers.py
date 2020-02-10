@@ -203,7 +203,14 @@ class OrganisationSerializer(StringIDMixin, serializers.ModelSerializer):
 
     class Meta:
         model = Organisation
-        fields = ["id", "name", "assessments", "members", "permissions", "report"]
+        fields = [
+            "id",
+            "name",
+            "assessments",
+            "members",
+            "permissions",
+            "report_template",
+        ]
 
     def get_assessments(self, obj):
         return obj.assessments.count()
