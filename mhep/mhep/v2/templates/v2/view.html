@@ -2,22 +2,24 @@
 {% load static i18n %}
 
 {% block extra_head %}
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
-<script language="javascript" type="text/javascript" src="{% static VERSION|add:'/js/report-helper.js' %}"></script>
-
+<script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
+<script src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
+<script src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
 
 <link rel="stylesheet" href="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.css' %}">
 <script src="{% static VERSION|add:'/js/jquery-ui-1.12.1/jquery-ui.min.js' %}"></script>
+<script src="{% static VERSION|add:'/js/nunjucks-3.2.0.min.js' %}"></script>
 <script src="{% static VERSION|add:'/js/papaparse-5.0.2.min.js' %}"></script>
+<script>
+    const VERSION = "{{ VERSION }}";
+</script>
 
 <!-- open floor uvalue calculator -->
-<script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
-<script type="text/javascript" src="{% static VERSION|add:'/js/openFUVC/openFUVC-ui-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openFUVC/openFUVC.js' %}"></script>
+<script src="{% static VERSION|add:'/js/openFUVC/openFUVC-ui-helper.js' %}"></script>
 <link rel="stylesheet" href="{% static VERSION|add:'/js/openFUVC/openFUVC.css' %}">
 
 <style>
@@ -65,7 +67,7 @@
 {% block content %}
 
 <div id="openbem">
-    <div id="sidebar">
+    <div id="sidebar" style="background: white">
         <div class="side-block" style="background-color: #EEECE5 !important; padding: 15px;">
             <button id="edit-project-name-and-description" style="float:right">
                 <i class="icon-edit"></i>
@@ -79,7 +81,7 @@
 
         <div class="side-block">
             <div class="side-section">
-                <div class="side-section--header">Input</div>
+                <div class="side-section--header">Assessment</div>
 
                 <ul>
                     <li><a class="project-menu-item" href="#master/householdquestionnaire">Household Questionnaire</a></li>
@@ -98,6 +100,28 @@
                 </ul>
             </div>
 
+            <div class="side-section" style="padding-bottom: 5px">
+                <div class="side-section--header" style="display: flex; justify-content: space-between;">
+                    <div>Scenarios</div>
+                    <div><small>kgCO<sub>2</sub>/m<sup>2</sup></small></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="scenario-list"></div>
+
+        <div class="side-block side-section" style="border-bottom: none">
+            <ul>
+                <li>
+                    <button id="create-new" class="btn">
+                        <i class="icon-plus" style="margin-right: 0.25rem"></i> New scenario
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="side-block" style="margin-bottom: 10px; border-bottom: none">
             <div class="side-section">
                 <div class="side-section--header">Tools & Settings</div>
 
@@ -105,31 +129,6 @@
                     <li><a class="project-menu-item" href="#master/export">Import/Export</a></li>
                     <li><a class="project-menu-item" href="#master/librariesmanager">Libraries manager</a></li>
                     <li><a class="project-menu-item" href="#master/fuelsmanager">Fuels manager</a></li>
-                </ul>
-            </div>
-
-            <div class="side-section">
-                <div class="side-section--header">Scenarios</div>
-            </div>
-
-        </div>
-
-        <div id="scenario-list"></div>
-
-        <div class="side-block">
-            <div id="create-new" class="block-header block-header--clickable" style="display: flex">
-                <i class="icon-plus" style="margin-right: 0.25rem"></i> Create new scenario
-            </div>
-        </div>
-
-        <div class="side-block">
-            <div class="side-section">
-                <div class="side-section--header">Documentation</div>
-
-                <ul>
-                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/MyHomeEnergyPlanner">User guide</a></li>
-                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/ElementLibrary">A Fabric elements Library</a></li>
-                    <li><a target='_blank' rel="noopener" href="https://learn.openenergymonitor.org/sustainable-energy/building-energy-model/readme">Building Energy Modelling</a></li>
                 </ul>
             </div>
         </div>
@@ -252,7 +251,6 @@
     var changelog = "";
     var selected_library = -1;
     var selected_library_tag = "Wall";
-    var printmode = false;
     var page = undefined;
     var locked = {{ locked_javascript }}; // populated via Django template
     scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
@@ -629,7 +627,7 @@
 
         return `
         <div class="side-block scenario-block" scenario="${id}">
-            <div class="block-header block-header--clickable" style="height:40px; display: flex; justify-content: space-between;">
+            <div class="block-header block-header--clickable" style="display: flex; justify-content: space-between;">
                 <div>
                     ${title}
                     ${locked ? '<i class="icon-lock"></i>' : ''}
@@ -637,10 +635,7 @@
                     ${created_from_html}
                 </div>
 
-                <div style="text-align: right; font-weight: normal">
-                    <span class="block_emissions"></span>
-                    <small>kgCO<sub>2</sub>/m<sup>2</sup></small>
-                </div>
+                <div style="text-align: right; font-weight: normal" class="block_emissions"></div>
             </div>
 
             <div class="menu-content" class="${menu_class}">
@@ -801,9 +796,6 @@
         }
     }
     function show_sidebar() {
-        if (printmode)
-            return;
-
         var width = $(window).width();
         sidebar_visible = true;
 

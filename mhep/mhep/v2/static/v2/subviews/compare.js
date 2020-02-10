@@ -53,7 +53,7 @@ function generateSummary() {
         ['Primary energy demand (kWh/m<sup>2</sup>.a)', 'primary_energy_use_m2'],
         ['CO<sub>2</sub> emission rate (kgCO<sub>2</sub>/m<sup>2</sup>.a)', 'kwhdpp'],
         ['Per person energy use (kWh/m<sup>2</sup>.a)', 'kgco2perm2'],
-        ['SAP rating', 'SAP', 'rating'],
+        // ['SAP rating', 'SAP', 'rating'],
         ['Fabric Energy Efficiency', 'FEE'],
         ['', ''],
         ['<b>Gains/losses (kWh/m<sup>2</sup>)</b>', ''],
@@ -227,7 +227,7 @@ function compareCarbonCoop(scenario) {
     out += '<h4>Totals</h4><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
     out += '<tr><td>Annual cost</td><td><i>£' + project.master.total_cost.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_cost.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>Total income</td><td><i>£' + project.master.total_income.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_income.toFixed(0) + '</i></td></tr>';
-    out += '<tr><td>SAP rating</td><td><i>' + project.master.SAP.rating.toFixed(0) + '</i></td><td><i>' + project[scenario].SAP.rating.toFixed(0) + '</i></td></tr>';
+    // out += '<tr><td>SAP rating</td><td><i>' + project.master.SAP.rating.toFixed(0) + '</i></td><td><i>' + project[scenario].SAP.rating.toFixed(0) + '</i></td></tr>';
     out += '</table>';
     return out;
 }
@@ -1182,7 +1182,7 @@ function measureForCompleteTable(measure) {
 
     return `
         <div class="complete-measures-wrapper">
-            <table class='complete-measures-table break-inside-avoid'>
+            <table class='complete-measures-table'>
                 <tr><th>Measure:</th>              <td>${measure.name}</td></tr>
                 <tr><th>Label/location:</th>       <td>${location}</td></tr>
                 <tr><th>Description:</th>          <td>${measure.description}</td></tr>

@@ -12,10 +12,10 @@ function commentary_initUI() {
 
     // Add overviews
     for (let s of scenarios) {
-        data = project[s];
+        let scenario = project[s];
         $('#overviews').append('<div id="overview-' + s + '" class="overview"></div>');
         load_view('#overview-' + s, 'topgraphic');
-        $('#overviews #overview-' + s + ' #scenario-name').html(s.charAt(0).toUpperCase() + s.slice(1) + ' - ' + data.scenario_name);
+        $('#overviews #overview-' + s + ' #scenario-name').html(s.charAt(0).toUpperCase() + s.slice(1) + ' - ' + scenario.scenario_name);
         draw_openbem_graphics('#overview-' + s);
     }
 
@@ -40,8 +40,8 @@ function commentary_initUI() {
         // The current "key" attribute setup doesn't allow for this. Luckily, the logic
         // that sets the model value on change works, so we just have to set the initial
         // value manually.
-        $(root, '.scenario_name').val(scenario.scenario_name);
-        $(root, '.scenario_description').val(scenario.scenario_description);
+        $(root).find('.scenario_name').val(scenario.scenario_name);
+        $(root).find('.scenario_description').val(scenario.scenario_description);
 
         $(root).insertBefore('#scenario-template');
     }
