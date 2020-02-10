@@ -945,7 +945,7 @@
     <div class="pa-15 bg-assessor">
 
         <div class="mb-30">
-            <label>Is there evidence of adequate supply paths as well as extract air paths?</label>
+            <label>Is there evidence of an adequate supply of fresh air through planned intake vents such as trickle vents in walls and/or windows or a mechanical supply system?</label>
 
             <label class="radio d-flex mb-7" for="ventilation_adequate_paths_2">
                 <input type="radio" class="mr-7 big-checkbox"
@@ -1086,39 +1086,32 @@
 
     <div class="d-flex">
         <div class="w-50 mr-15">
-            <p>Does any solid fuel appliance have an appropriate dedicated supply air vent or duct?</p>
+            <p>Do you have a fuel burning appliance?</p>
 
-            <label class="radio d-flex mb-7" for="solid_fuel_vents_1">
+            <label class="radio d-flex mb-7" for="fuel_burner_1">
                 <input type="radio" class="mr-7 big-checkbox"
-                        key="data.household.solid_fuel_vents"
-                        id="solid_fuel_vents_1"
-                        name="solid_fuel_vents"
+                        key="data.household.fuel_burner"
+                        id="fuel_burner_1"
+                        name="fuel_burner"
                         value="YES">
                 Yes
             </label>
-            <label class="radio d-flex mb-7" for="solid_fuel_vents_2">
+            <label class="radio d-flex mb-7" for="fuel_burner_2">
                 <input type="radio" class="mr-7 big-checkbox"
-                        key="data.household.solid_fuel_vents"
-                        id="solid_fuel_vents_2"
-                        name="solid_fuel_vents"
+                        key="data.household.fuel_burner"
+                        id="fuel_burner_2"
+                        name="fuel_burner"
                         value="NO">
                 No
-            </label>
-            <label class="radio d-flex mb-7" for="solid_fuel_vents_3">
-                <input type="radio" class="mr-7 big-checkbox"
-                        key="data.household.solid_fuel_vents"
-                        id="solid_fuel_vents_3"
-                        name="solid_fuel_vents"
-                        value="NA">
-                Not applicable
             </label>
         </div>
         <div class="w-50 pa-15 ml-15 bg-assessor">
             <span class="form-row-label">Assessor notes</span>
             <div class="form-row-control">
-                <textarea key="data.household.solid_fuel_note" class="textarea--100"></textarea>
+                <textarea key="data.household.fuel_burner_note" class="textarea--100"></textarea>
             </div>
-            <p>Any quirks or comments?</p>
+
+            <p>Note any appliances and the current ventilation supplied to the appliance.  Mention if there is a relevant professional who can ensure the ventilation is adequate.</p>
         </div>
     </div>
 
