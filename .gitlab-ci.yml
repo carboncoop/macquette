@@ -9,6 +9,9 @@ test:
     variables:
         DEBUG: 1
         POSTGRES_DB: mhep
+        POSTGRES_USER: 'postgres'
+        POSTGRES_PASSWORD: 'postgres'
+        POSTGRES_HOST_AUTH_METHOD: trust
         DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/$POSTGRES_DB"
         DJANGO_SETTINGS_MODULE: config.settings.test
 
