@@ -1,6 +1,6 @@
 import os
 
-# os.environ["DJANGO_READ_DOT_ENV_FILE"] = "true"
+os.environ["DJANGO_READ_DOT_ENV_FILE"] = "true"
 from .base import *  # noqa
 from .base import env
 
