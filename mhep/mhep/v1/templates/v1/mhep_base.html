@@ -16,9 +16,10 @@
     {# Load Sentry first #}
     {% if settings.sentry_url %}
     <script
-        src="https://browser.sentry-cdn.com/5.10.2/bundle.min.js"
-        integrity="sha384-ssBfXiBvlVC7bdA/VX03S88B5MwXQWdnpJRbUYFPgswlOBwETwTp6F3SMUNpo9M9"
-        crossorigin="anonymous"></script>
+  src="https://browser.sentry-cdn.com/5.15.0/bundle.min.js"
+  integrity="sha384-+ysfQckQvwCB5SppH41IScIz/Iynt2pePnJNMl+D7ZOzDJ+VYhQEuwB0pA60IDM0"
+  crossorigin="anonymous"></script>
+
     <script>Sentry.init({ dsn: "{{ settings.sentry_url }}" });</script>
     {% endif %}
 
