@@ -66,6 +66,7 @@ if SENTRY_DSN:
         dsn=SENTRY_DSN,
         integrations=[sentry_logging, DjangoIntegration()],
         environment=ENV,
+        release=env.str("CI_COMMIT_SHA", ""),
     )
 
     # DisallowedHost errors are basically spam
