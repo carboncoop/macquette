@@ -256,10 +256,6 @@
     var locked = {{ locked_javascript }}; // populated via Django template
     scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
     var data = {};
-
-    var path = '{{ request.build_absolute_uri }}';
-    var jspath = path; // TODO: remove this, and all uses of it
-
     var keys = {};
 
     //*******************

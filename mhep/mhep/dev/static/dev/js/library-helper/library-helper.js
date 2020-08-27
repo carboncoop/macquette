@@ -54,9 +54,6 @@ libraryHelper.prototype.add_events = function () {
         myself.init(); // Reload the lobrary before we display it
         myself.onAddItemFromLib($(this));
     });
-    this.container.on('click', '.remove-user', function () {
-        myself.onRemoveUserFromSharedLib($(this).attr('username'), $(this).attr('data-library-id'));
-    });
     this.container.on('change', '#library-select', function () {
         myself.onSelectingLibraryToShow($(this));
     });
@@ -382,19 +379,6 @@ libraryHelper.prototype.onEditLibraryNameOk = function () {
     var myself = this;
     this.set_library_name(library_id, library_new_name);
     //this.set_library_name(library_id, library_new_name);
-};
-libraryHelper.prototype.onRemoveUserFromSharedLib = function (user_to_remove, selected_library) {
-    $('#return-message').html('');
-    //var selected_library = $('#library-select').val();
-    var myself = this;
-    $.ajax({
-        url: path + 'assessment/removeuserfromsharedlibrary.json',
-        data: 'library_id=' + selected_library + '&user_to_remove=' + user_to_remove,
-        error: handleServerError('removing user from shared library'),
-        success: function (result) {
-            $('#return-message').html(result);
-            myself.display_library_users(selected_library);
-        }});
 };
 libraryHelper.prototype.onSelectingLibraryToShow = function (origin) {
     var id = $('#library-select').val();
@@ -3486,28 +3470,6 @@ libraryHelper.prototype.load_user_libraries = function (callback) {
             }
 
             this.library_list = libraries_by_type;
-        }});
-};
-libraryHelper.prototype.display_library_users = function (library_id) {
-    $.ajax({
-        url: path + 'assessment/getsharedlibrary.json',
-        data: 'id=' + library_id,
-        error: handleServerError('loading library users'),
-        success: function (shared) {
-            var out = '<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>';
-            var write = '';
-            for (var i in shared) {
-                write = shared[i].write == 1 ? 'Yes' : 'No';
-                if (shared[i].username != p.author) {
-                    out += '<tr><td>' + shared[i].username + '</td><td>' + write + "</td><td><i style='cursor:pointer' class='icon-trash remove-user' data-library-id='" + library_id + "' username='" + shared[i].username + "'></i></td></tr>";
-                } else {
-                    out += '<tr><td>' + shared[i].username + '</td><td>' + write + '</td><td>&nbsp;</td></tr>';
-                }
-            }
-            if (out == '<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>') {
-                out = "<tr><td colspan='3'>This library is currently private</td></tr>";
-            }
-            $('#shared-with-table').html(out);
         }});
 };
 libraryHelper.prototype.get_library_by_id = function (id) {
