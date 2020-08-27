@@ -927,23 +927,37 @@ function get_storage_html(storage, compare_to) {
     if (storage == undefined) {
         return 'Not present';
     }
-    var bold = [];
-    for (var key in storage) {
-        if (compare_to != undefined && storage[key] != compare_to[key]) {
-            bold[key] = ['<b>', '</b>'];
-        } else {
-            bold[key] = ['', ''];
+
+    const rows = [];
+    const row = (heading, key, unit) => {
+        const changed = compare_to != undefined && storage[key] != compare_to[key];
+
+        let text = `${heading}: ${storage[key]} ${unit?unit:""}`;
+        if (changed) {
+            text = `<b>${text}</b>`;
         }
+
+        rows.push(text);
     }
 
-    var out = '';
-    out = '<b>' + storage.name + '</b><br /><div style="padding-left:15px"><i>' + bold['storage_volume'][0] + 'Storage volume: ' + storage.storage_volume + bold['storage_volume'][1] + '<br />' + bold['declared_loss_factor_known'][0] + "Manufacturer's declared loss factor known: " + storage.declared_loss_factor_known + bold['declared_loss_factor_known'][1];
-    if (storage.declared_loss_factor_known != false) {
-        out += '<br />' + bold['manufacturer_loss_factor'][0] + 'Hot water storage loss factor : ' + storage.manufacturer_loss_factor + ' kWh/litre/day' + bold['manufacturer_loss_factor'][1] + '<br />' + bold['temperature_factor_a'][0] + 'Temperature factor : ' + storage.temperature_factor_a + bold['temperature_factor_a'][1];
+    row("Storage volume", "storage_volume");
+
+    if (storage.declared_loss_factor_known) {
+        rows.push("Manufacturer's declared loss factor: known");
+        row("Hot water storage loss factor", "manufacturer_loss_factor", "kWh/litre/day");
+        row("Temperature factor", "temperature_factor_a");
     } else {
-        out += '<br />' + bold['loss_factor_b'][0] + ' Hot water storage loss factor : ' + storage.loss_factor_b + ' kWh/litre/day' + bold['loss_factor_b'][1] + bold['volume_factor_b'][0] + '<br /> Volume factor: ' + storage.volume_factor_b + bold['volume_factor_b'][1] + ',' + bold['temperature_factor_b'][0] + '<br />Temperature factor: ' + storage.temperature_factor_b + bold['temperature_factor_b'][1] + '</i></div>';
+        rows.push("Manufacturer's declared loss factor: not known");
+        row("Hot water storage loss factor", "loss_factor_b", "kWh/litre/day");
+        row("Volume factor", "volume_factor_b");
+        row("Temperature factor", "temperature_factor_b");
     }
-    return out;
+
+    return `
+        <b>${storage.name}</b><br>
+        <div style="padding-left: 15px">
+            ${rows.join("<br>")}
+        </div>`;
 }
 
 //*******************************************
