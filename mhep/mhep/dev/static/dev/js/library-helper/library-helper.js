@@ -125,10 +125,6 @@ libraryHelper.prototype.add_events = function () {
     this.container.on('click', '#edit-library-name-ok', function () {
         myself.onEditLibraryNameOk();
     });
-    this.container.on('click', '.show-items', function () {
-        myself.init(); // Reload the lobrary before we display it
-        myself.onShowLibraryItems($(this).attr('data-library-id'));
-    });
     this.container.on('click', '.show-items-edit-mode', function () {
         myself.init(); // Reload the lobrary before we display it
         myself.onShowLibraryItemsEditMode($(this).attr('data-library-id'));
@@ -801,34 +797,6 @@ libraryHelper.prototype.onChangeTypeOnCreateElementLibItem = function () {
         $('#modal-create-in-library .new-item-in-library').html(out);
         $('#modal-create-in-library .item-tag').val('New tag');
     }
-};
-libraryHelper.prototype.onShowLibraryItems = function (library_id) {
-    var library = this.get_library_by_id(library_id);
-    this.type = library.type;
-    //Header
-    $('#show-library-items-header').html(this.library_names[this.type]);
-    $('#show-library-items-library-name').html(library.name);
-    // Items
-    var function_name = library.type + '_library_to_html';
-    var out = this[function_name](null, library_id);
-    $('#show-library-items-modal #show-library-items-table').html(out);
-    // Add Library id to edit buttons
-
-    // Hide the Use buttons
-    $('#show-library-items-modal .use-from-lib').hide('fast');
-    // Hide Write options if no write access
-    if (!library.permissions.can_write) {
-        $('#show-library-items-modal .if-write').hide('fast');
-    }
-    // Show the select to choose the type of fabric elements when library is "elements"
-    if (this.type == 'elements' || this.type == 'elements_measures') {
-        $('#show-library-items-modal .element-type').show('fast');
-    }
-    // Add library id to Create new item and Save
-    $('#show-library-items-modal #create-in-library').attr('data-library-id', library_id);
-    $('#show-library-items-modal #save').attr('data-library-id', library_id);
-    // Show modal
-    $('#show-library-items-modal').modal('show');
 };
 libraryHelper.prototype.onChangeTypeOfElementsToShow = function (origin) {
     origin.attr('tags', [origin.val()]); //this is the type of elements to display
