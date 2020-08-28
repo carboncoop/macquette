@@ -41,7 +41,7 @@ libraryHelper.prototype.init = function () {
         'appliances_and_cooking': 'Appliances and Cooking',
         'heating_control': "Heating controls",
         'heating_systems': "Heating systems",
-        'heating_systems_measures': "Heating systems mesaures",
+        'heating_systems_measures': "Heating systems measures",
         'pipework_insulation': "Pipework insulation measures",
         'hot_water_control_type': "Storage control types",
         space_heating_control_type: 'Space heating control types',
