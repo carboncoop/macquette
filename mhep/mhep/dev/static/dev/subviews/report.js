@@ -705,17 +705,6 @@ function add_primary_energy_usage(root, scenarios) {
             // 'Generation': 'rgb(200,213,203)'
         },
         data: dataGraph,
-        targets: [
-            {
-                label: 'UK Average 360 kWh/m².a',
-                target: 360,
-                color: 'rgb(231,37,57)'
-            }, {
-                label: 'Carbon Coop Target 120 kWh/m².a',
-                target: 120,
-                color: 'rgb(231,37,57)'
-            }
-        ],
     });
     primaryEneryUse.draw(root);
 }
@@ -764,10 +753,6 @@ function add_carbon_dioxide_per_m2(root, scenarios) {
         defaultBarColor: 'rgb(157,213,203)',
         data: carbonDioxideEmissionsData,
         targets: [
-            {
-                label: 'Carbon Coop Target - ' + datasets.target_values.co2_emission_rate + 'kgCO₂/m².year', target: datasets.target_values.co2_emission_rate,
-                color: 'rgb(231,37,57)'
-            },
             {
                 label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO₂/m².year',
                 target: datasets.uk_average_values.co2_emission_rate,
