@@ -157,13 +157,13 @@ var datasets = {
             SAP_code: 30,
         },
         generation: {
-            category: 'generation',
+            category: "Generation",
             standingcharge: 0,
-            fuelcost: 15.06,
-            co2factor: 0.381,
-            primaryenergyfactor: 3.28,
-            SAP_code: 0,
-        },
+            fuelcost: 0,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 0
+        }
     },
     
     
