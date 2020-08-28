@@ -49,3 +49,7 @@ function commentary_initUI() {
     // commentary belongs to master
     data = project['master'];
 }
+
+$('#openbem textarea').on('input', function(e) {
+    $(this).trigger('change');
+});

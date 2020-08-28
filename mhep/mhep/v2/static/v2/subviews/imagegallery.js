@@ -7,8 +7,10 @@ class ImageGallery {
         };
         this.projectId = id;
         this.list = data;
-        this.featured_id = this.list.find(image => image.is_featured === true).id;
-
+        var featured_image = this.list.find(image => image.is_featured === true);
+        if (featured_image) {
+            this.featured_id = featured_image.id;
+        }
         this.selected = [];
         this.currentlyEditing = null;
 

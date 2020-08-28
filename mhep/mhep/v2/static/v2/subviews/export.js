@@ -11,19 +11,27 @@ $('#openbem').on('click', '#import-data', function () {
     redraw_scenario_menu();
 });
 
-$('#openbem').on('click', '#input-data', function () {
-    var project_inputdata = {};
-    for (var scenario in project) {
-        project_inputdata[scenario] = mhep_helper.extract_inputdata(project[scenario]);
-    }
-
-    $('#export').html(JSON.stringify(project_inputdata, null, 4));
-    $('textarea').height($('textarea').prop('scrollHeight'));
+$('#openbem').on('click', '#show-project-data', function () {
+    $('#export').val(JSON.stringify(project, null, 4));
 });
 
-$('#openbem').on('click', '#show-project-data', function () {
-    $('#export').html(JSON.stringify(project, null, 4));
-    $('#export').height($('#export').prop('scrollHeight'));
+$('#openbem').on('click', '#download-project-data', function () {
+    var data = JSON.stringify(project, null, 4);
+    var d = new Date();
+    var filename = p.name + '-' + d.toLocaleString() + '.json';
+
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:application/json;charset=utf-8,' + encodeURIComponent(data));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    setTimeout(() => {
+        document.body.removeChild(element);
+    }, 150);
 });
 
 $('#upload_project').submit(function (e) {
@@ -62,19 +70,5 @@ $('#openbem').on('click', '#file_to_upload', function () {
     $('#upload-result').css('color', 'black').html('');
 });
 
-
 function export_initUI() {
-    var project_data = JSON.stringify(project, null, 4);
-    var d = new Date();
-    $('#download-project-data').attr('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(project_data));
-    $('#download-project-data').attr('download', p.name + '-' + d.toLocaleString() + '.json');
-    /*var project_inputdata = {};
-     for (var scenario in project) {
-     project_inputdata[scenario] = mhep_helper.extract_inputdata(project[scenario])
-     }*/
-
-    //$("#import-export").html(JSON.stringify(project_inputdata, null, 4));
-    //$("#import-export").html(JSON.stringify(project, null, 4));
-    //$('textarea').height($('textarea').prop('scrollHeight'));
 }
-

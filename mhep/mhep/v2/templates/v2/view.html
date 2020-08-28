@@ -5,6 +5,7 @@
 <script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
 <script src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
 <script src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
+<script src="{% static VERSION|add:'/js/library-r6.js' %}"></script>
 <script src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
 <script src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
 <script src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
@@ -255,10 +256,6 @@
     var locked = {{ locked_javascript }}; // populated via Django template
     scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
     var data = {};
-
-    var path = '{{ request.build_absolute_uri }}';
-    var jspath = path; // TODO: remove this, and all uses of it
-
     var keys = {};
 
     //*******************

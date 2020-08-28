@@ -1,43 +1,169 @@
 var datasets = {
     /**********************************
      *  fuels
-     *   - Units:
-     *      - standing charge: £/year
-     *      - fuelcost: p/kWh
-     *      - CO2 factor: kgCO2/kWh
-     *   - Sources:
-     *      - Wood co2factor: http://www.volker-quaschning.de/datserv/CO2-spez/index_e.php, also insteresting discussion in https://github.com/emoncms/MyHomeEnergyPlanner/issues/226#issuecomment-276710998
-     *      - Other fuel's  co2factor and primaryenergyfactor: https://www.bre.co.uk/filelibrary/SAP/2016/CONSP-07---CO2-and-PE-factors---V1_0.pdf
-     *      - Cost: https://github.com/emoncms/MyHomeEnergyPlanner/files/706014/BRE.SAP-fuel-prices-July-2015-summary.xls.pdf
-     *  - Notes for developers: 
+     *   Data from SAP 10.1
+     *  - Notes for developers:
      *      - This list of fuels has been created as they are the ones that best suit our needs at the time of development, there might be many missing so feel free to add new ones
      *      - The only fuels required by the model are: 'generation' and 'Standard Tariff', if you choose to delete any fuel ensure these two ones are kept
      */
-    
+
     /***************************************************************************************************
-    *   USA data by  michaelsuhl11 - https://community.openenergymonitor.org/u/michaelsuhl11/summary
-    *****************************************************************************************************/
+     *
+     *****************************************************************************************************/
     fuels: {
-        'Mains Gas': {category: 'Gas', standingcharge: 101, fuelcost: 4.25, co2factor: 0.222, primaryenergyfactor: 1.28, SAP_code: 1},
-        'Bulk LPG': {category: 'Gas', standingcharge: 70, fuelcost: 8.46, co2factor: 0.242, primaryenergyfactor: 1.166, SAP_code: 2},
-        'Bottled LPG ': {category: 'Gas', standingcharge: 0, fuelcost: 10.61, co2factor: 0.242, primaryenergyfactor: 1.166, SAP_code: 3},
-        'Heating Oil': {category: 'Oil', standingcharge: 0, fuelcost: 5.43, co2factor: 0.298, primaryenergyfactor: 1.189, SAP_code: 4},
-        'House Coal': {category: 'Solid fuel', standingcharge: 0, fuelcost: 4.01, co2factor: 0.416, primaryenergyfactor: 1.079, SAP_code: 11},
-        'Anthracite': {category: 'Solid fuel', standingcharge: 0, fuelcost: 4.02, co2factor: 0.416, primaryenergyfactor: 1.079, SAP_code: 15},
-        'Manufactured smokeless fuel': {category: 'Solid fuel', standingcharge: 0, fuelcost: 5.04, co2factor: 0.490, primaryenergyfactor: 1.265, SAP_code: 12},
-        'Wood Logs': {category: 'Solid fuel', standingcharge: 0, fuelcost: 4.65, co2factor: 0.390, primaryenergyfactor: 1.058, SAP_code: 20},
-        'Wood Pellets secondary heating in bags': {category: 'Solid fuel', standingcharge: 0, fuelcost: 6.3, co2factor: 0.390, primaryenergyfactor: 1.32, SAP_code: 22},
-        'Wood pellets main heating bulk supply': {category: 'Solid fuel', standingcharge: 0, fuelcost: 5.7, co2factor: 0.390, primaryenergyfactor: 1.32, SAP_code: 23},
-        'Wood chips': {category: 'Solid fuel', standingcharge: 0, fuelcost: 3.36, co2factor: 0.390, primaryenergyfactor: 1.174, SAP_code: 21},
-        'Dual Fuel Appliance': {category: 'Solid fuel', standingcharge: 0, fuelcost: 4.36, co2factor: 0.108, primaryenergyfactor: 1.062, SAP_code: 10},
-        '7-Hour tariff - High Rate': {category: 'Electricity', standingcharge: 79, fuelcost: 17.81, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 32},
-        '7 Hour tariff - Low Rate': {category: 'Electricity', standingcharge: 0, fuelcost: 6.67, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 31},
-        '10-hour tariff - High Rate': {category: 'Electricity', standingcharge: 77, fuelcost: 17.1, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 34},
-        '10-hour tariff - Low Rate': {category: 'Electricity', standingcharge: 0, fuelcost: 9.25, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 33},
-        '24-hour heating tariff': {category: 'Electricity', standingcharge: 40, fuelcost: 7.75, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 35},
+        'Mains Gas': {
+            category: 'Gas',
+            standingcharge: 88,
+            fuelcost: 3.93,
+            co2factor: 0.21,
+            primaryenergyfactor: 1.13,
+            SAP_code: 1,
+        },
+        'Bulk LPG': {
+            category: 'Gas',
+            standingcharge: 58,
+            fuelcost: 6.59,
+            co2factor: 0.241,
+            primaryenergyfactor: 1.141,
+            SAP_code: 2,
+        },
+        'Bottled LPG ': {
+            category: 'Gas',
+            standingcharge: 0,
+            fuelcost: 7.85,
+            co2factor: 0.241,
+            primaryenergyfactor: 1.141,
+            SAP_code: 3,
+        },
+        'Heating Oil': {
+            category: 'Oil',
+            standingcharge: 0,
+            fuelcost: 4.35,
+            co2factor: 0.298,
+            primaryenergyfactor: 1.18,
+            SAP_code: 4,
+        },
+        'House Coal': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 4.18,
+            co2factor: 0.395,
+            primaryenergyfactor: 1.064,
+            SAP_code: 11,
+        },
+        Anthracite: {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 4.14,
+            co2factor: 0.395,
+            primaryenergyfactor: 1.064,
+            SAP_code: 15,
+        },
+        'Manufactured smokeless fuel': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 5.17,
+            co2factor: 0.366,
+            primaryenergyfactor: 1.261,
+            SAP_code: 12,
+        },
+        'Wood Logs': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 4.65,
+            co2factor: 0.39,
+            primaryenergyfactor: 1.046,
+            SAP_code: 20,
+        },
+        'Wood Pellets secondary heating in bags': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 6.09,
+            co2factor: 0.39,
+            primaryenergyfactor: 1.325,
+            SAP_code: 22,
+        },
+        'Wood pellets main heating bulk supply': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 5.51,
+            co2factor: 0.39,
+            primaryenergyfactor: 1.325,
+            SAP_code: 23,
+        },
+        'Wood chips': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 3.48,
+            co2factor: 0.39,
+            primaryenergyfactor: 1.046,
+            SAP_code: 21,
+        },
+        'Dual Fuel Appliance': {
+            category: 'Solid fuel',
+            standingcharge: 0,
+            fuelcost: 4.53,
+            co2factor: 0.39,
+            primaryenergyfactor: 1.049,
+            SAP_code: 10,
+        },
+        '7-Hour tariff - High Rate': {
+            category: 'Electricity',
+            standingcharge: 8,
+            fuelcost: 20.72,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 32,
+        },
+        '7 Hour tariff - Low Rate': {
+            category: 'Electricity',
+            standingcharge: 0,
+            fuelcost: 8.13,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 31,
+        },
+        '10-hour tariff - High Rate': {
+            category: 'Electricity',
+            standingcharge: 7,
+            fuelcost: 18.71,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 34,
+        },
+        '10-hour tariff - Low Rate': {
+            category: 'Electricity',
+            standingcharge: 0,
+            fuelcost: 10.68,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 33,
+        },
+        '24-hour heating tariff': {
+            category: 'Electricity',
+            standingcharge: 31,
+            fuelcost: 10.38,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 35,
+        },
         // Do not remove the following fuels from the datasets, they are required by the model
-        'Standard Tariff': {category: 'Electricity', standingcharge: 66, fuelcost: 15.06, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 30},
-        'generation': {category: 'generation', standingcharge: 0, fuelcost: 15.06, co2factor: 0.381, primaryenergyfactor: 3.28, SAP_code: 0}
+        'Standard Tariff': {
+            category: 'Electricity',
+            standingcharge: 72,
+            fuelcost: 17.56,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 30,
+        },
+        generation: {
+            category: "Generation",
+            standingcharge: 0,
+            fuelcost: 0,
+            co2factor: 0.136,
+            primaryenergyfactor: 1.501,
+            SAP_code: 0
+        }
     },
     
     

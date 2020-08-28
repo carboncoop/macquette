@@ -524,7 +524,7 @@ function add_storage() {
     $('#type_of_storage').html('');
     var st = data.water_heating.storage_type;
     if (st == undefined) {
-        $('#type_of_storage').append('<tr><th>Type of storage <span class="select-type-of-storage-from-lib if-master" style="cursor:pointer"><button class="btn" style="margin-left: 20px"> Add from library</button></span></th></tr>');
+        $('#type_of_storage').append('<tr><th>Type of storage <span class="select-type-of-storage-from-lib" style="cursor:pointer"><button class="btn" style="margin-left: 20px"> Add from library</button></span></th></tr>');
     } else {
         var specific_header = '';
         var specific_st_info = '';

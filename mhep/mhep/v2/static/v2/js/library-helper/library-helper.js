@@ -54,9 +54,6 @@ libraryHelper.prototype.add_events = function () {
         myself.init(); // Reload the lobrary before we display it
         myself.onAddItemFromLib($(this));
     });
-    this.container.on('click', '.remove-user', function () {
-        myself.onRemoveUserFromSharedLib($(this).attr('username'), $(this).attr('data-library-id'));
-    });
     this.container.on('change', '#library-select', function () {
         myself.onSelectingLibraryToShow($(this));
     });
@@ -127,10 +124,6 @@ libraryHelper.prototype.add_events = function () {
     });
     this.container.on('click', '#edit-library-name-ok', function () {
         myself.onEditLibraryNameOk();
-    });
-    this.container.on('click', '.show-items', function () {
-        myself.init(); // Reload the lobrary before we display it
-        myself.onShowLibraryItems($(this).attr('data-library-id'));
     });
     this.container.on('click', '.show-items-edit-mode', function () {
         myself.init(); // Reload the lobrary before we display it
@@ -382,19 +375,6 @@ libraryHelper.prototype.onEditLibraryNameOk = function () {
     var myself = this;
     this.set_library_name(library_id, library_new_name);
     //this.set_library_name(library_id, library_new_name);
-};
-libraryHelper.prototype.onRemoveUserFromSharedLib = function (user_to_remove, selected_library) {
-    $('#return-message').html('');
-    //var selected_library = $('#library-select').val();
-    var myself = this;
-    $.ajax({
-        url: path + 'assessment/removeuserfromsharedlibrary.json',
-        data: 'library_id=' + selected_library + '&user_to_remove=' + user_to_remove,
-        error: handleServerError('removing user from shared library'),
-        success: function (result) {
-            $('#return-message').html(result);
-            myself.display_library_users(selected_library);
-        }});
 };
 libraryHelper.prototype.onSelectingLibraryToShow = function (origin) {
     var id = $('#library-select').val();
@@ -817,34 +797,6 @@ libraryHelper.prototype.onChangeTypeOnCreateElementLibItem = function () {
         $('#modal-create-in-library .new-item-in-library').html(out);
         $('#modal-create-in-library .item-tag').val('New tag');
     }
-};
-libraryHelper.prototype.onShowLibraryItems = function (library_id) {
-    var library = this.get_library_by_id(library_id);
-    this.type = library.type;
-    //Header
-    $('#show-library-items-header').html(this.library_names[this.type]);
-    $('#show-library-items-library-name').html(library.name);
-    // Items
-    var function_name = library.type + '_library_to_html';
-    var out = this[function_name](null, library_id);
-    $('#show-library-items-modal #show-library-items-table').html(out);
-    // Add Library id to edit buttons
-
-    // Hide the Use buttons
-    $('#show-library-items-modal .use-from-lib').hide('fast');
-    // Hide Write options if no write access
-    if (!library.permissions.can_write) {
-        $('#show-library-items-modal .if-write').hide('fast');
-    }
-    // Show the select to choose the type of fabric elements when library is "elements"
-    if (this.type == 'elements' || this.type == 'elements_measures') {
-        $('#show-library-items-modal .element-type').show('fast');
-    }
-    // Add library id to Create new item and Save
-    $('#show-library-items-modal #create-in-library').attr('data-library-id', library_id);
-    $('#show-library-items-modal #save').attr('data-library-id', library_id);
-    // Show modal
-    $('#show-library-items-modal').modal('show');
 };
 libraryHelper.prototype.onChangeTypeOfElementsToShow = function (origin) {
     origin.attr('tags', [origin.val()]); //this is the type of elements to display
@@ -2009,9 +1961,9 @@ libraryHelper.prototype.pipework_insulation_library_to_html_edit_mode = function
             out += '<tr tag="' + z + '" title="' + z + '" class="item"><td index="tag"><input class="" type="text" value="' + z + '" /></td>';
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
             out += '<td index="SELECT"><select class="w200" value="' + item.SELECT + '">';
-            out += item.pipework_insulation == 'First 1m from cylinder insulated' ? '<option value="First 1m from cylinder insulated" selected>First 1m from cylinder insulated</option>' : '<option value="First 1m from cylinder insulated">First 1m from cylinder insulated</option>';
-            out += item.pipework_insulation == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible piperwok insulated</option>' : '<option value="All accesible piperwok insulated">All accesible piperwok insulated</option>';
-            out += item.pipework_insulation == 'Fully insulated primary pipework' ? '<option value="Fully insulated primary pipework" selected>Fully insulated primary pipework</option>' : '<option value="Fully insulated primary pipework">Fully insulated primary pipework</option>';
+            out += item.SELECT == 'First 1m from cylinder insulated' ? '<option value="First 1m from cylinder insulated" selected>First 1m from cylinder insulated</option>' : '<option value="First 1m from cylinder insulated">First 1m from cylinder insulated</option>';
+            out += item.SELECT == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible piperwok insulated</option>' : '<option value="All accesible piperwok insulated">All accesible piperwok insulated</option>';
+            out += item.SELECT == 'Fully insulated primary pipework' ? '<option value="Fully insulated primary pipework" selected>Fully insulated primary pipework</option>' : '<option value="Fully insulated primary pipework">Fully insulated primary pipework</option>';
             out += '</select></td>';
             out += '<td index="source" title="' + item.source + '"><input class="w200" type="text" value="' + item.source + '" /></td>';
             out += this.measure_fields_for_library_to_html_edit_mode(item);
@@ -3486,28 +3438,6 @@ libraryHelper.prototype.load_user_libraries = function (callback) {
             }
 
             this.library_list = libraries_by_type;
-        }});
-};
-libraryHelper.prototype.display_library_users = function (library_id) {
-    $.ajax({
-        url: path + 'assessment/getsharedlibrary.json',
-        data: 'id=' + library_id,
-        error: handleServerError('loading library users'),
-        success: function (shared) {
-            var out = '<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>';
-            var write = '';
-            for (var i in shared) {
-                write = shared[i].write == 1 ? 'Yes' : 'No';
-                if (shared[i].username != p.author) {
-                    out += '<tr><td>' + shared[i].username + '</td><td>' + write + "</td><td><i style='cursor:pointer' class='icon-trash remove-user' data-library-id='" + library_id + "' username='" + shared[i].username + "'></i></td></tr>";
-                } else {
-                    out += '<tr><td>' + shared[i].username + '</td><td>' + write + '</td><td>&nbsp;</td></tr>';
-                }
-            }
-            if (out == '<tr><th>Shared with:</th><th>Has write persmissions</th><th></th></tr>') {
-                out = "<tr><td colspan='3'>This library is currently private</td></tr>";
-            }
-            $('#shared-with-table').html(out);
         }});
 };
 libraryHelper.prototype.get_library_by_id = function (id) {
