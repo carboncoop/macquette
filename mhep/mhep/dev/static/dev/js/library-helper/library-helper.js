@@ -1,12 +1,10 @@
 const LIBRARY_NAMES = {
     'elements': 'Fabric elements',
-    'systems': 'Energy systems',
     'elements_measures': 'Fabric elements measures',
     'draught_proofing_measures': 'Draught proofing measures',
     'ventilation_systems_measures': 'Ventilation system measures',
     'ventilation_systems': 'Ventilation systems',
     'extract_ventilation_points': 'Extract ventilation points',
-    //'extract_ventilation_points_measures': 'Extract ventilation points measures',
     'intentional_vents_and_flues': 'Intentional vents and flues',
     'intentional_vents_and_flues_measures': 'Intentional vents and flues measures',
     'water_usage': 'Water usage',
