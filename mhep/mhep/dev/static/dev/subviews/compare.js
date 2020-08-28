@@ -1057,12 +1057,8 @@ function measureForSummaryTable(measure) {
     html += '<td>' + measure.who_by + '</td>';
 
     // Disruption
-    if (typeof (disruption) == 'string') {
-        html += '<td>' + disruption.replace('MEDIUMHIGH', 'MEDIUM / HIGH') + '</td>';
-    } else {
-        html += '<td></td>';
-    }
-
+    let disruption = measure.disruption != undefined ? measure.disruption.replace('MEDIUMHIGH', 'MEDIUM / HIGH') : 'N/A';
+    html +='<td>' + disruption +'<td>';
 
     // Finish
     html += '</tr>';
