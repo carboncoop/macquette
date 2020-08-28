@@ -752,13 +752,7 @@ function add_carbon_dioxide_per_m2(root, scenarios) {
         barGutter: 400 / carbonDioxideEmissionsData.length,
         defaultBarColor: 'rgb(157,213,203)',
         data: carbonDioxideEmissionsData,
-        targets: [
-            {
-                label: 'UK Average - ' + datasets.uk_average_values.co2_emission_rate + 'kgCO₂/m².year',
-                target: datasets.uk_average_values.co2_emission_rate,
-                color: 'rgb(231,37,57)'
-            },
-        ], });
+    });
     CarbonDioxideEmissions.draw(root);
 }
 
