@@ -53,7 +53,7 @@ function houseSVG(data) {
             <use xlink:href="#house-house" x="128" y="55" transform="scale(2)" />
             <text x="500" y="400" class="text-bold house--dark" text-anchor="middle">TOTAL</text>
             <text class="house--dark" x="500" y="435" text-anchor="middle">
-                ${Math.round(thermalbridgewk)} W/K
+                ${Math.round(totalwk)} W/K
             </text>
 
             <use transform="translate(460,615) rotate(90) scale(${scaled_floor}) translate(0,-50)"

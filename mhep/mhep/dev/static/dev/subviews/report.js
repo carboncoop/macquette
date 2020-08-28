@@ -1230,7 +1230,7 @@ function add_peak_heating_load(root, scenario_list) {
             name = `Scenario ${num}`;
         }
 
-        const heatloss = scenario.fabric.total_heat_loss_WK;
+        const heatloss = scenario.totalWK;
         const temp = scenario.temperature.target;
         const temp_diff = temp - (-5);
         const peak_heat = heatloss * temp_diff;
