@@ -2413,6 +2413,9 @@ calc.currentenergy = function (data) {
     data.currentenergy.total_co2m2 = total_co2 / data.TFA;
     data.currentenergy.total_costm2 = total_cost / data.TFA;
     data.currentenergy.energyuseperperson = (enduse_annual_kwh / 365.0) / data.occupancy;
+    data.currentenergy.enduse_annual_kwh = enduse_annual_kwh;
+    data.currentenergy.enduse_annual_kwhm2 = enduse_annual_kwh / data.TFA;
+
     return data;
 };
 

@@ -161,7 +161,7 @@ function report_show(root, template) {
         [ add_heat_balance,              '#heat-balance' ],
         [ add_space_heating_demand,      '#space-heating-demand' ],
         [ add_energy_demand,             '#fuel-use' ],
-        [ add_primary_energy_usage,      '#energy-use-intensity' ],
+        [ add_energy_usage,              '#energy-use-intensity' ],
         [ add_carbon_dioxide_per_m2,     '#carbon-dioxide-emissions' ],
         [ add_carbon_dioxide_per_person, '#carbon-dioxide-emissions-per-person' ],
         [ add_energy_costs,              '#estimated-energy-cost-comparison' ],
@@ -603,9 +603,9 @@ function add_space_heating_demand(root, scenarios) {
         barGutter: 380 / dataFig.length,
         defaultBarColor: 'rgb(157,213,203)',
         // barColors: {
-        // 	'Space heating': 'rgb(157,213,203)',
-        // 	'Pumps, fans, etc.': 'rgb(24,86,62)',
-        // 	'Cooking': 'rgb(40,153,139)',
+        //  'Space heating': 'rgb(157,213,203)',
+        //  'Pumps, fans, etc.': 'rgb(24,86,62)',
+        //  'Cooking': 'rgb(40,153,139)',
         // },
         targets: [
             {
@@ -674,12 +674,12 @@ function add_energy_demand(root, scenarios) {
     });
     EnergyDemand.draw(root);
 }
-function add_primary_energy_usage(root, scenarios) {
-    let [ primaryEnergyUseData, min, max ] = getPrimaryEnergyUseData(scenarios);
+function add_energy_usage(root, scenarios) {
+    let [energyUseData, min, max] = getEnergyUseData(scenarios);
     min -= 50;
 
-    var dataGraph = prepare_data_for_graph(primaryEnergyUseData);
-    var primaryEneryUse = new BarChart({
+    var dataGraph = prepare_data_for_graph(energyUseData);
+    var energyUse = new BarChart({
         chartTitleColor: 'rgb(87, 77, 86)',
         yAxisLabelColor: 'rgb(87, 77, 86)',
         barLabelsColor: 'rgb(87, 77, 86)',
@@ -706,7 +706,7 @@ function add_primary_energy_usage(root, scenarios) {
         },
         data: dataGraph,
     });
-    primaryEneryUse.draw(root);
+    energyUse.draw(root);
 }
 function add_carbon_dioxide_per_m2(root, scenarios) {
     var carbonDioxideEmissionsData = [];
@@ -1061,17 +1061,17 @@ function generateHouseMarkup(heatlossData) {
      <text transform="matrix(1 0 0 1 35.0902 90.1215)"><tspan x="-5" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Windows &amp; doors</tspan><tspan x="11.2" y="12" fill="#F0533C" font-size="11">' + heatlossData.windowswk + ' W/K</tspan></text>\
      <text transform="matrix(1 0 0 1 248.466 283.9302)"><tspan x="0" y="0" fill="#F0533C" font-family="Work Sans" font-size="11">Floor</tspan><tspan x="0" y="12" fill="#F0533C" font-size="11">' + heatlossData.floorwk + ' W/K</tspan></text>\
      <g opacity="0.4">\
-     <polygon fill="#F0533C" points="110.1,133.2 102.8,128.8 102.8,129.9 110.1,134.3 	"/>\
-     <polygon fill="#F0533C" points="110.1,141.5 102.8,137.1 102.8,138.2 110.1,142.6 	"/>\
-     <polygon fill="#F0533C" points="110.1,149.8 102.8,145.4 102.8,146.4 110.1,150.8 	"/>\
-     <polygon fill="#F0533C" points="110.1,158 102.8,153.6 102.8,154.7 110.1,159.1 	"/>\
+     <polygon fill="#F0533C" points="110.1,133.2 102.8,128.8 102.8,129.9 110.1,134.3    "/>\
+     <polygon fill="#F0533C" points="110.1,141.5 102.8,137.1 102.8,138.2 110.1,142.6    "/>\
+     <polygon fill="#F0533C" points="110.1,149.8 102.8,145.4 102.8,146.4 110.1,150.8    "/>\
+     <polygon fill="#F0533C" points="110.1,158 102.8,153.6 102.8,154.7 110.1,159.1  "/>\
      </g>\
      <line opacity="0.4" fill="none" stroke="#F0533C" stroke-width="8" stroke-miterlimit="10" x1="106.5" y1="230.7" x2="106.5" y2="195.8"/>\
      <g opacity="0.4">\
-     <polygon fill="#F0533C" points="110.1,203.2 102.8,198.8 102.8,199.9 110.1,204.3 	"/>\
-     <polygon fill="#F0533C" points="110.1,211.5 102.8,207.1 102.8,208.2 110.1,212.6 	"/>\
-     <polygon fill="#F0533C" points="110.1,219.8 102.8,215.4 102.8,216.4 110.1,220.8 	"/>\
-     <polygon fill="#F0533C" points="110.1,228 102.8,223.6 102.8,224.7 110.1,229.1 	"/>\
+     <polygon fill="#F0533C" points="110.1,203.2 102.8,198.8 102.8,199.9 110.1,204.3    "/>\
+     <polygon fill="#F0533C" points="110.1,211.5 102.8,207.1 102.8,208.2 110.1,212.6    "/>\
+     <polygon fill="#F0533C" points="110.1,219.8 102.8,215.4 102.8,216.4 110.1,220.8    "/>\
+     <polygon fill="#F0533C" points="110.1,228 102.8,223.6 102.8,224.7 110.1,229.1  "/>\
      </g>\
      </svg>';
     return html;
@@ -1128,8 +1128,8 @@ function getEnergyDemandData(scenarios) {
 
     return data;
 }
-function getPrimaryEnergyUseData(scenarios) {
-    let primaryEnergyUseData = {};
+function getEnergyUseData(scenarios) {
+    let energyUseData = {};
     let min = 0;
     let max = 500;
 
@@ -1139,14 +1139,14 @@ function getPrimaryEnergyUseData(scenarios) {
 
         const val = (label, key) => {
             if (scenario.fuel_requirements[key] !== undefined) {
-                primaryEnergyUseData[scenario_id].push({
+                energyUseData[scenario_id].push({
                     label: label,
                     value: scenario.fuel_requirements[key].quantity / data.TFA,
                 });
             }
         };
 
-        primaryEnergyUseData[scenario_id] = [];
+        energyUseData[scenario_id] = [];
         val('Water Heating',  'waterheating');
         val('Space Heating',  'space_heating');
         val('Cooking',        'cooking');
@@ -1159,12 +1159,15 @@ function getPrimaryEnergyUseData(scenarios) {
             // fuel_totals['generation'].primaryenergy is negative
             var renewable_left = -scenario.fuel_totals['generation'].primaryenergy / data.TFA;
 
-            primaryEnergyUseData[scenario_id].forEach(function (use) {
+            energyUseData[scenario_id].forEach(function(use) {
                 if (use.value <= renewable_left) {
                     renewable_left -= use.value;
                     use.value = -use.value;
                 } else {
-                    primaryEnergyUseData[scenario_id].push({value: use.value - renewable_left, label: use.label}); // we create another bar with the same color than current use with the amount that is still positive
+                    energyUseData[scenario_id].push({
+                        value: use.value - renewable_left,
+                        label: use.label
+                    }); // we create another bar with the same color than current use with the amount that is still positive
                     use.value = -renewable_left; // the amount offseted
                     renewable_left = 0;
                 }
@@ -1181,18 +1184,18 @@ function getPrimaryEnergyUseData(scenarios) {
         }
     }
 
-    primaryEnergyUseData.bills = [
+    energyUseData.bills = [
         {
-            value: data.currentenergy.primaryenergy_annual_kwhm2,
-            label: 'Non categorized'
+            value: data.currentenergy.enduse_annual_kwhm2,
+            label: 'Non-categorized'
         },
         {
             value: -data.currentenergy.generation.primaryenergy / data.TFA,
-            label: 'Non categorized'
+            label: 'Non-categorized'
         }
     ];
 
-    return [ primaryEnergyUseData, min, max ];
+    return [ energyUseData, min, max ];
 }
 
 function prepare_data_for_graph(data_source) {
