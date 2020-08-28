@@ -554,6 +554,7 @@ function elements_initUI() {
         const tbodyId = e.dataset.fabricTable;
         const areaKey = e.dataset.areaKey;
         const lossKey = e.dataset.lossKey;
+        const secondDimension = e.dataset.secondDimension;
 
         const root = cloneTemplate('#element-table-template');
 
@@ -568,6 +569,10 @@ function elements_initUI() {
             root.querySelector('[data-template-loss]').setAttribute('key', lossKey);
         } else {
             root.querySelector('[data-template-loss]').parentNode.innerHTML = '';
+        }
+
+        if (secondDimension) {
+            root.querySelector('[data-second-dimension]').innerHTML = secondDimension;
         }
 
         e.parentNode.replaceChild(root, e);
