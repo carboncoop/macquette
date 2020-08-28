@@ -40,7 +40,7 @@ class MyLibrariesMixin:
         )
         all_libraries |= global_libraries
 
-        return all_libraries
+        return all_libraries.distinct()
 
 
 class ListCreateLibraries(MyLibrariesMixin, generics.ListCreateAPIView):
