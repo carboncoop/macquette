@@ -276,7 +276,8 @@
     $("#project-author").html(p.author);
 
     if (p.data == false || p.data == null || Object.keys(p.data).length == 0)
-        p.data = {'master': {}};
+        p.data = {'master': { scenario_name: 'Baseline'}};
+
     var project = p.data;
 
     //********************************
@@ -429,8 +430,10 @@
         $('#select-scenario').html("");
 
         // Fill up the select
-        for (z in project)
-            $('#select-scenario').append("<option value='" + z + "'>" + z + "</option>");
+        for (z in project) {
+            const name = project[z].scenario_name || z;
+            $('#select-scenario').append(`<option value='${z}'>${name}</option>`);
+        }
 
         $('#modal-create-scenario').modal('show');
     });
@@ -604,14 +607,14 @@
         const locked = project[id].locked
         const menu_class = id === currently_open ? "active" : ""
         const is_master = id === "master"
+        const created_from = project[id].created_from == "master" ? "baseline" : project[id].created_from
 
-        const created_from = project[id].created_from
         let created_from_html = ""
         if (created_from) {
             let created_from_extra = ""
             let created_from_title = ""
 
-            if (project[created_from] == undefined) {
+            if (project[created_from] == undefined && created_from != "baseline") {
                 // If the parent scenario has been deleted
                 created_from_extra = " - deleted"
             } else if (has_changed_base_scenario(id)) {
