@@ -392,14 +392,6 @@ $('#openbem').on('click', '.move-down', function () {
     }
 });
 
-$("[key='data.fabric.global_TMP']").change(function () {
-    value = $("[key='data.fabric.global_TMP']").is(':checked');
-    if (value === true) {
-        $("[key='data.fabric.global_TMP_value']").prop('disabled', false);
-    } else {
-        $("[key='data.fabric.global_TMP_value']").prop('disabled', true);
-    }
-});
 
 // --------------------------------------------------------
 // View/redraw code
@@ -600,12 +592,6 @@ function elements_initUI() {
         }
     }
 
-    // Enable/disable dropdown for global TMP
-    if (data.fabric.global_TMP === 1) {
-        $("[key='data.fabric.global_TMP_value']").prop('disabled', false);
-    } else {
-        $("[key='data.fabric.global_TMP_value']").prop('disabled', true);
-    }
     // Check all the windows, doors, etc are subtracted from somewhere and if not attach them to the first wall, floor, etc from the list. This is a bug fix with backwards compatibility, that's why it's done here
     elements_UpdateUI();
     for (z in data.fabric.elements) {
@@ -619,6 +605,9 @@ function elements_initUI() {
     if (data.measures != undefined && data.thermal_bridging != undefined) {
         $('#TB-measured-applied').show();
     }
+
+    // Set up TMP value workaround
+    initTMPChoices();
 }
 
 function getSubtractOptions(data) {
@@ -796,4 +785,37 @@ function add_quantity_and_cost_to_bulk_fabric_measure(measure_id) {
 
 function scenario_can_revert() {
     return (data.created_from && project[data.created_from]) ? true : false;
+}
+
+function initTMPChoices() {
+    const values = [
+        { val: 'NONE', output: null },
+        { val: 'LOW',  output: 100 },
+        { val: 'MED',  output: 250 },
+        { val: 'HIGH', output: 450 },
+    ];
+
+    if (!data.fabric.global_TMP) {
+        $('input[name=tmp_override][value=NONE]').click();
+    } else {
+        const found = values.find(
+            ({ output }) => data.fabric.global_TMP_value == output
+        );
+
+        if (found) {
+            $(`input[name=tmp_override][value=${found.val}]`).click();
+        } else {
+            $('input[name=tmp_override][value=NONE]').click();
+        }
+    }
+
+    $('input[name=tmp_override]').on('change', () => {
+        const input = $('[name=tmp_override]:checked').val();
+        const item = values.find(({ val }) => input === val);
+
+        data.fabric.global_TMP = (item.output !== null);
+        data.fabric.global_TMP_value = item.output;
+
+        update();
+    });
 }

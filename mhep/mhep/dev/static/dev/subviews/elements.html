@@ -10,25 +10,43 @@
 <section class="line-top mb-45">
     <h3 class="ma-0 mb-15">Thermal Mass Parameter (TMP)</h3>
 
-    <div class="d-flex align-items-start">
-        <input
-            type="checkbox"
-            id="global_TMP"
-            key="data.fabric.global_TMP"
-            class="ma-0 big-checkbox">
+    <p>The thermal mass parameter (TMP) gives an indication of how quickly a structure will absorb and release heat.  You can choose to ignore the k value of individual elements and use a global TMP value instead.</p>
 
-        <div class="ml-7">
-            <label for="global_TMP">
-                Ignore the <i>k</i> value of individual elements and use a global TMP value instead:
-            </label>
+    <p>In multi-layered constructions - e.g. timber frame with external masonry leaf - the construction of the inner leaf is the more important factor.</p>
 
-            <select key="data.fabric.global_TMP_value">
-                <option value="100">Low TMP</option>
-                <option value="250">Medium TMP</option>
-                <option value="450">High TMP</option>
-            </select>
-        </div>
-    </div>
+    <p>Use:</p>
+
+    <label class="radio d-flex mb-7" for="tmp_override_1">
+        <input type="radio" class="mr-7 big-checkbox"
+                id="tmp_override_1"
+                name="tmp_override"
+                value="NONE">
+        the k value of individual elements
+    </label>
+
+    <label class="radio d-flex mb-7" for="tmp_override_2">
+        <input type="radio" class="mr-7 big-checkbox"
+                id="tmp_override_2"
+                name="tmp_override"
+                value="LOW">
+        timber or steel frame with lightweight infill (low TMP)
+    </label>
+
+    <label class="radio d-flex mb-7" for="tmp_override_3">
+        <input type="radio" class="mr-7 big-checkbox"
+                id="tmp_override_3"
+                name="tmp_override"
+                value="MED">
+        masonry walls with timber floors or other mixed structure (medium TMP)
+    </label>
+
+    <label class="radio d-flex mb-7" for="tmp_override_4">
+        <input type="radio" class="mr-7 big-checkbox"
+                id="tmp_override_4"
+                name="tmp_override"
+                value="HIGH">
+        masonry walls and solid floors (high TMP)
+    </label>
 </section>
 
 <template id="element-table-template">
