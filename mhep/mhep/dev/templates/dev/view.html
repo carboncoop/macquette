@@ -104,7 +104,7 @@
             <div class="side-section" style="padding-bottom: 5px">
                 <div class="side-section--header" style="display: flex; justify-content: space-between;">
                     <div>Scenarios</div>
-                    <div><small>kgCO<sub>2</sub>/m<sup>2</sup></small></div>
+                    <div><abbr title="Space Heating Demand (kWh/m²·year)">SHD</abbr></div>
                 </div>
             </div>
 
@@ -635,7 +635,7 @@
                     ${created_from_html}
                 </div>
 
-                <div style="text-align: right; font-weight: normal" class="block_emissions"></div>
+                <div style="text-align: right; font-weight: normal" class="shd"></div>
             </div>
 
             <div class="menu-content" class="${menu_class}">
@@ -692,10 +692,10 @@
     }
     function redraw_emissions() {
         for (let s in project) {
-            const $emissions = $(`[scenario="${s}"] .block_emissions`)
-            const kgco2perm2 = project[s].kgco2perm2
-            if (typeof(kgco2perm2) == "number" && !isNaN(kgco2perm2)) {
-              $emissions.html(kgco2perm2.toFixed(0));
+            const $emissions = $(`[scenario="${s}"] .shd`)
+            const space_heating_demand_m2 = project[s].space_heating_demand_m2
+            if (typeof(space_heating_demand_m2) == "number" && !isNaN(space_heating_demand_m2)) {
+              $emissions.html(space_heating_demand_m2.toFixed(0));
             } else {
               $emissions.html("-")
             }
