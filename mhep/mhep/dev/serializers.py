@@ -19,6 +19,14 @@ class AuthorUserIDMixin:
         return "{:d}".format(obj.owner.id)
 
 
+class OrganisationMixin:
+    def get_organisation(self, obj):
+        if obj.organisation:
+            return {"id": obj.organisation.id, "name": obj.organisation.name}
+        else:
+            return None
+
+
 class StringIDMixin:
     def get_id(self, obj):
         return "{:d}".format(obj.id)
@@ -77,10 +85,15 @@ class ImageUpdateSerializer(serializers.Serializer):
 
 
 class AssessmentMetadataSerializer(
-    MdateMixin, StringIDMixin, AuthorUserIDMixin, serializers.ModelSerializer
+    MdateMixin,
+    OrganisationMixin,
+    StringIDMixin,
+    AuthorUserIDMixin,
+    serializers.ModelSerializer,
 ):
 
     author = serializers.SerializerMethodField()
+    organisation = serializers.SerializerMethodField()
     userid = serializers.SerializerMethodField()
     id = serializers.SerializerMethodField()
     mdate = serializers.SerializerMethodField()
@@ -101,6 +114,7 @@ class AssessmentMetadataSerializer(
             "updated_at",
             "author",
             "userid",
+            "organisation",
             "mdate",
         ]
 
