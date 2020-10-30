@@ -3,12 +3,14 @@ import os
 
 import PIL
 from django.core.files.base import ContentFile
+from django.db.models import Q
 from rest_framework import generics
 from rest_framework import parsers
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from .. import VERSION
 from ..models import Assessment
 from ..models import Image
 from ..permissions import IsAssessmentOwner
@@ -25,7 +27,10 @@ class ListCreateAssessments(generics.ListCreateAPIView):
     serializer_class = AssessmentMetadataSerializer
 
     def get_queryset(self, *args, **kwargs):
-        return Assessment.objects.all().filter(owner=self.request.user)
+        user_orgs = getattr(self.request.user, f"{VERSION}_organisations").all()
+        return Assessment.objects.all().filter(
+            Q(owner=self.request.user) | Q(organisation__in=user_orgs)
+        )
 
 
 class RetrieveUpdateDestroyAssessment(

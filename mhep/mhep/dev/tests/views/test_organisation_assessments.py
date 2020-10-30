@@ -63,6 +63,10 @@ class TestListAssessmentsForOrganisation(APITestCase):
             "description": "test description",
             "author": self.org_member.username,
             "userid": f"{self.org_member.id}",
+            "organisation": {
+                "id": self.organisation.pk,
+                "name": self.organisation.name,
+            },
         }
 
         assert expected_result == response.data.pop()
@@ -125,18 +129,18 @@ class TestCreateAssessmentForOrganisation(CreateAssessmentTestsMixin, APITestCas
     """
 
     def post_to_create_endpoint(self, assessment):
-        organisation = OrganisationFactory.create()
-        organisation.members.add(self.user)
+        self.organisation = OrganisationFactory.create()
+        self.organisation.members.add(self.user)
 
         return self.client.post(
-            f"/{VERSION}/api/organisations/{organisation.pk}/assessments/",
+            f"/{VERSION}/api/organisations/{self.organisation.pk}/assessments/",
             assessment,
             format="json",
         )
 
     def test_sets_organisation(self):
-        organisation = OrganisationFactory.create()
-        organisation.members.add(self.user)
+        self.organisation = OrganisationFactory.create()
+        self.organisation.members.add(self.user)
 
         self.client.force_authenticate(self.user)
 
@@ -146,7 +150,7 @@ class TestCreateAssessmentForOrganisation(CreateAssessmentTestsMixin, APITestCas
         }
 
         response = self.client.post(
-            f"/{VERSION}/api/organisations/{organisation.pk}/assessments/",
+            f"/{VERSION}/api/organisations/{self.organisation.pk}/assessments/",
             new_assessment,
             format="json",
         )
@@ -154,10 +158,10 @@ class TestCreateAssessmentForOrganisation(CreateAssessmentTestsMixin, APITestCas
         assert status.HTTP_201_CREATED == response.status_code
 
         assessment = Assessment.objects.get(pk=response.data["id"])
-        assert organisation == assessment.organisation
+        assert self.organisation == assessment.organisation
 
     def test_fails_if_not_a_member_of_organisation(self):
-        organisation = OrganisationFactory.create()
+        self.organisation = OrganisationFactory.create()
 
         self.client.force_authenticate(self.user)
 
@@ -167,7 +171,7 @@ class TestCreateAssessmentForOrganisation(CreateAssessmentTestsMixin, APITestCas
         }
 
         response = self.client.post(
-            f"/{VERSION}/api/organisations/{organisation.pk}/assessments/",
+            f"/{VERSION}/api/organisations/{self.organisation.pk}/assessments/",
             new_assessment,
             format="json",
         )

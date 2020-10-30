@@ -45,6 +45,14 @@ class CreateAssessmentTestsMixin:
             "userid": f"{self.user.id}",
         }
 
+        if hasattr(self, "organisation"):
+            expected_result["organisation"] = {
+                "id": self.organisation.pk,
+                "name": self.organisation.name,
+            }
+        else:
+            expected_result["organisation"] = None
+
         assert "id" in response.data
         response.data.pop("id")
 
