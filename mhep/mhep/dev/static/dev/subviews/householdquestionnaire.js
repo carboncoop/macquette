@@ -115,6 +115,10 @@ var questionnaire = {
         'LOW':  'low',
         'VLOW': 'very low',
     },
+    FLOODING_RISK_RESERVOIRS: {
+        'WITHIN': 'within potential extent of flooding from reservoir',
+        'OUTWITH': 'not within potential extent of flooding from reservoir',
+    }
 };
 
 const qsucceed = v => ({ type: 'SUCCESS', 'val': v });
@@ -314,6 +318,7 @@ const qfields = {
     'flooding_note': qtype.str,
     'flooding_rivers_sea': qtype.opt(questionnaire.FLOODING_RISK),
     'flooding_surface_water': qtype.opt(questionnaire.FLOODING_RISK),
+    'flooding_reservoirs': qtype.opt(questionnaire.FLOODING_RISK_RESERVOIRS),
     'overheating_note': qtype.str,
     'context_and_other_points': qtype.str,
 };
