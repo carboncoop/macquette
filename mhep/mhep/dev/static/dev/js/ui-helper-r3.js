@@ -169,14 +169,15 @@ function UpdateUI(data) {
 
     getkeys('data', data);
 
-    for (z in keys) {
-        var value = keys[z];
-        var target = $("[key='" + z + "']");
+    let elems = document.querySelectorAll('[key]');
+    for (let elem of elems) {
+        let key = elem.getAttribute('key');
+        if (keys[key]) {
+            let value = keys[key];
+            let target = $(elem);
+            let dp = 1 * target.attr('dp');
+            let units = target.attr('units');
 
-        if (target.length) {
-
-            var dp = 1 * target.attr('dp');
-            var units = target.attr('units');
             if (!isNaN(dp)) {
                 value = (1 * value).toFixed(dp);
             }
