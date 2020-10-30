@@ -162,7 +162,7 @@
             <tr>
                 <th width="15%">Name</th>
                 <th>Description</th>
-                <th>Author</th>
+                <th>Owner</th>
                 <th width="10%">Modified</th>
                 <th>Status <i class="icon-question-sign" title="Completed assessments are locked"></i></th>
                 <th>Actions</th>
@@ -365,6 +365,11 @@
             let statusColour = status_colours[assessment.status]
             let assessmentURL = urlHelper.html.assessment(assessment.id);
 
+            let owner = `${assessment.author}`;
+            if (assessment.organisation) {
+                owner += `<br><small>(${assessment.organisation.name})</small>`
+            }
+
             out +=
                 `<tr>
                     <td>
@@ -375,7 +380,7 @@
                     <td>
                         ${assessment.description}
                     </td>
-                    <td style='color:#888'>${assessment.author}</td>
+                    <td style='color:#888'>${owner}</td>
                     <td style='color:#888'>${getDate(assessment.mdate * 1000)}</td>
                     <td>
                         <select class='assessment-status ${statusColour}'
