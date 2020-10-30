@@ -208,6 +208,7 @@ function report_show(root, template) {
 }
 
 function filter_comfort_table(selected, left, right) {
+    const hatching = (selected === 'VAR' || selected === 'DK' || selected === 'NA');
     return new nunjucks.runtime.SafeString(`
         <div style="width: 7em; text-align: right; margin-right: 0.5em;">${left}</div>
         <svg viewBox="0 0 92 32" class="comfort-table">
@@ -217,7 +218,7 @@ function filter_comfort_table(selected, left, right) {
             <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'LOW' ? 'red' : 'white'}"></rect>
             <rect y="1" x="31" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'MID' ? 'green' : 'white'}"></rect>
             <rect y="1" x="61" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'HIGH' ? 'red' : 'white'}"></rect>
-            <rect y="1" x="1" width="90" height="30" fill="${selected === 'VAR' ? 'url(#hatch)' : 'transparent'}"></rect>
+            <rect y="1" x="1" width="90" height="30" fill="${hatching ? 'url(#hatch)' : 'transparent'}"></rect>
         </svg>
         <div style="width: 7em; margin-left: 0.5em;">${right}</div>`);
 }
