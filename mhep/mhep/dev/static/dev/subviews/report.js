@@ -701,7 +701,7 @@ function add_energy_usage(root, scenarios) {
             'Appliances': 'rgb(240,212,156)',
             'Lighting': 'rgb(236,102,79)',
             'Fans and Pumps': 'rgb(246, 167, 7)',
-            'Non categorized': 'rgb(131, 51, 47)',
+            'Not Categorised': 'rgb(131, 51, 47)',
             // 'Generation': 'rgb(200,213,203)'
         },
         data: dataGraph,
@@ -1181,11 +1181,11 @@ function getEnergyUseData(scenarios) {
     energyUseData.bills = [
         {
             value: data.currentenergy.enduse_annual_kwhm2,
-            label: 'Non-categorized'
+            label: 'Not Categorised'
         },
         {
             value: -data.currentenergy.generation.primaryenergy / data.TFA,
-            label: 'Non-categorized'
+            label: 'Not Categorised'
         }
     ];
 
