@@ -211,9 +211,13 @@ function filter_comfort_table(selected, left, right) {
     return new nunjucks.runtime.SafeString(`
         <div style="width: 7em; text-align: right; margin-right: 0.5em;">${left}</div>
         <svg viewBox="0 0 92 32" class="comfort-table">
+            <pattern id="hatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="10" style="stroke: #777; stroke-width: 1;"></line>
+            </pattern>
             <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'LOW' ? 'red' : 'white'}"></rect>
             <rect y="1" x="31" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'MID' ? 'green' : 'white'}"></rect>
             <rect y="1" x="61" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'HIGH' ? 'red' : 'white'}"></rect>
+            <rect y="1" x="1" width="90" height="30" fill="${selected === 'VAR' ? 'url(#hatch)' : 'transparent'}"></rect>
         </svg>
         <div style="width: 7em; margin-left: 0.5em;">${right}</div>`);
 }

@@ -86,6 +86,7 @@ var questionnaire = {
         'LOW': 'Too little',
         'MID': 'Just right',
         'HIGH': 'Too much',
+        'VAR': 'Variable',
     },
     HISTORIC_AGE_BAND: {
         'before-1900':  'before 1900',
