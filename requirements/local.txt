@@ -104,7 +104,8 @@ six==1.13.0               # via argon2-cffi, astroid, cfgv, django-coverage-plug
 snowballstemmer==2.0.0    # via sphinx
 social-auth-app-django==3.1.0  # via -r requirements/./base.in
 social-auth-core==3.2.0   # via social-auth-app-django
-sphinx==3.3.0             # via -r requirements/local.in
+sphinx-rtd-theme==0.5.0   # via -r requirements/./docs.in
+sphinx==3.3.0             # via -r requirements/./docs.in, sphinx-rtd-theme
 sphinxcontrib-applehelp==1.0.1  # via sphinx
 sphinxcontrib-devhelp==1.0.1  # via sphinx
 sphinxcontrib-htmlhelp==1.0.2  # via sphinx
