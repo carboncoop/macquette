@@ -1,4 +1,10 @@
+variables:
+    # Change pip's cache directory to be inside the project directory since we can
+    # only cache local items.
+    PIP_CACHE_DIR: '$CI_PROJECT_DIR/.cache/pip'
+
 stages:
+    - docs
     - test
 
 test:
@@ -15,6 +21,11 @@ test:
         DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/$POSTGRES_DB"
         DJANGO_SETTINGS_MODULE: config.settings.test
 
+    cache:
+        paths:
+            - .cache/pip
+            - venv
+
     before_script:
         - python -V
         - pip install virtualenv
@@ -23,3 +34,20 @@ test:
         - pip install -r mhep/requirements/local.txt
     script:
         - cd mhep; pytest --cov=mhep
+
+pages:
+    stage: docs
+    image: sphinxdoc/sphinx:3.3.0
+    rules:
+        - if: $CI_COMMIT_BRANCH == "master"
+          changes:
+          - docs/**/*
+
+    artifacts:
+        paths:
+            - public
+
+    script:
+        - pip install sphinx-rtd-theme
+        - make html -C docs/
+        - mv docs/_build/html/ public/
