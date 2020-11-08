@@ -23,10 +23,10 @@ pip-sync:  ## Make the local installed packages reflect the ones in the local re
 	pip-sync requirements/local.txt
 
 docker-up:  ## Bring up our local docker containers
-	docker-compose -f local.yml start
+	docker-compose -f scripts/local.yml start
 
 docker-down:  ## Shut down our local docker containers
-	docker-compose -f local.yml stop
+	docker-compose -f scripts/local.yml stop
 
 docker-clean:  ## Clean system volumes (helpful for resetting broken databases)
 	docker system prune --volumes -f
@@ -34,6 +34,9 @@ docker-clean:  ## Clean system volumes (helpful for resetting broken databases)
 coverage:  ## Run tests & generate line-by-line coverage
 	pytest --cov=mhep
 	coverage html
+
+upversion:  ## Mint a new version
+	scripts/upversion.sh
 
 test:  ## Run tests and flake8
 	pytest --cov=mhep
