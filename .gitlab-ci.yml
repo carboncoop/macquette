@@ -9,6 +9,7 @@ stages:
 
 test:
     stage: test
+    needs: []
     image: python:3.7-buster
     services:
         - postgres:11
@@ -37,6 +38,7 @@ test:
 
 pages:
     stage: docs
+    needs: []
     image: sphinxdoc/sphinx:3.3.0
     rules:
         - if: $CI_COMMIT_BRANCH == "master"
