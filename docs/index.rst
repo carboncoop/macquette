@@ -6,9 +6,12 @@ Table of Contents:
 .. toctree::
    :maxdepth: 2
 
+   getting-started
    development
+   design-decisions
    reports
    notes_for_developers
+   api-v1
 
 
 Websites
