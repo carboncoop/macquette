@@ -19,3 +19,18 @@ repos:
   hooks:
   - id: eslint
     args: ["--fix"]
+
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v3.3.0
+  hooks:
+  - id: check-merge-conflict
+  - id: debug-statements
+  - id: check-docstring-first
+  - id: check-json
+  - id: end-of-file-fixer
+    exclude: \.min\.
+  - id: fix-byte-order-marker
+  - id: forbid-new-submodules
+  - id: mixed-line-ending
+    args: [ "--fix=lf" ]
+  - id: trailing-whitespace
