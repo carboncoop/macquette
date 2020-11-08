@@ -290,7 +290,7 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
             if (measure[tag].category == 'Warm air systems')
                 measure[tag].fans_and_supply_pumps = 0.4 * measure[tag].sfp * data.volume;
             add_quantity_and_cost_to_measure(measure[tag]);
-            // Add extra properties to measure 
+            // Add extra properties to measure
             measure[tag].fuel = 'Standard Tariff';
             measure[tag].fraction_space = 1;
             measure[tag].fraction_water_heating = 1;

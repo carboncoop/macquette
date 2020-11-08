@@ -3,9 +3,9 @@ function draw_arrow(ctx,x,y,angle,size,proportion)
     var tail = {x:x, y:y};
     var l = Math.sqrt(size / proportion);
     var w = proportion * l;
-  
+
     head = {x:tail.x+Math.cos(angle)*l, y:tail.y+Math.sin(angle)*l};
-    
+
     var tailwidth = w / 2;
     var headwidth = w / 1.2;
     var headlength = 0.6;

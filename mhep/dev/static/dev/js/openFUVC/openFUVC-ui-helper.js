@@ -1,16 +1,16 @@
 /******************************************************
- * 
+ *
  * # Open floor U-value calculator (openFUVC)
  * ------------------------------------------
- * 
- * Welcome to openFUVC, an open source implementation of the thermal transmittance 
+ *
+ * Welcome to openFUVC, an open source implementation of the thermal transmittance
  * calculation of floors as specified in BS EN ISO 13370:2007.
- * 
- * This project has been developed by [URBED](http://urbed.coop/) and 
+ *
+ * This project has been developed by [URBED](http://urbed.coop/) and
  * [Carbon Co-op](http://carbon.coop/) as part of [MyHomeEnergyPlanner](https://github.com/emoncms/MyHomeEnergyPlanner).
- * 
+ *
  * The calculator is released under the [GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html). So download it, study it, share it, change it, use it for yourself or in your website in which case don't forget to add a link to the <a rehf="https://github.com/carboncoop/openFUVC">source code</a> (also applies to any changes you may make).
- * 
+ *
  ********************************************************/
 
 var openFUVC_helper = new openFUVC();
@@ -33,7 +33,7 @@ $(document).ready(function () {
     $('#depth_of_basement_floor input').val(0.3);
     $('#wind_speed_annual_average input').val(4);
     $('#external_temperature_annual_average input').val(10);*/
-    
+
     /*$('#add-layer').click();
      $('[layer="1"] .thickness').val(0.10);
      $('[layer="1"] .spacing').val(1);
@@ -43,7 +43,7 @@ $(document).ready(function () {
      $('[layer="2"] .length-material2').val(0.2);
      $('[layer="1"] .material1').val("unventilated");
      $('#openFUVC-calculate').click();*/
-     
+
 });
 
 openFUVC.prototype.add_modal_to_DOM = function () {
@@ -72,7 +72,7 @@ openFUVC.prototype.ini_modal = function () {
 
     // Remove 'none' option from 'Edge insulation type' as it is already in 'Edge insulation'
     $('tr#edge_insulation_thermal_conductivity option[value="none"]').remove();
-    
+
     // Initialize some inputs/selects
     $('#type-of-floor select').val('slab_on_ground').change();
     $('#base_insulation_thermal_conductivity select').val('none').change();
@@ -106,11 +106,11 @@ openFUVC.prototype.add_events = function () {
         var layer =  $(this).parent().parent().attr('layer');
         if ($(this).find('option[value=none]').is(':selected')){
             $('tr[layer='+layer+'] .length-material2').hide().attr('required', false);
-            $('tr[layer='+layer+'] .spacing').hide().attr('required', false);            
+            $('tr[layer='+layer+'] .spacing').hide().attr('required', false);
         } else{
             $('tr[layer='+layer+'] .length-material2').show().attr('required', true);
-            $('tr[layer='+layer+'] .spacing').show().attr('required', true);            
-        }      
+            $('tr[layer='+layer+'] .spacing').show().attr('required', true);
+        }
     });
     $('#openFUVC-modal').on('change', 'p.other input', function () {
         // Copy value of the input to the option in select
@@ -350,7 +350,7 @@ openFUVC.prototype.fetch_inputs = function (type_of_floor) {
                         layer.length_2 = $(this).find('.length-material2').val();
                         layer.thermal_conductivity_2 = $(this).find('.material2').val();
                         layer.spacing = $(this).find('.spacing').val();
-                    } else{                    
+                    } else{
                         layer.length_2 = 0;
                         layer.thermal_conductivity_2 = 1; // doesn't matter the value
                         layer.spacing = 1; // meaning meterial 1 has 100%
@@ -371,7 +371,7 @@ openFUVC.prototype.fetch_inputs = function (type_of_floor) {
                         layer.length_2 = $(this).find('.length-material2').val();
                         layer.thermal_conductivity_2 = $(this).find('.material2').val();
                         layer.spacing = $(this).find('.spacing').val();
-                    } else{                    
+                    } else{
                         layer.length_2 = 0;
                         layer.thermal_conductivity_2 = 1; // doesn't matter the value
                         layer.spacing = 1; // meaning meterial 1 has 100%

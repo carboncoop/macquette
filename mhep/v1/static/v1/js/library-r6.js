@@ -1,10 +1,10 @@
 /*****************************************************
- * 
+ *
  * Version: 6.0
- * 
- * - Version of the model is noted as major.minor -> changes of the major value are due to 
+ *
+ * - Version of the model is noted as major.minor -> changes of the major value are due to
  the addition of a new library. Changes of the minor values are due to changes only in existing libraries.
- * 
+ *
  */
 var standard_library = {
     elements: {

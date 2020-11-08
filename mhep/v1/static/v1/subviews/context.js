@@ -24,7 +24,7 @@ function add_floor(z)
     $("#floors [key='data.floors.template.area']").attr('key','data.floors.'+z+'.area');
     $("#floors [key='data.floors.template.height']").attr('key','data.floors.'+z+'.height');
     $("#floors [key='data.floors.template.volume']").attr('key','data.floors.'+z+'.volume');
-    $("#floors [row='template']").attr('row',z); 
+    $("#floors [row='template']").attr('row',z);
 }
 
 function context_initUI()
@@ -57,5 +57,5 @@ $('#openbem').on('click','#region-postcodes-modal input[name=region]', function(
 $('#openbem').on('click','#region-postcodes-modal #region-postcodes-ok', function(){
     $('#region-postcodes-modal').modal('hide');
     var region = $('#region-postcodes-modal input[name=region]:checked').val();
-    $('select[key="data.region"]').val(region).change();  
+    $('select[key="data.region"]').val(region).change();
 });

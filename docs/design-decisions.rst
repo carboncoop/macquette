@@ -141,4 +141,3 @@ When the ``dev`` app is finished it should be renamed to e.g. ``v2``.
 
 Once an app is assigned a version number its code should never be
 modified again.
-

@@ -6,7 +6,7 @@
 
     .librow:hover {
         background-color: #eee;
-    } 
+    }
 
     #myModal{
         width:auto;
@@ -79,7 +79,7 @@
                 <td><input type="number" min="0" dp="2" step="0.01" key="data.fabric.elements.template.area" style="width:50px"/></td>
                 <td><span key="data.fabric.elements.template.windowarea" dp=2>0.0</span>m<sup>2</sup></td>
                 <td><span key="data.fabric.elements.template.netarea" dp=2>0.0</span>m<sup>2</sup></td>
-                <td><span key="data.fabric.elements.template.wk" dp=2>0</span> W/K</td>                
+                <td><span key="data.fabric.elements.template.wk" dp=2>0</span> W/K</td>
                 <td class="only-for-walls"><span key="data.fabric.elements.template.EWI">0</span> </td>
                 <td style="text-align:center">
                     <button class="apply-measure if-not-master" tag="template" row="template" item="template" item_id="template">Apply Measure</button>
@@ -179,7 +179,7 @@
                 <td><i class="icon-list-alt calculate-floor-uvalue" z="template" style="margin-right:5px; cursor:pointer"></i><input type="number" min="0" dp="2" step="0.01" class="floor-uvalue" value="0" key="data.fabric.elements.template.uvalue"  dp=2 style="width:40px"/></td>
                 <td><input type="number" min="0" dp="2" step="0.01" value="0" key="data.fabric.elements.template.perimeter" dp=2 style="width:50px"/></td>
                 <td><input type="number" min="0" dp="2" step="0.01" value="0" key="data.fabric.elements.template.area" dp=2 style="width:50px"/></td>
-                <td><span key="data.fabric.elements.template.wk" dp=2>0</span> W/K</td>   
+                <td><span key="data.fabric.elements.template.wk" dp=2>0</span> W/K</td>
                 <td>
                     <button class="apply-measure if-not-master" tag="template" row="template" item="template" item_id="template">Apply Measure</button>
                     <br /><p style="margin-top:5px; display:none; cursor: pointer" class="revert-to-original if-not-master" row="template" item_id="template"><img src="" class="revert-to-original-icon" title="Revert to master" style="width:14px" /> Revert to master</p>
@@ -229,7 +229,7 @@
             <th>Over<br>shading <i class="icon-question-sign" title="MHEP applies same solar access factor to roof lights than any other windows. This is a deviation from SAP2012 (p.26 note 2) where solar factors for roof lights are always 1 independent of the overshading"></i></th>
             <th>Gain</th>
             <th>W/K</th>
-            <th style="text-align: center"><button class=" if-not-master apply-bulk-measure" tags="Window" 
+            <th style="text-align: center"><button class=" if-not-master apply-bulk-measure" tags="Window"
                                                    item='{"type":"Window","name":"--","lib":"--","l":0,"h":0,"area":0,"uvalue":0,"id":0,"location":"","description":"","kvalue":"","orientation":0,"overshading":0,"g":"0","gL":"0","ff":"0","performance":"","benefits":"","cost":"","who_by":"","disruption":"","associated_work":"","notes":"","maintenance":"","netarea":0,"wk":0,"gain":0}'
                                                    tag="--" item_id="0" row="13">Apply bulk measure
                 </button>
@@ -326,7 +326,7 @@
         <tr><td>Annual solar gains:</td><td><span key="data.fabric.annual_solar_gain" dp=2>0</span> W (<span key="data.fabric.annual_solar_gain_kwh" dp=0>0</span> kWh)</td></tr>
 
 
-    </table>    
+    </table>
 </div>
 
 <div id="apply-measure-TB-modal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">
@@ -346,4 +346,3 @@
         <button class="btn btn-primary" id="apply-measure-TB-modal-ok">OK</button>
     </div>
 </div>
-

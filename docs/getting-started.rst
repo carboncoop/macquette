@@ -107,5 +107,3 @@ You can find a list of available variables `in the bootstrap source`_, or get ex
 
 .. _in the bootstrap source: https://github.com/twbs/bootstrap/blob/v4-dev/scss/_variables.scss
 .. _Bootstrap docs: https://getbootstrap.com/docs/4.1/getting-started/theming/
-
-

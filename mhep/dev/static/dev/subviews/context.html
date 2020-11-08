@@ -5,11 +5,11 @@
     <br>
     <p>Scenario name:<br><input type="text" value="" key="data.scenario_name" style="width:300px" /></p>
     <br>
-    
+
     <h4>Overall building dimensions</h4>
-    
+
     <table class="table">
-    
+
         <tr>
             <th style="text-align:left">Name</th>
             <th>Area (m<sup>2</sup>)</th>
@@ -19,7 +19,7 @@
             <th>Volume (m<sup>3</sup>)</th>
             <th></th>
         </tr>
-        
+
         <tbody id="template" style="display:none">
             <tr>
                 <td style="text-align:left"><input style="text-align:left; width:200px" type="text" key="data.floors.template.name" value=""></td>
@@ -31,7 +31,7 @@
                 <td><span class="delete-floor" row="template" style="cursor:pointer"><a>Delete<i class="icon-trash"></i></a></span></td>
             </tr>
         </tbody>
-        
+
         <tbody id="floors"></tbody>
 
         <tr>
@@ -45,15 +45,15 @@
             <td></td>
             <td></td>
         </tr>
-        
+
     </table>
-    
+
     <h4>Total area and volume</h4>
     <table class="table">
         <tr><td width="60%">Total floor area:</td><td><span key="data.TFA" dp=1>0</span> m2</td></tr>
         <tr><td>Total dwelling volume:</td><td><span key="data.volume" dp=1>0</span> m3</td></tr>
     </table>
-    
+
     <h4>Location</h4>
     <p>Long term flood risk assessment for locations in England can be found <a href="https://flood-warning-information.service.gov.uk/long-term-flood-risk" target="blank">here</a></p>
     <table class="table">
@@ -82,20 +82,20 @@
             <option value=19>Orkney</option>
             <option value=20>Shetland</option>
             <option value=21>Northern Ireland</option>
-            
+
         </select>
     </td></tr>
     <tr><td>Dwelling altitude:<br/><span style="font-size:12px"><a href="https://www.daftlogic.com/sandbox-google-maps-find-altitude.htm" target="blank">Find it here</a></span></td><td><input type="text" key="data.altitude" style="width:60px" /> m</td></tr>
     </table>
-    
+
     <h4>Occupancy</h4>
-    
+
     <table class="table">
         <tr><td width="60%">SAP Occupancy based on floor area:</td><td><span type="text" key="data.occupancy" dp=3></span> person</td></tr>
         <tr><td>Use custom occupancy figure</td><td><input type="checkbox" key="data.use_custom_occupancy" /></td></tr>
         <tr><td>Custom occupancy</td><td><input type="text" key="data.custom_occupancy" style="width:60px" /></td></tr>
     </table>
-    
+
 </div>
 
 <div id="region-postcodes-modal" style="position: fixed" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" data-backdrop="true">

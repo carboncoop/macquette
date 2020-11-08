@@ -23,7 +23,7 @@ function generation_initUI() {
         $('#PV_calculator_message').show();
         $('#PV_generation-measure-applied').show();
     }
-    
+
 }
 
 function generation_UpdateUI() {
@@ -103,7 +103,7 @@ $('#openbem').on('click', '#apply-measure-generation-ok', function () {
     data.measures.PV_generation.measure.quantity = measure[tag].kWp;
     data.measures.PV_generation.measure.cost_total = measure[tag].cost * measure[tag].kWp;
 
-    // We copy over the kWp to the PV calculator, we show the calculator, we remove the checkbox so 
+    // We copy over the kWp to the PV calculator, we show the calculator, we remove the checkbox so
     // there is no other option than using the calculator and we disable the input for the kWp
     data.generation.solarpv_kwp_installed = measure[tag].kWp;
     $('#solarpv_kwp_installed').html('<span key="data.generation.solarpv_kwp_installed"> kWp');

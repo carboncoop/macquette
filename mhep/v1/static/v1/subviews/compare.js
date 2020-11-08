@@ -103,16 +103,16 @@ function generateSummary() {
         rows.push([fuel, 'fuel_totals', fuel, 'annualcost']);
     rows.push(['<b>Total cost (£)</b>', 'total_cost']);
     rows.push(['', '']);
-    /*['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
-     ['',''],      
+    /*['',''],
+     ['',''],
+     ['',''],
+     ['',''],
+     ['',''],
+     ['',''],
+     ['',''],
+     ['',''],
+     ['',''],
+     ['',''],
      ['',''], */
 
     rows.forEach(function (value) {
@@ -167,7 +167,7 @@ function compareCarbonCoop(scenario) {
     var Inf = compareInfiltration(scenario);
     if (Inf.changed === true)
         out += '<h3>Infiltration</h3><table class="table table-striped">' + Inf.html + '</table></br>';
-    // Clothes drying facilities     
+    // Clothes drying facilities
     var CDF = compareClothesDryingFacilities(scenario);
     if (CDF.changed === true)
         out += '<h3>Clothes drying facilities</h3><table class="table table-striped">' + CDF.html + '</table></br>';
@@ -181,7 +181,7 @@ function compareCarbonCoop(scenario) {
     var Lighting = compareLighting(scenario);
     if (Lighting.changed === true)
         out += '<h3>Lighting</h3><p>Changes to number of fixed low energy lighting outlets (LLE)</p><table class="table table-striped">' + Lighting.html + '</table></br>';
-    // Heating    
+    // Heating
     var Heating = compareHeating(scenario);
     if (Heating.changed === true)
         out += '<h3>Heating</h3><table class="table table-striped">' + Heating.html + '</table></br>';
@@ -203,7 +203,7 @@ function compareCarbonCoop(scenario) {
     var FR = compareFuelRequirements(scenario);
     if (FR.changed === true)
         out += '<h3>Fuel requirements</h3><table class="table table-striped">' + FR.html + '</table></br>';
-    // Totals     
+    // Totals
     out += '<h3>Totals</h3><table class="table table-striped"><tr><td></td><td>Before</td><td>After</td></tr>';
     out += '<tr><td>Annual cost</td><td><i>£' + project.master.total_cost.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_cost.toFixed(0) + '</i></td></tr>';
     out += '<tr><td>Total income</td><td><i>£' + project.master.total_income.toFixed(0) + '</i></td><td><i>£' + project[scenario].total_income.toFixed(0) + '</i></td></tr>';

@@ -10,11 +10,11 @@ html, body {
     margin:0px;
 }
 
-h1 { 
+h1 {
     color: var(--app-color);
 }
 
-h3 { 
+h3 {
     color: var(--app-color);
     font-size:20px;
     line-height: 22px;
@@ -44,7 +44,7 @@ a:hover {
     background: #d6d4ce;
     position: fixed;
     overflow-y: auto;
-    z-index: 1000; 
+    z-index: 1000;
 }
 
 #wrapper {
@@ -56,7 +56,7 @@ a:hover {
 
 .block-header {
     background-color:#dbd6ce;
-    color:#897A67; 
+    color:#897A67;
     padding:10px;
     font-weight:bold;
     cursor:pointer;
@@ -142,14 +142,12 @@ body .modal {
 
 @media (max-width: 450px) {
     .row { padding:10px; }
-    .col2 { width:100%; }  
+    .col2 { width:100%; }
     .col1-inner { padding:5px; }
     .col2-inner { padding:5px; }
 }
 
-@media (min-width: 450px) and (max-width: 960px) { 
-    .col2 { width:100%; } 
+@media (min-width: 450px) and (max-width: 960px) {
+    .col2 { width:100%; }
 }
 @media (min-width: 960px) { }
-
-

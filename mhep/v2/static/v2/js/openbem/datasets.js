@@ -165,11 +165,11 @@ var datasets = {
             SAP_code: 0
         }
     },
-    
-    
+
+
     /*********************************************
          * regions
-         * 
+         *
          * Lits of regions, this dataset is important as its index corresponds with many other datasets that have regions as a first dimension
          */
     regions: [
@@ -211,24 +211,24 @@ var datasets = {
                 "Cold (Helena, MT)", //"IECC Region 6B",
                 "Mixed-Marine (San Francisco, CA)"  //"IECC Region 3C",
                 "Marine (Seattle, WA)",  //"IECC Region 4C",
-                "Very Cold (Duluth, MN)",    //"IECC Region 7",  
+                "Very Cold (Duluth, MN)",    //"IECC Region 7",
                 "Arctic (Fairbanks, AK)"    //"IECC Region 8"*/
-        // References: 
-        // a) https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/4_3a_ba_innov_buildingscienceclimatemaps_011713.pdf 
+        // References:
+        // a) https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/4_3a_ba_innov_buildingscienceclimatemaps_011713.pdf
         // b) https://energy.gov/sites/prod/files/2015/10/f27/ba_climate_region_guide_7.3.pdf
         // c) http://en.openei.org/wiki/Commercial_Reference_Buildings
     ],
-        
-        
+
+
     /************************************************
          * table_u1
          * Mean external temperature: these data are for typical height above sea level of the regions in datasets.regions
-         * 
+         *
          *  - Units: ˚C
          *  - First dimension: region
          *  - Second dimension: month
          *  - Source: SAP2012, appendix U1, p. 172
-         * 
+         *
          */
     table_u1: [
         // UK regions
@@ -255,8 +255,8 @@ var datasets = {
         [4.6, 4.1, 4.7, 6.5, 8.3, 10.5, 12.4, 12.8, 11.4, 8.8, 6.5, 4.6],
         [4.8, 5.2, 6.4, 8.4, 10.9, 13.5, 15.0, 14.9, 13.1, 10.0, 7.2, 4.7],
         // USA regions
-        /*[20.3, 21.1, 22.5, 24.2, 26.6, 28.0, 28.8, 28.9, 28.3, 26.5, 23.8, 21.3], 
-                [11.9, 13.8, 16.9, 20.7, 24.9, 27.7, 28.9, 28.9, 26.3, 21.6, 16.5, 12.3], 
+        /*[20.3, 21.1, 22.5, 24.2, 26.6, 28.0, 28.8, 28.9, 28.3, 26.5, 23.8, 21.3],
+                [11.9, 13.8, 16.9, 20.7, 24.9, 27.7, 28.9, 28.9, 26.3, 21.6, 16.5, 12.3],
                 [6.9, 8.7, 12.7, 16.9, 21.4, 25.1, 26.8, 26.4, 23.2, 17.3, 12.3, 7.6],
                 [1.5, 2.4, 7.0, 12.5, 17.7, 22.9, 25.4, 24.4, 20.3, 13.7, 8.4, 3.0],
                 [-3.9, -2.1, 3.5, 9.6, 15.2, 20.7, 23.4, 22.5, 18.3, 11.5, 4.8, -1.9],
@@ -269,22 +269,22 @@ var datasets = {
                 [-5.1, -2.7, 2.2, 7.1, 12.1, 16.6, 20.9, 19.9, 14.6, 7.7, 0.6, -5.1],
                 [10.9, 12.7, 14.2, 15.6, 16.1, 17.4, 18.1, 18.5, 18.4, 17.8, 14.5, 10.9],
                 [5.9, 6.8, 8.7, 11.0, 14.3, 16.8, 19.6, 19.7, 17.1, 12.3, 8.2, 5.3],
-                [-11.5, -9.4, -3.1, 4.3, 10.8, 15.8, 18.7, 18.0, 13.3, 6.2, -1.6, -8.9],  
+                [-11.5, -9.4, -3.1, 4.3, 10.8, 15.8, 18.7, 18.0, 13.3, 6.2, -1.6, -8.9],
                 [-2.1, -22.5, -17.8, -11.6, 1.0, 10.0, 16.1, 17.2, 13.8, 7.5, -4.0, -16.2, -20.1]*/
-        // References: 
-        // a) http://ashrae-meteo.info/  1986-2010 for monthly temperature average temp (C) 
+        // References:
+        // a) http://ashrae-meteo.info/  1986-2010 for monthly temperature average temp (C)
     ],
-        
-        
+
+
     /************************************************
          * table_u2
          * Wind speed (m/s) for calculation of infiltration rate
-         * 
+         *
          *  - Units: m/s
          *  - First dimension: region
          *  - Second dimension: month
          *  - Source: SAP2012, appendix U2, p. 173
-         * 
+         *
          */
     table_u2: [
         // Uk regions
@@ -328,19 +328,19 @@ var datasets = {
                 [5.4, 5.4, 5.4, 5.8, 5.4, 4.9, 4.5, 4.5, 4.9, 5.4, 5.4, 5.4],
                 [1.3, 1.8, 2.2, 2.7, 3.6, 3.1, 3.1, 2.7, 2.7, 2.2, 1.8, 1.3] */
     ],
-        
+
     //      https://www.sercc.com/climateinfo/historical/avgwind.html (miami/atlanta)
     //      https://www.ncdc.noaa.gov/sites/default/files/attachments/wind1996.pdf (all others)
-    
+
     /************************************************
          * table_u3
          * Mean global solar irradiance (W/m2) on a horizontal plane
-         * 
+         *
          *  - Units: W/m2
          *  - First dimension: region
          *  - Second dimension: month
-         *  - Source: SAP2012, appendix U3, p. 174     
-         *  
+         *  - Source: SAP2012, appendix U3, p. 174
+         *
          */
     table_u3: [
         // Uk regions
@@ -367,50 +367,50 @@ var datasets = {
         [12, 34, 79, 135, 196, 190, 168, 144, 90, 46, 16, 7],
         [24, 52, 96, 155, 201, 198, 183, 150, 107, 61, 30, 18]
         // USA regions
-        /* [148, 184, 220, 244, 248, 228, 224, 206, 186, 180, 160, 140], 
+        /* [148, 184, 220, 244, 248, 228, 224, 206, 186, 180, 160, 140],
                 [142, 170, 216, 250, 260, 254, 266, 240, 208, 186, 148, 130],
-                [124, 164, 214, 254, 264, 244, 228, 222, 214, 182, 144, 118], 
-                [92, 130, 182, 230, 260, 278, 268, 246, 202, 156, 108, 82], 
-                [84, 124, 180, 220, 252, 278, 276, 250, 202, 138, 92, 72], 
-                [70, 112, 170, 212, 252, 264, 266, 242, 186, 120, 78, 64], 
-                [146, 184, 248, 308, 338, 356, 320, 284, 254, 212, 162, 132], 
-                [130, 164, 230, 284, 316, 340, 324, 300, 250, 198, 148, 122], 
-                [130, 172, 236, 292, 334, 360, 346, 310, 260, 202, 146, 120], 
-                [142, 186, 246, 302, 334, 348, 314, 280, 248, 204, 154, 130], 
-                [110, 150, 214, 266, 296, 328, 320, 286, 230, 172, 122, 98], 
-                [58, 100, 166, 216, 252, 272, 282, 254, 186, 120, 72, 50], 
-                [92, 126, 188, 240, 282, 320, 316, 288, 234, 170, 114, 88], 
-                [34, 72, 130, 186, 236, 258, 266, 236, 166, 96, 48, 34], 
-                [56, 96, 156, 210, 240, 252, 250, 230, 168, 108, 68, 50], 
+                [124, 164, 214, 254, 264, 244, 228, 222, 214, 182, 144, 118],
+                [92, 130, 182, 230, 260, 278, 268, 246, 202, 156, 108, 82],
+                [84, 124, 180, 220, 252, 278, 276, 250, 202, 138, 92, 72],
+                [70, 112, 170, 212, 252, 264, 266, 242, 186, 120, 78, 64],
+                [146, 184, 248, 308, 338, 356, 320, 284, 254, 212, 162, 132],
+                [130, 164, 230, 284, 316, 340, 324, 300, 250, 198, 148, 122],
+                [130, 172, 236, 292, 334, 360, 346, 310, 260, 202, 146, 120],
+                [142, 186, 246, 302, 334, 348, 314, 280, 248, 204, 154, 130],
+                [110, 150, 214, 266, 296, 328, 320, 286, 230, 172, 122, 98],
+                [58, 100, 166, 216, 252, 272, 282, 254, 186, 120, 72, 50],
+                [92, 126, 188, 240, 282, 320, 316, 288, 234, 170, 114, 88],
+                [34, 72, 130, 186, 236, 258, 266, 236, 166, 96, 48, 34],
+                [56, 96, 156, 210, 240, 252, 250, 230, 168, 108, 68, 50],
                 [0, 22, 78, 146, 220, 204, 170, 136, 86, 34, 14, 0]*/
         // http://www.soda-pro.com/web-services/meteo-data/monthly-means-solar-irradiance-temperature-relative-humidity
     ],
-                
+
     /************************************************
          * solar_declination
          * Solar declination for all regions
-         * 
+         *
          *  - Units: ˚
          *  - Index: month
-         *  - Source: SAP2012, appendix U3, p. 174     
-         *  
+         *  - Source: SAP2012, appendix U3, p. 174
+         *
          */
     solar_declination: [ - 20.7, - 12.8, - 1.8, 9.8, 18.8, 23.1, 21.2, 13.7, 2.9, - 8.7, - 18.4, - 23.0],
-        
-    
+
+
     /************************************************
          * table_u4
          * Representative latitude and height above mean sea level
-         * 
-         *  - Units: 
+         *
+         *  - Units:
          *      - Latitude: ˚N
          *      - Height: meters
          *  - First dimension: region
-         *  - Second dimension: 
+         *  - Second dimension:
          *      - 0: latitude
          *      - 1: Representative height about sea level
-         *  - Source: SAP2012, appendix U4, p. 175     
-         *  
+         *  - Source: SAP2012, appendix U4, p. 175
+         *
          */
     table_u4: [
         [53.5, 79],
@@ -436,22 +436,22 @@ var datasets = {
         [60.1, 50],
         [54.6, 72]
     ],
-        
-        
+
+
     /************************************************
          * table_u5
          * Constants for calculation of solar flux on vertical and inclined surfaces
          * Angles may need to be converted to radians depending on the software implementation of the sine and cosine functions
-         * 
+         *
          *  - Units: ˚
          *  - First dimension: constant (kx)
          *  - 2nd dimension: orientation
-         *      - 0: North 
-         *      - 1: NE/NW 
-         *      - 2: East/West 
+         *      - 0: North
+         *      - 1: NE/NW
+         *      - 2: East/West
          *      - 3: SE/SW 4:South
-         *  - Source: SAP2012, appendix U5, p. 176     
-         *  
+         *  - Source: SAP2012, appendix U5, p. 176
+         *
          */
     k: {
         1: [26.3, 0.165, 1.44, - 2.95, - 0.66],
@@ -464,61 +464,61 @@ var datasets = {
         8: [0.0872, 4.89, - 0.757, - 0.25, - 0.991],
         9: [ - 0.191, - 1.99, 0.604, 3.07, 4.59]
     },
-        
-        
+
+
     /************************************************
          * table_1a
          * Number of days of each month
-         * 
+         *
          *  - Units: days
          *  - Index: month
-         *  
+         *
          */
     table_1a: [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31],
-        
-        
+
+
     /************************************************
          * table_1c
-         * Monthly factors for hot water use, the coefficients in this table are used to calculate 
-         * the energy used to heat hot water in a specific month when  you know how much you have 
+         * Monthly factors for hot water use, the coefficients in this table are used to calculate
+         * the energy used to heat hot water in a specific month when  you know how much you have
          * used in the whole year
-         * 
+         *
          *  - Index: month
-         *  - Source: SAP2012, table 1c, p. 194 
-         *  
+         *  - Source: SAP2012, table 1c, p. 194
+         *
          */
     table_1c: [1.1, 1.06, 1.02, 0.98, 0.94, 0.90, 0.90, 0.94, 0.98, 1.02, 1.06, 1.10],
-        
-        
+
+
     /************************************************
          * table_1d
          * Temperature rise of hot water drawn off (∆Tm, in K)
-         * 
+         *
          *  - Units: K
          *  - Index: month
-         *  - Source: SAP2012, table 1d, p. 194 
-         *  
+         *  - Source: SAP2012, table 1d, p. 194
+         *
          */
     table_1d: [41.2, 41.4, 40.1, 37.6, 36.4, 33.9, 30.4, 33.4, 33.5, 36.3, 39.4, 39.9],
-        
-        
+
+
     /************************************************
          * table_h4
-         * Primary circuit loss factors with solar water heating 
-         * 
+         * Primary circuit loss factors with solar water heating
+         *
          *  - Index: month
-         *  - Source: SAP2012, appendix H, p. 77 
-         *  
+         *  - Source: SAP2012, appendix H, p. 77
+         *
          */
     table_h4: [1.0, 1.0, 0.94, 0.70, 0.45, 0.44, 0.44, 0.48, 0.76, 0.94, 1.0, 1.0],
-        
-        
+
+
     /************************************************
          * ratings
-         * Primary circuit loss factors with solar water heating 
-         * 
-         *  - Source: SAP2012, table 14, p. 231 
-         *  
+         * Primary circuit loss factors with solar water heating
+         *
+         *  - Source: SAP2012, table 14, p. 231
+         *
          */
     ratings: [
         {start: 92, end: 100, letter: 'A', color: '#009a44'},
@@ -529,12 +529,12 @@ var datasets = {
         {start: 21, end: 38, letter: 'F', color: '#fd8130'},
         {start: 1, end: 20, letter: 'G', color: '#fd001a'}
     ],
-        
-        
+
+
     /************************************************
          * table_6d_solar_access_factor
          * Solar access factors
-         * 
+         *
          *  - First dimension: shading factor
          *      - 0: heavy - >80% of sky blocked by obstacles
          *      - 1: more than average  - 60% - 80% of sky blocked by obstacles
@@ -543,34 +543,34 @@ var datasets = {
          *  - Second dimension:
          *      - 0: winter
          *      - 1: summer
-         *  - Source: SAP2012, table 6d, p.216 
-         *  
+         *  - Source: SAP2012, table 6d, p.216
+         *
          */
     table_6d_solar_access_factor: [[0.3, 0.5], [0.54, 0.7], [0.77, 0.9], [1.0, 1.0]],
-        
-        
+
+
     /************************************************
          * table_6d_light_access_factor
          * Light access factors
-         * 
+         *
          *  - First dimension: shading factor
          *      - 0: heavy - >80% of sky blocked by obstacles
          *      - 1: more than average  - 60% - 80% of sky blocked by obstacles
          *      - 2: average or unknown - 20% - 60% of sky blocked by obstacles
          *      - 3:  very little - <20% of sky blocked by obstacles
-         *  - Source: SAP2012, table 6d, p.216 
-         *  
+         *  - Source: SAP2012, table 6d, p.216
+         *
          */
     table_6d_light_access_factor: [0.5, 0.67, 0.83, 1.0],
-        
-        
+
+
     /************************************************
          * target_values
          * This dataset is not required by the model
-         * 
+         *
          *  - Units: kWh/m2.a
          *  - Source: 2050 80% reduction target (Carbon Co-op)
-         *  
+         *
          */
     target_values: {
         space_heating_demand_lower: 20,
@@ -581,15 +581,15 @@ var datasets = {
         co2_emission_rate: 17,
         energy_use_per_person: 8.6
     },
-        
-        
+
+
     /************************************************
          * target_values
          * This dataset is not required by the model
-         * 
+         *
          *  - Units: kWh/m2.a
          *  - Source: ???
-         *  
+         *
          */
     uk_average_values: {
         space_heating_demand: 120,
@@ -597,11 +597,11 @@ var datasets = {
         co2_emission_rate: 50.3,
         energy_use_per_person: 19.6
     },
-        
+
     /************************************************
          * table_U6_region_from_postcode
          * This dataset is not required by the model
-         * 
+         *
          *  - First dimension: Postcode
          *  - Second dimension: region index, see datasets.regions
          *  -Source: SAP2012 table U4 p.177

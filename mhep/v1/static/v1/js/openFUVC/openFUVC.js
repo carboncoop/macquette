@@ -1,23 +1,23 @@
 /******************************************************
- * 
+ *
  * # Open floor U-value calculator (openFUVC)
  * ------------------------------------------
- * 
- * Welcome to openFUVC, an open source implementation of the thermal transmittance 
+ *
+ * Welcome to openFUVC, an open source implementation of the thermal transmittance
  * calculation of floors as specified in BS EN ISO 13370:2007.
- * 
- * This project has been developed by [URBED](http://urbed.coop/) and 
+ *
+ * This project has been developed by [URBED](http://urbed.coop/) and
  * [Carbon Co-op](http://carbon.coop/) as part of [MyHomeEnergyPlanner](https://github.com/emoncms/MyHomeEnergyPlanner).
- * 
+ *
  * The calculator is released under the [GNU Affero General Public License](https://www.gnu.org/licenses/agpl-3.0.en.html). So download it, study it, share it, change it, use it for yourself or in your website in which case don't forget to add a link to the <a rehf="https://github.com/carboncoop/openFUVC">source code</a> (also applies to any changes you may make).
- * 
+ *
  ********************************************************/
 
 function openFUVC() {
     this.dataset = openFUVC_dataset;
 }
 
-/** 
+/**
  * @param {String} type - of floor to calculate U-value of. Options: suspended_floor, slab_on_ground, heated_basement or exposed_floor_above_GL
  * @param {Object} data - Object with all the different inputs required by the methods to calculate the u-value. The documentation of each method specifies the expected properties in the data object
  * @returns {Number} U-value for the given type of floor described by data in W/m2.K
@@ -58,13 +58,13 @@ openFUVC.prototype.calc = function (type, data) {
  *      - external_temperature_annual_average: Average annual external temperature in C. If not defined then it will be calculated for the region from the dataset
  *      - internal_temperature_annual_average: Average annual internal temperature in C
  *      - area_ventilation_openings: ventilation openings per m exposed perimeter in m2/m
- *      - floor_deck_layers: array of objects. Each object: {thickness: number, thermal_conductivity_1: number, thermal_conductivity_2: number, length_2: number, spacing: number} 
+ *      - floor_deck_layers: array of objects. Each object: {thickness: number, thermal_conductivity_1: number, thermal_conductivity_2: number, length_2: number, spacing: number}
  *      - wall_thickness - External walls thickness in m
  *      - wall_uvalue: thermal transmittance of walls of underfloor space (above ground level) in W/m2.K
  *      - base_insulation_thermal_conductivity: Thermal conductivity (λ) of insulation on the base of the underfloor space in W/m.K
  *      - base_insulation_thickness: in metres
  *      - edge_insulation_underfloor_space: edge insulation is applied around the base of the underfloor space - Options: horizontal, vertical or none
- *      - edge_insulation_thickness: horizontal or vertical edge insulation around the base of the underfloor space in metres    
+ *      - edge_insulation_thickness: horizontal or vertical edge insulation around the base of the underfloor space in metres
  *      - edge_insulation_length: width of horizontal edge isulation or depth of vertical edge insulation, in metres
  *      - edge_insulation_thermal_conductivity: thermal conductivity due to the type of insulation in W/m.K
  *      - thermal_conductivity_ug: Thermal conductivity of unfrozen ground in W/m.K
@@ -72,10 +72,10 @@ openFUVC.prototype.calc = function (type, data) {
  *      - ventilation_rate: volumetric air change rate, in m3/s. Required when 'ventilation_type' is 'mechanical_from_inside', 'mechanical_from_outside_to_heated_basement' or 'mechanical_from_outside_to_unheated_basement'
  *      - ventilation_rate_unheated_basement: ventilation rate to unheated basement in air changes per hour. Use when "ventilation_type" is "mechanical_from_outside_to_unheated_basement". If not present then default one in openFUVC.dataset.default_ventilation_rate_unheated_basement will be used
  *      - basement_volume: air volume of the basement in ??? I guess m3
- *     
+ *
  * @returns {number} u-value of the suspended floor W/m2.K
  * @see data.dataset
- * 
+ *
  */
 openFUVC.prototype.supended_floor = function (datain) {
     // 1. Calculation of B: characteristic dimension
@@ -116,7 +116,7 @@ openFUVC.prototype.supended_floor = function (datain) {
         Ug = Ug + Uei;
     }
 
-    // 3. Calculation of Uf: the thermal transmittance of suspended part of floor, 
+    // 3. Calculation of Uf: the thermal transmittance of suspended part of floor,
     // in W/(m 2 ·K) (between the internal environment and the underfloor space);
     var Uf = this.thermal_transmittance_floor_deck(datain.floor_deck_layers);
 
@@ -185,20 +185,20 @@ openFUVC.prototype.supended_floor = function (datain) {
  *      - base_insulation_thermal_conductivity: Thermal conductivity (λ) of insulation on the base of the underfloor space in W/m.K
  *      - base_insulation_thickness: in metres
  *      - edge_insulation_underfloor_space: edge insulation is applied around the base of the underfloor space - Options: horizontal, vertical or none
- *      - edge_insulation_thickness: horizontal or vertical edge insulation around the base of the underfloor space in metres    
+ *      - edge_insulation_thickness: horizontal or vertical edge insulation around the base of the underfloor space in metres
  *      - edge_insulation_length: width of horizontal edge isulation or depth of vertical edge insulation, in metres
  *      - edge_insulation_thermal_conductivity: thermal conductivity due to the type of insulation in W/m.K
  *      - thermal_conductivity_ug: Thermal conductivity of unfrozen ground in W/m.K
- *    
+ *
  * @returns {number} u-value of the slab on ground floor W/m2.K
  * @see data.dataset
- * 
+ *
  */
 openFUVC.prototype.slab_on_ground = function (datain) {
     // Calculation of B: characteristic dimension
     var B = this.characteristic_dimension(datain.area, datain.perimeter);
 
-    // Calculation of Rf: thermal resistance of the floor slab, including that of any 
+    // Calculation of Rf: thermal resistance of the floor slab, including that of any
     // all-over insulation layers above, below or within the floor slab, and that of any floor covering
     if (datain.base_insulation_thickness != undefined && datain.base_insulation_thermal_conductivity != undefined)
         var Rf = datain.base_insulation_thickness / datain.base_insulation_thermal_conductivity;
@@ -242,15 +242,15 @@ openFUVC.prototype.slab_on_ground = function (datain) {
  *      - thermal_conductivity_ug: Thermal conductivity of unfrozen ground in W/m.K
  *      - wall_uvalue: U-value of basement walls (thermal transmittance) in W/m2.K
  *      - depth_of_basement_floor: depth of basement floor below ground level in metres
- *    
+ *
  * @returns {number} u-value of the slab on ground floor W/m2.K
  * @see data.dataset
- * 
+ *
  */
 openFUVC.prototype.heated_basement = function (datain) {
     // Calculation of B: characteristic dimension
     var B = this.characteristic_dimension(datain.area, datain.perimeter);
-    // Calculation of Rf: thermal resistance of the floor slab, including that of any 
+    // Calculation of Rf: thermal resistance of the floor slab, including that of any
     // all-over insulation layers above, below or within the floor slab, and that of any floor covering
     if (datain.base_insulation_thickness != undefined && datain.base_insulation_thermal_conductivity != undefined)
         var Rf = datain.base_insulation_thickness / datain.base_insulation_thermal_conductivity;
@@ -273,11 +273,11 @@ openFUVC.prototype.heated_basement = function (datain) {
 /********************************************************************
  * Calculates u-value of an exposed floor above ground level according to SAP 2012 section 3.3 p.15
  * @param datain object with the relevant data to do the calculations
- *      - floor_deck_layers: array of objects. Each object: {thickness: number, thermal_conductivity_1: number, thermal_conductivity_2: number, length_2: number, spacing: number} 
- *      - unheated_space_thermal_resistance: thermal resistance of the unheated space underneath the floor in m2.K/W 
- *    
+ *      - floor_deck_layers: array of objects. Each object: {thickness: number, thermal_conductivity_1: number, thermal_conductivity_2: number, length_2: number, spacing: number}
+ *      - unheated_space_thermal_resistance: thermal resistance of the unheated space underneath the floor in m2.K/W
+ *
  * @returns {number} u-value of exposed floor above ground level in W/m2.K
- * 
+ *
  */
 openFUVC.prototype.exposed_floor_above_GL = function (datain) {
     var Uo = this.thermal_transmittance_floor_deck(datain.floor_deck_layers);
@@ -288,7 +288,7 @@ openFUVC.prototype.exposed_floor_above_GL = function (datain) {
 
 /****
  * Calculate characteristic dimension of floor - formula 2 in BS EN ISO 13370:2007
- * 
+ *
  * @param {Number} area
  * @param {Number} perimeter
  * @returns {Number} characteristic dimension of floor in metres
@@ -299,7 +299,7 @@ openFUVC.prototype.characteristic_dimension = function (area, perimeter) {
 
 /***
  * Calculates total equivalent thickness - formulas 3, 7 and 13 in  BS EN ISO 13370:2007
- * 
+ *
  * @param {number} thickness
  * @param {number} thermal_conductivity_ug - thermal conductivity of unfrozen ground in W/(m·K)
  * @param {number} Rsi - internal surface resistance in m2K/W
@@ -315,7 +315,7 @@ openFUVC.prototype.equivalent_thickness = function (thickness, thermal_conductiv
 /**
  * Calculates the thermal transmittance of a floor deck taking into account the different layers. Each layer
  * can be made of one or two materials
- * @param {array} layers - array of objects. Each object is layer of the floor deck defining the thickness of the layer, the thermal conductivity of each material, spacing between joists and lenght of the second material. Each object: {thickness: number, thermal_conductivity_1: number, thermal_conductivity_2: number, length_2: number, spacing: number} 
+ * @param {array} layers - array of objects. Each object is layer of the floor deck defining the thickness of the layer, the thermal conductivity of each material, spacing between joists and lenght of the second material. Each object: {thickness: number, thermal_conductivity_1: number, thermal_conductivity_2: number, length_2: number, spacing: number}
  * @returns {Number} The thermal transmittance of the floor deck in W/(m2 ·K)
  */
 openFUVC.prototype.thermal_transmittance_floor_deck = function (layers) {
@@ -335,9 +335,9 @@ openFUVC.prototype.thermal_transmittance_floor_deck = function (layers) {
 
 /**
  * Calculates the thermal resistance of an unventilated layer of a deck floor as defined in a table in EN ISO 6946 : 2007
- * That table links the thickness of the layer with the resistance. This method interpolates the value of 
+ * That table links the thickness of the layer with the resistance. This method interpolates the value of
  * the resistance for the thickness of the air layer
- * 
+ *
  * @see openFUVC.dataset.thermal_resistance_unventilated_layer
  * @param {number} thickness of the air layer in m
  * @returns {Number} The thermal resistance of the unventilated layer in m2.K/W
@@ -366,7 +366,7 @@ openFUVC.prototype.thermal_resistance_unventilated_layer = function (thickness) 
 /**
  * Calculate the thermal resistance of an slightly ventilated layer of a deck floor as defined in EN ISO 6946 : 2007
  * Ventilation openings (Av) are assumed to be 1000 mm 2 per metre of length
- * 
+ *
  * @see openFUVC.dataset.thermal_resistance_unventilated_layer
  * @param {Number} thickness of the air layer in m
  * @returns {Number} The thermal resistance of the unventilated layer in m2.K/W
@@ -381,7 +381,7 @@ openFUVC.prototype.thermal_resistance_slightly_ventilated_layer = function (thic
 
 /**
  * Calculates the transmittance of a basement floor - section 9.32 in BS EN ISO 13370:2007
- * 
+ *
  * @param {number} thermal_conductivity_ug - Thermal conductivity of unfrozen ground - W/m.K
  * @param {number} B - characteristic dimension of floor
  * @param {number} depth_of_basement_floor - depth of basement floor below ground level in metres
@@ -398,7 +398,7 @@ openFUVC.prototype.thermal_transmittance_basement_floor = function (thermal_cond
 
 /***
  * Calculates the transmittance of a basement walls - section 9.33 in BS EN ISO 13370:2007
- * 
+ *
  * @param {number} thermal_conductivity_ug - Thermal conductivity of unfrozen ground - W/m.K
  * @param {number} depth_of_basement_floor - depth of basement floor below ground level in metres
  * @param {number} dw - total equivalent thickness basement wall in metres
@@ -488,7 +488,7 @@ openFUVC.prototype.get_wind_speed_annual_average = function (region) {
 
 /**
  * Casts relevant properties of the data object to number
- * 
+ *
  * @param {object} data
  * @returns {object} data object after sanitizing all the numeric properties
  */
@@ -713,20 +713,20 @@ var openFUVC_dataset = {
                  "Cold (Helena, MT)", //"IECC Region 6B",
                  "Mixed-Marine (San Francisco, CA)"  //"IECC Region 3C",
                  "Marine (Seattle, WA)",  //"IECC Region 4C",
-                 "Very Cold (Duluth, MN)",    //"IECC Region 7",  
+                 "Very Cold (Duluth, MN)",    //"IECC Region 7",
                  "Arctic (Fairbanks, AK)"    //"IECC Region 8"*/
                 // for USA regions:
-                // a) https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/4_3a_ba_innov_buildingscienceclimatemaps_011713.pdf 
+                // a) https://www1.eere.energy.gov/buildings/publications/pdfs/building_america/4_3a_ba_innov_buildingscienceclimatemaps_011713.pdf
                 // b) https://energy.gov/sites/prod/files/2015/10/f27/ba_climate_region_guide_7.3.pdf
                 // c) http://en.openei.org/wiki/Commercial_Reference_Buildings
     ],
     /************************************************
      * external_temperature_monthly_average
-     * Mean external temperature: these data are for typical height above sea level of the regions in datasets.regions 
+     * Mean external temperature: these data are for typical height above sea level of the regions in datasets.regions
      *  - Units: ˚C
      *  - First dimension: region
      *  - Second dimension: month
-     *  - Source: SAP2012, appendix U1, p. 172     * 
+     *  - Source: SAP2012, appendix U1, p. 172     *
      */
     external_temperature_monthly_average: [
         // UK regions
@@ -753,8 +753,8 @@ var openFUVC_dataset = {
         [4.6, 4.1, 4.7, 6.5, 8.3, 10.5, 12.4, 12.8, 11.4, 8.8, 6.5, 4.6],
         [4.8, 5.2, 6.4, 8.4, 10.9, 13.5, 15.0, 14.9, 13.1, 10.0, 7.2, 4.7],
                 // USA regions
-                /*[20.3, 21.1, 22.5, 24.2, 26.6, 28.0, 28.8, 28.9, 28.3, 26.5, 23.8, 21.3], 
-                 [11.9, 13.8, 16.9, 20.7, 24.9, 27.7, 28.9, 28.9, 26.3, 21.6, 16.5, 12.3], 
+                /*[20.3, 21.1, 22.5, 24.2, 26.6, 28.0, 28.8, 28.9, 28.3, 26.5, 23.8, 21.3],
+                 [11.9, 13.8, 16.9, 20.7, 24.9, 27.7, 28.9, 28.9, 26.3, 21.6, 16.5, 12.3],
                  [6.9, 8.7, 12.7, 16.9, 21.4, 25.1, 26.8, 26.4, 23.2, 17.3, 12.3, 7.6],
                  [1.5, 2.4, 7.0, 12.5, 17.7, 22.9, 25.4, 24.4, 20.3, 13.7, 8.4, 3.0],
                  [-3.9, -2.1, 3.5, 9.6, 15.2, 20.7, 23.4, 22.5, 18.3, 11.5, 4.8, -1.9],
@@ -767,18 +767,18 @@ var openFUVC_dataset = {
                  [-5.1, -2.7, 2.2, 7.1, 12.1, 16.6, 20.9, 19.9, 14.6, 7.7, 0.6, -5.1],
                  [10.9, 12.7, 14.2, 15.6, 16.1, 17.4, 18.1, 18.5, 18.4, 17.8, 14.5, 10.9],
                  [5.9, 6.8, 8.7, 11.0, 14.3, 16.8, 19.6, 19.7, 17.1, 12.3, 8.2, 5.3],
-                 [-11.5, -9.4, -3.1, 4.3, 10.8, 15.8, 18.7, 18.0, 13.3, 6.2, -1.6, -8.9],  
+                 [-11.5, -9.4, -3.1, 4.3, 10.8, 15.8, 18.7, 18.0, 13.3, 6.2, -1.6, -8.9],
                  [-2.1, -22.5, -17.8, -11.6, 1.0, 10.0, 16.1, 17.2, 13.8, 7.5, -4.0, -16.2, -20.1]*/
                 // References for USA regions
-                // a) http://ashrae-meteo.info/  1986-2010 for monthly temperature average temp (C) 
+                // a) http://ashrae-meteo.info/  1986-2010 for monthly temperature average temp (C)
     ],
     /************************************************
      * wind_speed_monthly_average
-     * Wind speed (m/s) for calculation of infiltration rate         * 
+     * Wind speed (m/s) for calculation of infiltration rate         *
      *  - Units: m/s
      *  - First dimension: region
      *  - Second dimension: month
-     *  - Source: SAP2012, appendix U2, p. 173         * 
+     *  - Source: SAP2012, appendix U2, p. 173         *
      */
     wind_speed_monthly_average: [
         // Uk regions

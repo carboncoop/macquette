@@ -10,6 +10,6 @@ function worksheets_initUI(){
         for(i in [$(this).attr('array-key')]){
             console.log([$(this).attr('array-key')]);
         }
-            
+
     })
 }

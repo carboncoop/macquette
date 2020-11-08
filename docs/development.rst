@@ -124,4 +124,3 @@ Sentry
 Sentry has a lot of JS errors from MHEP but from what I've seen they're not showstoppers, and a lot of them have probably been there for years.
 I think there are marginal gains in trying to fix them one by one because they're caused really by poorly-defined data structures.
 I'm don't think local fixes of adding "x !== undefined" checks everywhere really address the cause of the issue... in the medium term I wanted to experiment with using TypeScript to try and catch these kinds of bugs in a structured way.
-

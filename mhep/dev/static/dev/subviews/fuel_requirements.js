@@ -95,4 +95,3 @@ $('#openbem').on('click', '.remove-fans-and-pumps-fuel', function () {
     data.fans_and_pumps.splice($(this).attr('index'), 1);
     update();
 });
-

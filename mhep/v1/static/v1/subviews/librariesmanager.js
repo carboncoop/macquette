@@ -23,7 +23,7 @@ function librariesmanager_UpdateUI()
         $('#libraries-table').append($('#library-table-header-template').html());
         $("#libraries-table .header[library-type='template']").html(library_helper.library_names[type]);
         $("#libraries-table [library-type='template']").attr('library-type', type);
-        
+
         //Add libraries
         array_libraries_of_same_type.forEach(function (library) {
             var access = '';
@@ -47,4 +47,3 @@ function librariesmanager_UpdateUI()
 
     });
 }
-

@@ -76,4 +76,3 @@ function export_initUI() {
     //$("#import-export").html(JSON.stringify(project, null, 4));
     //$('textarea').height($('textarea').prop('scrollHeight'));
 }
-

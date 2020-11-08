@@ -5,7 +5,7 @@ The 'reporting' used to be implemented as git submodules which were included in 
 
 To replace this system I reworked it so the report template is stored in the db as a text field on an Organisation.  It's a nunjucks template, rendered client-side.  The JS produces a big context dictionary/object feeding in all the relevant info from other places to render it, and then inserts graphs.
 
-I chose nunjucks because the syntax is basically a JS-y version of Django templates, so it should be familiar.  The template is rendered into an iframe so it's a standalone document, unaffected by global UI styles.  
+I chose nunjucks because the syntax is basically a JS-y version of Django templates, so it should be familiar.  The template is rendered into an iframe so it's a standalone document, unaffected by global UI styles.
 
 Each organisation has its own report; CAfS for example has a very straightforward copy of CC's with few alterations.  Futureproof Bristol doesn't have a report template yet.
 
@@ -29,4 +29,3 @@ The future plans for reports (v3+):
 - replace the bar charts library with SVG generation (currently uses canvas, which produces bad print output) - in the process switching most of them to more space-efficient horizontal bar charts (the print output often looks awful because the charts take up 3/4 of a page it makes the text flow badly)
 - send the generated report as a blog to the server to generate PDFs with page numbers, better formatting, and a table of contents with page numbers.  There's a nice python lib for this, weasyprint.
 - split out the report into a separate model which is shared among different orgs.  Each org would then have a set of key-value pairs (likely just a JSON dictionary of strings<->strings) that are passed along through the context into the template - so when we have 3+ different templates to edit with minor variations between them it's possible to keep on top of them and not miss stuff out.  Maybe also including revisioning to avoid accidentally nuking important things.  Some of this might be gold-plating, but the reports are the most important thing for the householder so avoiding accidental fuckups is quite a high priority for me, and the current system of editing things in three different places and using comments is pretty error-prone.
-

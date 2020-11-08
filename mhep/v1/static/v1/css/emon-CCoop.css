@@ -44,22 +44,22 @@ i[title="Logout"]{
     background-repeat: repeat-x;
     border: 1px solid #d4d4d4;
     border-radius: 4px;
-    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065); 
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
 }
 
 
-h1 { 
+h1 {
     color: #ff2712 !important;
 }
 
-h2 { 
+h2 {
     color: #ff2712 !important;
     font-size:25px;
     line-height: 22px;
     margin-bottom: 25px;
 }
 
-h3 { 
+h3 {
     color: #ff2712 !important;
     font-size:20px;
     line-height: 22px;
