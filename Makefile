@@ -14,10 +14,17 @@ dev: docker-up ## Bring docker up and run the local server
 pip-compile:  ## Recompile requirements file after a change
 	pip-compile -q --output-file=requirements/local.txt requirements/local.in
 	pip-compile -q --output-file=requirements/production.txt requirements/production.in
+	git diff requirements/
 
-pip-upgrade:  ## Try to upgrade requirements files to latest available versions
-	pip-compile -U --output-file=requirements/local.txt requirements/local.in
-	pip-compile -U --output-file=requirements/production.txt requirements/production.in
+pip-upgrade:  ## Compile new requirements files with the latest pkg (make pip-upgrade pkg=...)
+	pip-compile -qP $(pkg) --output-file=requirements/local.txt requirements/local.in
+	pip-compile -qP $(pkg) --output-file=requirements/production.txt requirements/production.in
+	git diff requirements/
+
+pip-upgrade-all:  ## Compile new requirements files with latest possible versions of everything (be careful!)
+	pip-compile -qU --output-file=requirements/local.txt requirements/local.in
+	pip-compile -qU --output-file=requirements/production.txt requirements/production.in
+	git diff requirements/
 
 pip-sync:  ## Make the local installed packages reflect the ones in the local requirements
 	pip-sync requirements/local.txt
