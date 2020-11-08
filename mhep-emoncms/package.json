@@ -1,8 +1,0 @@
-{
-  "name": "MHEP Travis-CI",
-  "description": "Travis Continuous Integration for MyHomeEnergyPlanner",
-  "author": "Carbon Co-op",
-  "version": "0.0.1",
-  "devDependencies": {    
-  }
-}
