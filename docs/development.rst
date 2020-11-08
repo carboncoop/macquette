@@ -1,3 +1,6 @@
+Development notes
+=================
+
 Folder Layout
 -------------
 The repository includes the new Django application at `mhep` and the older PHP application at `mhep-emoncms`.
@@ -82,7 +85,7 @@ Before your first run, you will need to migrate the database.
 Setting Up Your Users
 ^^^^^^^^^^^^^^^^^^^^^
 
-* To create an **superuser account**, use this command::
+* To create an **superuser account**, use this command:
 
 .. code:: bash
 

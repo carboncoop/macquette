@@ -1,3 +1,5 @@
+Reports
+=======
 
 The 'reporting' used to be implemented as git submodules which were included in certain places and conditionally included.  This was because there were liability issues around the report contents - essentially, if a random householder used MHEP to produce their own report that uses Carbon Co-op text and surrounding info about methodology, then CC/Marianne is potentially liable if that information is incorrect!  So the liability issue was solved by moving things into git submodules that weren't part of the open-source project.  I wanted to remove git submodules because they are a PITA for making reliable atomic deployments (openfuvc was included this way too).
 

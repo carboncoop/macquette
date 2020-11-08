@@ -12,6 +12,8 @@ Table of Contents:
    :maxdepth: 2
 
    development
+   reports
+   notes_for_developers
 
 
 Websites

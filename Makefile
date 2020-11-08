@@ -1,7 +1,7 @@
 # Self-documenting makefile
 # https://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
 
-.PHONY: help
+.PHONY: help docs
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -48,3 +48,8 @@ upversion:  ## Mint a new version
 test:  ## Run tests and flake8
 	pytest --cov=mhep
 	flake8 mhep
+
+docs:  ## Build HTML docs (for other options run make in docs/)
+	make -C docs/ html
+	echo
+	echo "URL: file://`pwd`/docs/_build/html/index.html"
