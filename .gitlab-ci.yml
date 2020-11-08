@@ -34,6 +34,8 @@ test:
         - source venv/bin/activate
         - pip install -r requirements/local.txt
     script:
+        # Silence warnings
+        - mkdir staticfiles
         - pytest --cov=mhep
 
 pages:
