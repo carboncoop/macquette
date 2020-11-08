@@ -32,9 +32,9 @@ test:
         - pip install virtualenv
         - virtualenv venv
         - source venv/bin/activate
-        - pip install -r mhep/requirements/local.txt
+        - pip install -r requirements/local.txt
     script:
-        - cd mhep; pytest --cov=mhep
+        - pytest --cov=mhep
 
 pages:
     stage: docs
