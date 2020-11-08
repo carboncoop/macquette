@@ -30,11 +30,11 @@ pip-sync:  ## Make the local installed packages reflect the ones in the local re
 	pip-sync requirements/local.txt
 
 docker-up:  ## Bring up our local docker containers
-	docker-compose -f scripts/local.yml up --no-start
-	docker-compose -f scripts/local.yml start
+	docker-compose -p macquette -f scripts/local.yml up --no-start
+	docker-compose -p macquette -f scripts/local.yml start
 
 docker-down:  ## Shut down our local docker containers
-	docker-compose -f scripts/local.yml stop
+	docker-compose -p macquette -f scripts/local.yml stop
 
 docker-clean:  ## Clean system volumes (helpful for resetting broken databases)
 	docker system prune --volumes -f
