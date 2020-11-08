@@ -1,21 +1,19 @@
 version: '3'
 
 volumes:
-  local_postgres_data: {}
-  local_postgres_data_backups: {}
+  macquette_postgres_data: {}
 
 services:
   postgres:
     image: postgres:11
     volumes:
-      - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
+      - macquette_postgres_data:/var/lib/postgresql/data
     environment:
-        POSTGRES_USER: LmYWLIqTOZmyPvoPFgVnwgWCtJrSLjGQ
-        POSTGRES_PASSWORD: 4OcGftfvqhATVNtcc2pCtgKgTM73mKawUj2ovVlScwgvf9D38nqLzKEDB81OIbmc
-        POSTGRES_DB: hub
+        POSTGRES_USER: macquette
+        POSTGRES_PASSWORD: snapper-herald-gazumped-finesse
+        POSTGRES_DB: macquette
     ports:
-      - "5432:5432"
+      - "5400:5432"
 
   mailhog:
     image: mailhog/mailhog:v1.0.0
