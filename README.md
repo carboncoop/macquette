@@ -1,7 +1,7 @@
 # My Home Energy Planner (MHEP) Django
 
-[![Build Status](https://travis-ci.org/mhep-transition/mhep-django.svg?branch=master)](https://travis-ci.org/mhep-transition/mhep-django)
-[![Coverage Status](https://coveralls.io/repos/github/mhep-transition/mhep-django/badge.svg?branch=master)](https://coveralls.io/github/mhep-transition/mhep-django?branch=master)
+![Build status](https://gitlab.com/carboncoop/mhep/badges/master/pipeline.svg)
+![Coverage report](https://gitlab.com/carboncoop/mhep/badges/master/coverage.svg)
 
 Online developer docs: https://carboncoop.gitlab.io/mhep/index.html
 
