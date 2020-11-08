@@ -64,7 +64,7 @@ class TestShareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
         self._assert_error(
             response,
             status.HTTP_404_NOT_FOUND,
-            f"can't share library with non-existent organisation: id=9999",
+            "can't share library with non-existent organisation: id=9999",
         )
         assert self.library not in self.other_org.libraries_shared_with.all()
 
@@ -79,7 +79,7 @@ class TestShareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
         self._assert_error(
             response,
             status.HTTP_404_NOT_FOUND,
-            f"organisation doesn't have a library with id=9999",
+            "organisation doesn't have a library with id=9999",
         )
         assert self.library not in self.other_org.libraries_shared_with.all()
 
@@ -136,7 +136,7 @@ class TestUnshareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
         )
 
         self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, f"Organisation not found"
+            response, status.HTTP_404_NOT_FOUND, "Organisation not found"
         )
 
     def test_returns_404_if_other_organisation_id_doesnt_exist(self):
@@ -151,7 +151,7 @@ class TestUnshareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
         self._assert_error(
             response,
             status.HTTP_404_NOT_FOUND,
-            f"can't share library with non-existent organisation: id=9999",
+            "can't share library with non-existent organisation: id=9999",
         )
         assert self.library in self.other_org.libraries_shared_with.all()
 
@@ -167,7 +167,7 @@ class TestUnshareOrganisationLibrary(SetUpMixin, AssertErrorMixin, APITestCase):
         self._assert_error(
             response,
             status.HTTP_404_NOT_FOUND,
-            f"organisation doesn't have a library with id=9999",
+            "organisation doesn't have a library with id=9999",
         )
         assert self.library in self.other_org.libraries_shared_with.all()
 
@@ -195,7 +195,7 @@ class TestListOrganisationLibraryShares(SetUpMixin, AssertErrorMixin, APITestCas
         )
 
         self._assert_error(
-            response, status.HTTP_404_NOT_FOUND, f"Organisation not found"
+            response, status.HTTP_404_NOT_FOUND, "Organisation not found"
         )
 
     def test_returns_404_if_library_id_doesnt_exist(self):
@@ -207,5 +207,5 @@ class TestListOrganisationLibraryShares(SetUpMixin, AssertErrorMixin, APITestCas
         self._assert_error(
             response,
             status.HTTP_404_NOT_FOUND,
-            f"organisation doesn't have a library with id=999",
+            "organisation doesn't have a library with id=999",
         )

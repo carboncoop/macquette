@@ -92,7 +92,7 @@ class TestListLibraries(APITestCase):
 
         assert 3 == len(response.data)
 
-        retrieved_ids = [int(l["id"]) for l in response.data]
+        retrieved_ids = [int(row["id"]) for row in response.data]
 
         assert my_lib.id in retrieved_ids
         assert org_lib_1.id in retrieved_ids
@@ -108,7 +108,7 @@ class TestListLibraries(APITestCase):
 
         assert 1 == len(response.data)
 
-        retrieved_ids = [int(l["id"]) for l in response.data]
+        retrieved_ids = [int(row["id"]) for row in response.data]
 
         assert global_lib.id in retrieved_ids
 
@@ -129,7 +129,7 @@ class TestListLibraries(APITestCase):
 
         assert 1 == len(response.data)
 
-        retrieved_ids = [int(l["id"]) for l in response.data]
+        retrieved_ids = [int(row["id"]) for row in response.data]
 
         assert shared_lib.id in retrieved_ids
 

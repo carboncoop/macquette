@@ -5,7 +5,7 @@ import os
 
 os.environ["DJANGO_READ_DOT_ENV_FILE"] = "true"  # noqa
 from .base import *  # noqa
-from .base import env
+from .base import env  # noqa
 
 # GENERAL
 # ------------------------------------------------------------------------------

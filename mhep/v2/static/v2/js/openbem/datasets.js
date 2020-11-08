@@ -157,7 +157,7 @@ var datasets = {
             SAP_code: 30,
         },
         generation: {
-            category: "Generation",
+            category: 'Generation',
             standingcharge: 0,
             fuelcost: 0,
             co2factor: 0.136,

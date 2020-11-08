@@ -72,7 +72,10 @@ class Migration(migrations.Migration):
                 (
                     "report",
                     django.contrib.postgres.fields.jsonb.JSONField(
-                        default=dict, validators=[mhep.v2.validators.validate_dict,],
+                        default=dict,
+                        validators=[
+                            mhep.v2.validators.validate_dict,
+                        ],
                     ),
                 ),
                 ("created_at", models.DateTimeField(auto_now_add=True)),
@@ -155,7 +158,9 @@ class Migration(migrations.Migration):
                     ),
                 ),
             ],
-            options={"verbose_name_plural": "libraries",},
+            options={
+                "verbose_name_plural": "libraries",
+            },
         ),
         migrations.CreateModel(
             name="Image",

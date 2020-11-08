@@ -12,7 +12,8 @@ class Migration(migrations.Migration):
             model_name="organisation",
             name="report",
             field=django.contrib.postgres.fields.jsonb.JSONField(
-                default=dict, validators=[],
+                default=dict,
+                validators=[],
             ),
         )
     ]

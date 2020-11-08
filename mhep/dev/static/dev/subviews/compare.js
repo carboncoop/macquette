@@ -932,31 +932,31 @@ function get_storage_html(storage, compare_to) {
     const row = (heading, key, unit) => {
         const changed = compare_to != undefined && storage[key] != compare_to[key];
 
-        let text = `${heading}: ${storage[key]} ${unit?unit:""}`;
+        let text = `${heading}: ${storage[key]} ${unit?unit:''}`;
         if (changed) {
             text = `<b>${text}</b>`;
         }
 
         rows.push(text);
-    }
+    };
 
-    row("Storage volume", "storage_volume");
+    row('Storage volume', 'storage_volume');
 
     if (storage.declared_loss_factor_known) {
         rows.push("Manufacturer's declared loss factor: known");
-        row("Hot water storage loss factor", "manufacturer_loss_factor", "kWh/litre/day");
-        row("Temperature factor", "temperature_factor_a");
+        row('Hot water storage loss factor', 'manufacturer_loss_factor', 'kWh/litre/day');
+        row('Temperature factor', 'temperature_factor_a');
     } else {
         rows.push("Manufacturer's declared loss factor: not known");
-        row("Hot water storage loss factor", "loss_factor_b", "kWh/litre/day");
-        row("Volume factor", "volume_factor_b");
-        row("Temperature factor", "temperature_factor_b");
+        row('Hot water storage loss factor', 'loss_factor_b', 'kWh/litre/day');
+        row('Volume factor', 'volume_factor_b');
+        row('Temperature factor', 'temperature_factor_b');
     }
 
     return `
         <b>${storage.name}</b><br>
         <div style="padding-left: 15px">
-            ${rows.join("<br>")}
+            ${rows.join('<br>')}
         </div>`;
 }
 

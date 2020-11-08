@@ -10,7 +10,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="organisation", name="report",),
+        migrations.RemoveField(
+            model_name="organisation",
+            name="report",
+        ),
         migrations.AddField(
             model_name="organisation",
             name="report_template",

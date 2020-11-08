@@ -161,7 +161,7 @@ class ShareUnshareOrganisationLibraries(
             return Organisation.objects.get(id=other_org_id)
         except Organisation.DoesNotExist:
             raise exceptions.NotFound(
-                detail=f"can't share library with non-existent organisation: id=9999"
+                detail="can't share library with non-existent organisation: id=9999"
             )
 
     def post(self, request, pk, otherorgid, libraryid):
@@ -202,7 +202,7 @@ class ListOrganisationLibraryShares(GetOrganisationLibraryMixin, generics.ListAP
             shared_from_org = Organisation.objects.get(id=self.kwargs["pk"])
         except Organisation.DoesNotExist:
             raise exceptions.NotFound(
-                detail=f"can't list shares for non-existent organisation: id=9999"
+                detail="can't list shares for non-existent organisation: id=9999"
             )
 
         library = self._get_organisation_library(
