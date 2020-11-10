@@ -42,7 +42,7 @@ oauthlib==3.1.0           # via requests-oauthlib, social-auth-core
 odfpy==1.4.0              # via tablib
 openpyxl==3.0.2           # via tablib
 pillow==6.2.1             # via -r requirements/./base.in
-psycopg2-binary==2.8.3    # via -r requirements/production.in
+psycopg2-binary==2.8.3    # via -r requirements/./base.in
 pyasn1==0.4.8             # via python-jose, rsa
 pycparser==2.19           # via cffi
 pyjwt==1.7.1              # via social-auth-core

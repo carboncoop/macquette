@@ -2,6 +2,7 @@ pytz                  # https://github.com/stub42/pytz
 argon2-cffi           # https://github.com/hynek/argon2_cffi
 requests
 pillow
+psycopg2-binary       # https://github.com/psycopg/psycopg2
 
 # Django
 # ------------------------------------------------------------------------------
