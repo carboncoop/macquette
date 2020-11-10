@@ -1,13 +1,11 @@
-
-
 Design decisions
-----------------
+================
 
 Here we document some decisions and principles we worked to while
 carrying out the port from emoncms.
 
 Prefer static files over Django templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+-----------------------------------------
 
 Previously, most app logic was implemented in Javascript, but there were
 a number of places where things were rendered by PHP. We almost
@@ -23,13 +21,12 @@ There were 2 notable places we *had* to use Django template functions:
    (for imports) and by Javascript (for dynamic loading of scripts). For
    the 2nd case, we created ``urlHelper.static(..)`` - a JS function
    which hides the use of ``{% static %}`` in a single place.
-
 2. The ``{% url %}`` (AKA ``reverse``) template tag, for deriving the
    URL of an API endpoint. Again, we created ``urlHelper.api.*()``
    functions to wrap and hide the use of Django’s template language.
 
 Define relationships in the API (hide from frontend)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------------------
 
 The *data model* of the app - the relationships between assessments,
 users, organisations and libraries - is defined in Django’s models,
@@ -63,7 +60,7 @@ organisation - so the frontend code doesn’t need to understand the
 current user’s roles directly.
 
 Frontend: prefer cloning DOM templates
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------
 
 In the absence of a modern framework like React, the app manually
 manipulates the DOM. This means that code and presentation are mixed up
@@ -101,43 +98,3 @@ Rather than outputting table rows like this:
 
 This way means you can look at the HTML and more easily understand how
 the DOM is supposed to look.
-
-Working with app versions
--------------------------
-
-The app is fully versioned at the Django application level, with names
-like ``v1``, ``v2`` etc.
-
-Different app versions live under a URL prefix e.g. ``/v1/``.
-
-App versions are highly isolated, meaning each version has its own:
-
--  templates & static assets
--  URL schema (including API URLs)
--  database models
-
-Starting a new app version
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To start working on a new version of the app, cd into ``./mhep`` and run
-the script
-```upversion.sh`` <https://github.com/mhep-transition/mhep-django/blob/master/mhep/upversion.sh>`__
-and set the new version as ``dev``.
-
-The script copies an app version to a new version, for example, going
-from ``v1`` to ``dev``:
-
--  copy-pastes the whole directory ``mhep/mhep/v1`` to
-   ``/mhep/mhep/dev``
--  renames the ``static/v1`` and ``templates/v1`` subdirectories
--  adds the new ``dev`` app to Django’s ``LOCAL_APPS`` setting and
-   ``urls.py``
--  modifies the ``dev/fixtures/*.json`` files with the updated app label
-
-Finalising an app version
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-When the ``dev`` app is finished it should be renamed to e.g. ``v2``.
-
-Once an app is assigned a version number its code should never be
-modified again.

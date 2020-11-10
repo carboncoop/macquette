@@ -1,109 +1,103 @@
+Getting started
+===============
 
+The repository is set up with a development environment that uses Docker
+to provide a PostgreSQL database so you don't have to set one up
+yourself. It doesn't use Docker to run the app itself though.
 
-Settings
---------
+Installing system dependencies
+------------------------------
 
-Moved to settings_.
+You will need:
 
-.. _settings: http://cookiecutter-django.readthedocs.io/en/latest/settings.html
+-  Docker <https://www.docker.com/>, with Compose
+   <https://docs.docker.com/compose/install/>
+-  Python 3.7 and pip <https://pip.pypa.io/en/stable/installing/>
+-  GNU make
 
-Basic Commands
---------------
+Debian / Ubuntu
+~~~~~~~~~~~~~~~
 
-Setting Up Your Users
-^^^^^^^^^^^^^^^^^^^^^
+``apt install docker.io docker-compose make python3.7``
 
-* To create a **normal user account**, just go to Sign Up and fill out the form. Once you submit it, you'll see a "Verify Your E-mail Address" page. Go to your console to see a simulated email verification message. Copy the link into your browser. Now the user's email should be verified and ready to go.
+Make sure your user is in the ``docker`` group, by running
+``sudo usermod -a -G docker <username>``.
 
-* To create an **superuser account**, use this command::
+Setting up your Python environment
+----------------------------------
 
-    $ python manage.py createsuperuser
+bash shell
+~~~~~~~~~~
 
-For convenience, you can keep your normal user logged in on Chrome and your superuser logged in on Firefox (or similar), so that you can see how the site behaves for both kinds of users.
+Here's a recipe for using ``virtualenvwrapper`` to manage your Python
+environments. If you're not sure what this means, RealPython has a
+`solid article about Python virtualenvs <https://realpython.com/python-virtual-environments-a-primer/>`_.
 
-Type checks
-^^^^^^^^^^^
+First, follow virtualenvwrapper's `installation
+instructions <https://virtualenvwrapper.readthedocs.io/en/latest/install.html>`__.
 
-Running type checks with mypy:
+To create a new virtual environment, run:
 
-::
+.. code:: bash
 
-  $ mypy mhep
+   mkvirtualenv -a . -p /usr/bin/python3.7 cc-macquette
 
-Test coverage
-^^^^^^^^^^^^^
+Your new virtualenv will be activated. To reactivate later, use 'workon
+cc-macquette'.
 
-To run the tests, check your test coverage, and generate an HTML coverage report::
+Fish shell
+~~~~~~~~~~
 
-    $ coverage run -m pytest
-    $ coverage html
-    $ open htmlcov/index.html
+First create a python virtual environment. Using
+`Virtual Fish <https://github.com/justinmayer/virtualfish>`_, run:
 
-Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+.. code:: bash
 
-::
+   vf new cc-macquette
+   vf connect
 
-  $ pytest
+Set up and run Macquette
+------------------------
 
-Live reloading and Sass CSS compilation
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. code:: bash
 
-Moved to `Live reloading and SASS compilation`_.
+   pip install pip-tools             # Install pip-tools to manage dependencies
+   make pip-sync                     # Install our Python dependencies
+   cp .example.env .env              # Set up env vars for local dev
+   pre-commit install                # Set up pre-commit code linters
+   make docker-up                    # Start postgres docker container
+   python manage.py migrate          # Migrate the database
+   python manage.py createsuperuser  # Create a user account
+   make dev                          # Bring up Macquette
 
-.. _`Live reloading and SASS compilation`: http://cookiecutter-django.readthedocs.io/en/latest/live-reloading-and-sass-compilation.html
+What is happening here?
+~~~~~~~~~~~~~~~~~~~~~~~
 
-
-
-
-Email Server
-^^^^^^^^^^^^
-
-In development, it is often nice to be able to see emails that are being sent from your application. For that reason local SMTP server `MailHog`_ with a web interface is available as docker container.
-
-Container mailhog will start automatically when you will run all docker containers.
-Please check `cookiecutter-django Docker documentation`_ for more details how to start all containers.
-
-With MailHog running, to view messages that are sent by your application, open your browser and go to ``http://127.0.0.1:8025``
-
-.. _mailhog: https://github.com/mailhog/MailHog
-
-
-
-Sentry
-^^^^^^
-
-Sentry is an error logging aggregator service. You can sign up for a free account at  https://sentry.io/signup/?code=cookiecutter  or download and host it yourself.
-The system is setup with reasonable defaults, including 404 logging and integration with the WSGI application.
-
-You must set the DSN url in production.
-
-
-Deployment
-----------
-
-The following details how to deploy this application.
-
-
-
-Docker
-^^^^^^
-
-See detailed `cookiecutter-django Docker documentation`_.
-
-.. _`cookiecutter-django Docker documentation`: http://cookiecutter-django.readthedocs.io/en/latest/deployment-with-docker.html
-
-
-
-Custom Bootstrap Compilation
-^^^^^^
-
-The generated CSS is set up with automatic Bootstrap recompilation with variables of your choice.
-Bootstrap v4 is installed using npm and customised by tweaking your variables in ``static/sass/custom_bootstrap_vars``.
-
-You can find a list of available variables `in the bootstrap source`_, or get explanations on them in the `Bootstrap docs`_.
-
-
-
-.. _in the bootstrap source: https://github.com/twbs/bootstrap/blob/v4-dev/scss/_variables.scss
-.. _Bootstrap docs: https://getbootstrap.com/docs/4.1/getting-started/theming/
+-  We use ``pip-tools`` to manage our Python dependencies so that we
+   keep the same versions between local development and production.
+-  Many common tasks are kept in our Makefile so you don't have to
+   remember CLI incantations. It's also a self-documenting Makefile -so
+   to see what commands are available, just type ``make`` and you will
+   see a list of available tasks.
+-  The tool ``pip-sync`` is part of the tools, and it will make sure
+   that the Python packages installed locally exactly match those
+   specified in a given file. In this case, we run it via the Makefile
+   which means we don't have to type out the full command.
+-  In local development, Macquette looks for settings in a ``.env`` file
+   in the project root. Without one of these, it doesn't know where to
+   find the database.
+-  We use `pre-commit <https://pre-commit.com/>`__ to run various
+   linters and code quality checks on commit. We also run it as part of
+   our CI.
+-  ``make docker-up`` sets up our Docker environment. At the moment this
+   is just PostgreSQL, which is run using a ``docker-compose`` file
+   stored in ``scripts/``. This file tells Docker what username,
+   password and database to use. These credentials match the ones in
+   .example.env.
+-  The Django framework gives us for database migrations. manage.py is
+   the standard CLI interface to Django tools, and its migrate command
+   runs all migrations that aren't already run (which in this case is
+   all of them). The database is ready after this.
+-  You need a user or you can't use the app!
+-  ``make dev`` is again a shortcut that makes sure that our Docker
+   containers are running and runs Macquette.
