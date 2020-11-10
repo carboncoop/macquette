@@ -14,9 +14,3 @@ services:
         POSTGRES_DB: macquette
     ports:
       - "5400:5432"
-
-  mailhog:
-    image: mailhog/mailhog:v1.0.0
-    ports:
-      - "8025:8025"
-      - "1025:1025"
