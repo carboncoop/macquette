@@ -571,7 +571,8 @@
 
         $("#saving_status").text("Saving...");
 
-        mhep_helper.set(projectid, project, function (err, result) {
+        const inputs = extract_assessment_inputs(project);
+        mhep_helper.set(projectid, inputs, function (err, result) {
             if (err) {
                 $("#saving_status").text("Failed to save");
             } else {
