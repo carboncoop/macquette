@@ -50,14 +50,13 @@ var mhep_helper = {
     },
     'create': function (name, description, orgid, callback) {
         var result = 0;
-        // TODO: Link this version of openBEM to the app, don't hard code it like this.
         const newAssessment = {
             'name': name,
             'description': description,
         };
 
         var endpoint;
-        if (orgid != null) {
+        if (orgid > 0) {
             endpoint = urlHelper.api.organisationAssessments(orgid);
         } else {
             endpoint = urlHelper.api.assessments();
