@@ -354,7 +354,7 @@
         // Disable measures if master
         show_hide_if_master();
 
-        update(false, false);
+        update();
     });
     $("#openbem").on("change", '[key]', function () {
         if (data.locked == true && page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary')
@@ -384,7 +384,7 @@
               redraw_scenario_menu();
             }
         }
-        update(false, false);
+        update();
     });
     $(window).on('hashchange', function () {
         load_page_from_hash();
@@ -545,7 +545,7 @@
     //*************
     // Functions
     //*************
-    function update(undo_redo = false, reload_menu = false) {
+    function update(undo_redo = false) {
         // We need to calculate the periods of heating off here because if we try to do it in household.js it happens after the update
         if (project.master.household != undefined) {
             for (var s in project) { // we ensure all the scenarios have the same household data and heating off periods
