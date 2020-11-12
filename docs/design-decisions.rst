@@ -4,6 +4,8 @@ Design decisions
 Here we document some decisions and principles we worked to while
 carrying out the port from emoncms.
 
+.. _design--static-files:
+
 Prefer static files over Django templates
 -----------------------------------------
 
@@ -48,7 +50,7 @@ librarians.
 But that would be duplicating the logic. Instead we chose to implement
 ``permissions`` on the organisation list endpoint:
 
-.. code:: json
+.. code::
 
    "permissions": {
        "can_add_remove_members": true,
@@ -94,7 +96,7 @@ Rather than outputting table rows like this:
    newRow.removeAttr('id');
 
    newRow.find('.foo-button').html(x.name);
-   newRow.show()
+   newRow.show();
 
 This way means you can look at the HTML and more easily understand how
 the DOM is supposed to look.

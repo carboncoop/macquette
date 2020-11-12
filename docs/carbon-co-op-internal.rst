@@ -17,16 +17,14 @@ How to deploy to the production site: you need to do this manually from
 AWS Elastic Beanstalk. Wait until the staging deploy has finished, then
 go to the mhep-production environment and it's 'change version' or
 'choose version', something like that. Then just deploy the same thing
-that's deployed on staging.
+that's deployed on staging.  This is a fairly rarely rare occurance so
+not worth automating.
 
-Sentry
-------
+Reports
+-------
 
-Sentry has a lot of JS errors from MHEP but from what I've seen they're
-not showstoppers, and a lot of them have probably been there for years.
-I think there are marginal gains in trying to fix them one by one
-because they're caused really by poorly-defined data structures. I'm
-don't think local fixes of adding "x !== undefined" checks everywhere
-really address the cause of the issue... in the medium term I wanted to
-experiment with using TypeScript to try and catch these kinds of bugs in
-a structured way.
+Carbon Co-op specific reports are held in a private repo on GitLab.
+
+Each organisation has its own report; CAfS for example has a very
+straightforward copy of CC's with few alterations. Futureproof Bristol
+doesn't have a report template yet.

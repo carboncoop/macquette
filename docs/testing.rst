@@ -6,4 +6,4 @@ Django. The backend API has high test coverage.
 
 There is a UI testsuite but it's not up to date and no-one's tried to
 run it in a while. It was designed to help port the backend from PHP to
-Python.
+Python.  It can be found at https://github.com/carboncoop/mhep-emoncms-vagrant.
