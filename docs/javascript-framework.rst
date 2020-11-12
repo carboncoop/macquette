@@ -82,10 +82,10 @@ inside ``mhep``.
       library-helper/   # Library management JS + HTML (gnarly)
       openbem/          # Building physics model/calculator
       openFUVC/         # Floor :ref:`term-u-value` calculator; used to separate repo
-      library-r6.js     # A single extended library item; a hack
-      mhep-helper.js    # API communication module
-      ui-helper-r3.js   # Various miscellaneous JS
-      ui-mhep.js        # Draws the house and some bar graphs
+      extended-library-items.js   # A single extended library item; a hack
+      api.js            # API communication module
+      misc.js           # Some of the JS framework
+      graphics.js       # Draws the house and some bar graphs
 
     subviews/        # Pairs of files containing HTML + JS for each view
       [name].{js,html}
