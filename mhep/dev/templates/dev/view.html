@@ -76,7 +76,7 @@
             <p style="margin-bottom: 0">
                 <b><span id="project-title"></span></b><br>
                 <span id="project-description"></span><br>
-                Author: <span id="project-author"></span>
+                <span style="font-style: italic;" id="project-author"></span>
             </p>
         </div>
 
@@ -265,10 +265,6 @@
 
     var p = mhep_helper.get(projectid);
 
-    $("#project-title").html(p.name);
-    $("#project-description").html(p.description);
-    $("#project-author").html(p.author);
-
     if (p.data == false || p.data == null || Object.keys(p.data).length == 0)
         p.data = {'master': { scenario_name: 'Baseline'}};
 
@@ -328,7 +324,19 @@
         }, 1);
     }
 
+    // Don't show reports to people who can't issue reports to avoid
+    // confusion
+    if (!p.organisation) {
+        $('[href="#master/report"]').hide();
+    }
 
+    $("#project-title").html(p.name);
+    $("#project-description").html(p.description);
+    if (p.organisation) {
+        $("#project-author").html(`${p.author}, ${p.organisation.name}`);
+    } else {
+        $("#project-author").html(`by ${p.author}`);
+    }
 
     //**********
     // Events
