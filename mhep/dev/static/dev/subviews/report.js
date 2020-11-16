@@ -49,15 +49,15 @@ class Report {
             reportPreviewFrame: document.querySelector('iframe'),
         };
 
-        this.organsations = [];
-        mhep_helper.list_organisations()
-            .then(orgs => this.organisations = orgs)
-            .then(() => this.draw_organisations());
-
+        this.get_template();
         this.draw_scenarios();
 
         this.element.generateReport.addEventListener('click', () => {
-            this.render_report();
+            this.element.reportPreview.style.display = 'block';
+            report_show(
+                this.element.reportPreviewFrame.contentDocument.querySelector('body'),
+                this.report_template
+            );
         });
 
         this.element.printReport.addEventListener('click', () => {
@@ -66,28 +66,12 @@ class Report {
         });
     }
 
-    draw_organisations() {
-        if (this.organisations.length === 0) {
-            document.querySelector('#organisation-choices').innerHTML = "Reports belong to organisations, and you are not in any organisations, so you can't generate reports.";
-            return;
-        }
-
-        this.organisations[0].checked = true;
-
-        let html = this.organisations
-            .map(org =>`
-                <li>
-                    <input type="radio"
-                           name="report-organisation"
-                           value="${org.id}"
-                           class="big-checkbox"
-                           id="org-choice-${org.id}"
-                           ${org.checked ? 'checked': ''}>
-                    <label class="d-i" for="org-choice-${org.id}">${org.name}</label>
-                </li>`)
-            .join('');
-
-        document.querySelector('#organisation-choices').innerHTML = html;
+    get_template() {
+        mhep_helper.list_organisations()
+            .then(orgs => {
+                let f = orgs.find(e => e.id == p.organisation.id);
+                this.report_template = f.report_template;
+            });
     }
 
     draw_scenarios() {
@@ -118,25 +102,6 @@ class Report {
         }
 
         document.querySelector('#scenario-choices').innerHTML = scenarioOpts;
-    }
-
-    render_report() {
-        const selected = document.querySelector('input[name=report-organisation]:checked');
-        if (!selected) {
-            return;
-        }
-
-        const selected_id = selected.value;
-        const org = this.organisations.find(e => e.id === selected_id);
-        if (!org) {
-            this.element.reportPreview.style.display = 'none';
-        } else {
-            this.element.reportPreview.style.display = 'block';
-            report_show(
-                this.element.reportPreviewFrame.contentDocument.querySelector('body'),
-                org.report_template
-            );
-        }
     }
 }
 
