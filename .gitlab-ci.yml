@@ -29,7 +29,8 @@ test:
         - pip install virtualenv
         - virtualenv venv
         - source venv/bin/activate
-        - pip install -r requirements/local.txt
+        - pip install pip-tools
+        - pip-sync requirements/local.txt
     script:
         # Silence warnings
         - mkdir staticfiles
