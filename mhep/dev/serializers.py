@@ -138,6 +138,7 @@ class AssessmentFullSerializer(ImagesMixin, AssessmentMetadataSerializer):
             "updated_at",
             "author",
             "userid",
+            "organisation",
             "mdate",
             "images",
             "data",

@@ -157,6 +157,7 @@ class TestGetAssessment(APITestCase):
             "description": "test description",
             "author": self.me.username,
             "userid": f"{self.me.id}",
+            "organisation": None,
             "images": [
                 {
                     "id": i.id,
@@ -190,6 +191,7 @@ class TestGetAssessment(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
             "name": "test name",
+            "organisation": None,
             # defaults:
             "description": "",
             "author": self.me.username,
