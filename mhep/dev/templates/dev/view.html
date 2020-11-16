@@ -240,21 +240,15 @@
 
 <script>
 
-    //$('#openBem-model').load("https://cdn.jsdelivr.net/gh/carboncoop/openBEM@10.1.0/openBEM.js");
-    /*$.holdReady(true);
-     $.getScript("https://cdn.jsdelivr.net/gh/carboncoop/openBEM@10.1.0/openBEM.js", function () {
-     $.holdReady(false);
-     });*/
-
     //************
     // Variables
     //************
     var changelog = "";
     var selected_library = -1;
     var selected_library_tag = "Wall";
-    var page = undefined;
+    var page;
+    var scenario;
     var locked = {{ locked_javascript }}; // populated via Django template
-    scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
     var data = {};
     var keys = {};
 
@@ -703,17 +697,24 @@
         }
     }
     function load_page_from_hash() {
-        var tmp = (window.location.hash).substring(1).split('/');
-        page = tmp[1];
-        scenario = tmp[0];
+        let oldPage = page;
+        let oldScenario = scenario;
 
-        if (!scenario)
-            scenario = "master";
-        if (!page)
-            page = "context";
+        var tmp = (window.location.hash).substring(1).split('/');
+        page = tmp[1] || "context";
+        scenario = tmp[0] || "master";
 
         if (project[scenario] == undefined)
             scenario = 'master';
+
+        if (oldPage === page && oldScenario === scenario) {
+            return;
+        }
+
+        // Unload previous view
+        if (oldPage && oldScenario) {
+            UnloadUI();
+        }
 
         data = project[scenario];
 

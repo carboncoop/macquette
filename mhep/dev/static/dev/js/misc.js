@@ -160,6 +160,14 @@ function InitUI() {
     }
 }
 
+function UnloadUI() {
+    // Call page specific updateui function
+    var functionname = page + '_UnloadUI';
+    if (window[functionname] != undefined) {
+        window[functionname]();
+    }
+}
+
 function UpdateUI(data) {
     // Call page specific updateui function
     var functionname = page + '_UpdateUI';

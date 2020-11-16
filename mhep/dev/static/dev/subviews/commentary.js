@@ -10,7 +10,6 @@ function commentary_initUI() {
     }
     scenarios.sort();
 
-    // Add overviews
     for (let s of scenarios) {
         let scenario = project[s];
         $('#overviews').append('<div id="overview-' + s + '" class="overview"></div>');
@@ -19,7 +18,6 @@ function commentary_initUI() {
         draw_openbem_graphics('#overview-' + s);
     }
 
-    // Add overviews
     for (let scenario_name of scenarios) {
         const scenario = project[scenario_name];
         const root = document.importNode(document.getElementById('scenario-template').content, true);
@@ -50,6 +48,10 @@ function commentary_initUI() {
     data = project['master'];
 }
 
-$('#openbem textarea').on('input', function(e) {
-    $(this).trigger('change');
-});
+function commentary_UnloadUI() {
+    // https://gitlab.com/carboncoop/mhep/-/issues/522 was a dataloss bug - if
+    // you navigated away from the page using the sidebar before bluring the
+    // textarea, its content would be lost.
+    // This is a bit of a hack around that.
+    $('#openbem textarea').trigger('change');
+}
