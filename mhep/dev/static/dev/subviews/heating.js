@@ -521,10 +521,9 @@ function add_heating_systems() {
 
 }
 function add_storage() {
-    $('#type_of_storage').html('');
     var st = data.water_heating.storage_type;
     if (st == undefined) {
-        $('#type_of_storage').append('<tr><th>Type of storage <span class="select-type-of-storage-from-lib" style="cursor:pointer"><button class="btn" style="margin-left: 20px"> Add from library</button></span></th></tr>');
+        $('#type_of_storage').html('<button class="btn select-type-of-storage-from-lib"><i class="icon-plus if-not-locked"></i> Add water storage</button>');
     } else {
         var specific_header = '';
         var specific_st_info = '';
@@ -535,8 +534,39 @@ function add_storage() {
             specific_header = '<th>Loss factor b</th><th>Volume factor b</th><th>Temperature factor b</th>';
             specific_st_info = '<td>' + st.loss_factor_b + '</td><td>' + st.volume_factor_b + '</td><td>' + st.temperature_factor_b + '</td>';
         }
-        $('#type_of_storage').append('<tr><th>Type of storage </th><th>Volume</th>' + specific_header + '<th>Inside dwelling?</th><th style="width:150px">Contains dedicated solar storage or WWHRS volume? <i class="icon-question-sign" title="WWHRS: Waste Water Heat Recovery" /></th><th></th></tr>');
-        $('#type_of_storage').append('<tr><td>' + st.tag + ': ' + st.name + '</td><td>' + st.storage_volume + '</td>' + specific_st_info + '<td><input type="checkbox" key="data.water_heating.hot_water_store_in_dwelling" /></td><td><input style="width:54px" type="number" min="0" key="data.water_heating.contains_dedicated_solar_storage_or_WWHRS" /> litres</td><td style="width:200px"><span class="delete-storage" style="cursor:pointer" title="Deleting an element this way is not considered a Measure"><a> <i class="icon-trash"></i></a></span><span class="select-type-of-storage-from-lib if-master" style="cursor:pointer"><button class="btn" style="margin-left: 20px"> Replace from library</button></span><span class="apply-water-heating-measure if-not-master" type="storage_type_measures" style="cursor:pointer"><button class="btn" style="margin-left: 20px"> Apply measure</button></span><p id="storage-type-measure-applied" style="margin:10px 40px; display:none">Measure applied</p></td></tr>');
+        $('#type_of_storage').html(`
+            <table class="table" id="type_of_storage">
+                <tr>
+                    <th>Type of storage</th>
+                    <th>Volume</th>
+                    ${specific_header}
+                    <th>Inside dwelling?</th>
+                    <th style="width:150px">Contains dedicated solar storage or <abbr title="WWHRS: Waste Water Heat Recovery">WWHRS</abbr> volume?</th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>${st.tag}: ${st.name}</td>
+                    <td>${st.storage_volume}</td>
+                    ${specific_st_info}
+                    <td>
+                        <input type="checkbox" key="data.water_heating.hot_water_store_in_dwelling" />
+                    </td>
+                    <td>
+                        <input style="width:54px" type="number" min="0" key="data.water_heating.contains_dedicated_solar_storage_or_WWHRS" /> litres
+                    </td>
+                    <td style="width:200px">
+                        <button class="btn delete-storage" title="Deleting an element this way is not considered a Measure">
+                            <i class="icon-trash"></i>
+                        </button>
+                        <button class="btn select-type-of-storage-from-lib if-master">Replace from library</button>
+                        <button class="btn apply-water-heating-measure if-not-master" type="storage_type_measures">Apply measure</button>
+
+                        <p id="storage-type-measure-applied" style="display:none">
+                            Measure applied
+                        </p>
+                    </td>
+                </tr>
+            </table>`);
     }
 
 }
