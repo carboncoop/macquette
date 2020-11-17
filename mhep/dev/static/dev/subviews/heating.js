@@ -221,7 +221,7 @@ $('#openbem').on('click', '#apply-measure-water-heating-ok', function () {
             if (data.measures.water_heating[library_helper.type].original == undefined) {
                 data.measures.water_heating[library_helper.type].original = data.water_heating.storage_type;
             }
-            var measure = library_helper.storage_type_get_item_to_save();
+            var measure = library_helper.storage_type_measures_get_item_to_save();
             for (z in measure) {
                 var tag = z;
             }
@@ -527,7 +527,10 @@ function add_heating_systems() {
 function add_storage() {
     var st = data.water_heating.storage_type;
     if (st == undefined) {
-        $('#type_of_storage').html('<button class="btn select-type-of-storage-from-lib"><i class="icon-plus if-not-locked"></i> Add water storage</button>');
+        $('#type_of_storage').html(`
+            <button class="btn select-type-of-storage-from-lib if-master"><i class="icon-plus if-not-locked"></i> Add water storage</button>
+            <button class="btn apply-water-heating-measure if-not-master" type="storage_type_measures"><i class="icon-plus if-not-locked"></i> Add water storage measure</button>
+        `);
     } else {
         var specific_header = '';
         var specific_st_info = '';
