@@ -359,6 +359,10 @@ $('#openbem').on('click', '.add-storage-type ', function () {
     heating_initUI();
 });
 $('#openbem').on('click', '.delete-storage', function () {
+    if (!window.confirm('Deleting an element is not considered a measure.  Really delete?')) {
+        return;
+    }
+
     delete data.water_heating.storage_type;
     console.log('hola');
     update();
@@ -555,7 +559,7 @@ function add_storage() {
                         <input style="width:54px" type="number" min="0" key="data.water_heating.contains_dedicated_solar_storage_or_WWHRS" /> litres
                     </td>
                     <td style="width:200px">
-                        <button class="btn delete-storage" title="Deleting an element this way is not considered a Measure">
+                        <button class="btn delete-storage">
                             <i class="icon-trash"></i>
                         </button>
                         <button class="btn select-type-of-storage-from-lib if-master">Replace from library</button>
