@@ -42,6 +42,7 @@ $("[key='data.ventilation.air_permeability_test']").change(function () {
     }
 
 });
+
 $('#openbem').on('click', '.add-ventilation-system-from-lib', function () {
     library_helper.init();
     library_helper.type = 'ventilation_systems';
@@ -494,6 +495,28 @@ function ventilation_initUI() {
             $('.CDF-measure-applied[item_id=' + id + ']').show();
         }
     }
+
+    if (data.num_of_floors_override) {
+        $('.storey-assumed').hide();
+        $('.storey-override').show();
+    } else {
+        $('.storey-assumed').show();
+        $('.storey-override').hide();
+    }
+
+    $("[data-action='storey-override']").on('click', function() {
+        data.num_of_floors_override = data.num_of_floors;
+        $('[key="data.num_of_floors_override"]').val(data.num_of_floors_override);
+        $('.storey-assumed').hide();
+        $('.storey-override').show();
+    });
+
+    $("[data-action='storey-revert']").on('click', function() {
+        delete data.num_of_floors_override;
+        update();
+        $('.storey-assumed').show();
+        $('.storey-override').hide();
+    });
 
     show_hide_if_master();
 }

@@ -545,7 +545,8 @@ calc.ventilation = function (data) {
     }
 
     // Strucutral infiltration
-    data.ventilation.structural_infiltration = (data.num_of_floors - 1) * 0.1;
+    const num_of_floors = data.num_of_floors_override ? data.num_of_floors_override : data.num_of_floors;
+    data.ventilation.structural_infiltration = (num_of_floors - 1) * 0.1;
     if (data.ventilation.dwelling_construction == 'timberframe') {
         data.ventilation.structural_infiltration += 0.25;
     }
