@@ -810,3 +810,40 @@ function _extract_scenario_inputs(data) {
 
     return inputdata;
 }
+
+
+
+/** Some debugging helpers **/
+
+function lines(obj, prefix = '.') {
+    return Object.entries(obj).flatMap(([ k, v ]) => {
+        if (typeof v === 'object' && v !== null ) {
+            return lines(v, prefix + k + '.');
+        } else {
+            return { key: `${prefix}${k}`, value: v };
+        }
+    });
+}
+
+function diff(left, right) {
+    const lleft = lines(left);
+    const lright = lines(right);
+    const mleft = new Map(lleft.map(e => [ e.key, e.value ]));
+    const mright = new Map(lright.map(e => [ e.key, e.value ]));
+    const allKeys = new Set(lleft.concat(lright).map(e => e.key));
+
+    for (let e of allKeys) {
+        const lval = mleft.get(e);
+        const rval = mright.get(e);
+        const bothNaN = typeof lval == 'number' && typeof rval == 'number' && isNaN(lval) && isNaN(rval);
+
+        if (lval !== rval && !bothNaN) {
+            if (lval !== undefined) {
+                console.log(`- ${e} = ${lval}`);
+            }
+            if (rval !== undefined) {
+                console.log(`+ ${e} = ${rval}`);
+            }
+        }
+    }
+}
