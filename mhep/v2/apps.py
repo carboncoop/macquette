@@ -6,4 +6,4 @@ from . import VERSION
 class AssessmentsConfig(AppConfig):
     name = f"mhep.{VERSION}"
     verbose_name = f"Assessments {VERSION}"
-    release_date = "February 2020"
+    release_date = "November 2020"

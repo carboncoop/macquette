@@ -1150,6 +1150,8 @@
                     <option value="LOW">Too cold</option>
                     <option value="MID">Just right</option>
                     <option value="HIGH">Too hot</option>
+                    <option value="DK">Don't know</option>
+                    <option value="NA">Not applicable</option>
                 </select>
             </td>
             <td><select class="mb-0" key="data.household.comfort_temperature_summer">
@@ -1157,6 +1159,8 @@
                     <option value="LOW">Too cold</option>
                     <option value="MID">Just right</option>
                     <option value="HIGH">Too hot</option>
+                    <option value="DK">Don't know</option>
+                    <option value="NA">Not applicable</option>
                 </select>
             </td>
         </tr>
@@ -1168,12 +1172,16 @@
                     <option value="LOW">Too dry</option>
                     <option value="MID">Just right</option>
                     <option value="HIGH">Too stuffy</option>
+                    <option value="DK">Don't know</option>
+                    <option value="NA">Not applicable</option>
                 </select></td>
             <td><select class="mb-0" key="data.household.comfort_airquality_summer">
                     <option value="">Select...</option>
                     <option value="LOW">Too dry</option>
                     <option value="MID">Just right</option>
                     <option value="HIGH">Too stuffy</option>
+                    <option value="DK">Don't know</option>
+                    <option value="NA">Not applicable</option>
                 </select></td>
         </tr>
 
@@ -1184,12 +1192,16 @@
                     <option value="LOW">Too draughty</option>
                     <option value="MID">Just right</option>
                     <option value="HIGH">Too still</option>
+                    <option value="DK">Don't know</option>
+                    <option value="NA">Not applicable</option>
                 </select></td>
             <td><select class="mb-0" key="data.household.comfort_draughts_summer">
                     <option value="">Select...</option>
                     <option value="LOW">Too draughty</option>
                     <option value="MID">Just right</option>
                     <option value="HIGH">Too still</option>
+                    <option value="DK">Don't know</option>
+                    <option value="NA">Not applicable</option>
                 </select></td>
         </tr>
     </table>
@@ -1229,6 +1241,7 @@
             <option value="LOW">Too little</option>
             <option value="MID">Just right</option>
             <option value="HIGH">Too much</option>
+            <option value="VAR">Variable</option>
         </select>
     </div>
 
@@ -1452,7 +1465,7 @@
             </div>
         </div>
 
-        <div class="form-row mb-0">
+        <div class="form-row">
             <label class="form-row-label" for="flooding_surface_water">Surface water</label>
             <div class="form-row-control">
                 <select class="mb-0" key="data.household.flooding_surface_water" id="flooding_surface_water">
@@ -1461,6 +1474,17 @@
                     <option value="MED">Medium</option>
                     <option value="LOW">Low</option>
                     <option value="VLOW">Very low</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-row mb-0">
+            <label class="form-row-label" for="flooding_reservoirs">Reservoirs</label>
+            <div class="form-row-control">
+                <select class="mb-0" key="data.household.flooding_reservoirs" id="flooding_reservoirs">
+                    <option value="">Select...</option>
+                    <option value="WITHIN">within potential extent of flooding from reservoir</option>
+                    <option value="OUTWITH">not within potential extent of flooding from reservoir</option>
                 </select>
             </div>
         </div>

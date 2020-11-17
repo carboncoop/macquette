@@ -1960,7 +1960,7 @@ libraryHelper.prototype.pipework_insulation_library_to_html_edit_mode = function
             out += '<td index="name" title="' + item.name + '"><input class="w350" type="text" value="' + item.name + '" /></td>';
             out += '<td index="SELECT"><select class="w200" value="' + item.SELECT + '">';
             out += item.SELECT == 'First 1m from cylinder insulated' ? '<option value="First 1m from cylinder insulated" selected>First 1m from cylinder insulated</option>' : '<option value="First 1m from cylinder insulated">First 1m from cylinder insulated</option>';
-            out += item.SELECT == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible piperwok insulated</option>' : '<option value="All accesible piperwok insulated">All accesible piperwok insulated</option>';
+            out += item.SELECT == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible pipework insulated</option>' : '<option value="All accesible piperwok insulated">All accesible pipework insulated</option>';
             out += item.SELECT == 'Fully insulated primary pipework' ? '<option value="Fully insulated primary pipework" selected>Fully insulated primary pipework</option>' : '<option value="Fully insulated primary pipework">Fully insulated primary pipework</option>';
             out += '</select></td>';
             out += '<td index="source" title="' + item.source + '"><input class="w200" type="text" value="' + item.source + '" /></td>';
@@ -2764,7 +2764,7 @@ libraryHelper.prototype.pipework_insulation_item_to_html = function (item, tag) 
     out += '<tr><td>Name</td><td><input type="text" class="item-name" required value="' + item.name + '"/></td></tr>';
     out += '<tr><td>Amount of pipework insulation</td><td><select class="item-pipework_insulation">';
     out += item.pipework_insulation == 'First 1m from cylinder insulated' ? '<option value="First 1m from cylinder insulated" selected>First 1m from cylinder insulated</option>' : '<option value="First 1m from cylinder insulated">First 1m from cylinder insulated</option>';
-    out += item.pipework_insulation == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible piperwok insulated</option>' : '<option value="All accesible piperwok insulated">All accesible piperwok insulated</option>';
+    out += item.pipework_insulation == 'All accesible piperwok insulated' ? '<option value="All accesible piperwok insulated" selected>All accesible pipework insulated</option>' : '<option value="All accesible piperwok insulated">All accesible pipework insulated</option>';
     out += item.pipework_insulation == 'Fully insulated primary pipework' ? '<option value="Fully insulated primary pipework" selected>Fully insulated primary pipework</option>' : '<option value="Fully insulated primary pipework">Fully insulated primary pipework</option>';
     out += '</select></td></tr>';
     out += '<tr><td>Source</td><td><input type="text" class="item-source" value="' + item.source + '" /></td></tr>';

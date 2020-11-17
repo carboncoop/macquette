@@ -999,8 +999,8 @@ function getMeasuresSummaryTable(scenario) {
             if (project[scenario].measures.water_heating.water_usage != undefined) {
                 out += measuresByIdForSummaryTable(project[scenario].measures.water_heating.water_usage);
             }
-            if (project[scenario].measures.water_heating.storage_type != undefined) {
-                out += measureForSummaryTable(project[scenario].measures.water_heating.storage_type.measure);
+            if (project[scenario].measures.water_heating.storage_type_measures != undefined) {
+                out += measureForSummaryTable(project[scenario].measures.water_heating.storage_type_measures.measure);
             }
             if (project[scenario].measures.water_heating.pipework_insulation != undefined) {
                 out += measureForSummaryTable(project[scenario].measures.water_heating.pipework_insulation.measure);

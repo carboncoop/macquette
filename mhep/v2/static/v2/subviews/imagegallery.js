@@ -133,7 +133,6 @@ class ImageGallery {
 
     imageToHTML({ id, url, thumbnail_url, thumbnail_width, thumbnail_height, name, note }) {
         const cardClasses = this.isSelected(id) ? 'gallery-card--selected' : '';
-        const starClasses = this.isFeatured(id) ? 'icon-star' : 'icon-star-empty';
         const isSelected = this.isSelected(id) ? 'checked' : '';
 
         let noteDisplay = note.replace(/</gi, '&lt;').replace(/\n/gi, '<br>');
@@ -150,7 +149,6 @@ class ImageGallery {
                 <button class='btn gallery-cancel-note'>Cancel</button>`;
         } else {
             var buttonHTML = `
-                <i style='cursor:pointer' class='gallery-feature ${starClasses} mr-7' data-id='${id} title='Feature this image'></i>
                 <button class="btn btn--icon gallery-edit" data-id="${id}">
                     <svg><use xlink:href="#iconset-edit" /></svg>
                     Edit note
@@ -158,7 +156,11 @@ class ImageGallery {
                 <button class="btn btn--icon gallery-delete" data-id="${id}">
                     <svg><use xlink:href="#iconset-trash" /></svg>
                     Delete
-                </button>`;
+                </button>
+                ${this.isFeatured(id) ?
+        "<span class='badge'>Cover image</span>" :
+        `<button class='btn gallery-feature' data-id='${id}'>Use as cover image</button>`
+}`;
         }
 
         return `

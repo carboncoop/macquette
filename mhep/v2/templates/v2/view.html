@@ -2,10 +2,10 @@
 {% load static i18n %}
 
 {% block extra_head %}
-<script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
-<script src="{% static VERSION|add:'/js/ui-helper-r3.js' %}"></script>
-<script src="{% static VERSION|add:'/js/ui-mhep.js' %}"></script>
-<script src="{% static VERSION|add:'/js/library-r6.js' %}"></script>
+<script src="{% static VERSION|add:'/js/api.js' %}"></script>
+<script src="{% static VERSION|add:'/js/misc.js' %}"></script>
+<script src="{% static VERSION|add:'/js/graphics.js' %}"></script>
+<script src="{% static VERSION|add:'/js/extended-library-items.js' %}"></script>
 <script src="{% static VERSION|add:'/js/openbem/datasets.js' %}"></script>
 <script src="{% static VERSION|add:'/js/openbem/openBEM.js' %}"></script>
 <script src="{% static VERSION|add:'/js/library-helper/library-helper.js' %}"></script>
@@ -76,7 +76,7 @@
             <p style="margin-bottom: 0">
                 <b><span id="project-title"></span></b><br>
                 <span id="project-description"></span><br>
-                Author: <span id="project-author"></span>
+                <span style="font-style: italic;" id="project-author"></span>
             </p>
         </div>
 
@@ -104,7 +104,7 @@
             <div class="side-section" style="padding-bottom: 5px">
                 <div class="side-section--header" style="display: flex; justify-content: space-between;">
                     <div>Scenarios</div>
-                    <div><small>kgCO<sub>2</sub>/m<sup>2</sup></small></div>
+                    <div><abbr title="Space Heating Demand (kWh/m²·year)">SHD</abbr></div>
                 </div>
             </div>
 
@@ -240,21 +240,15 @@
 
 <script>
 
-    //$('#openBem-model').load("https://cdn.jsdelivr.net/gh/carboncoop/openBEM@10.1.0/openBEM.js");
-    /*$.holdReady(true);
-     $.getScript("https://cdn.jsdelivr.net/gh/carboncoop/openBEM@10.1.0/openBEM.js", function () {
-     $.holdReady(false);
-     });*/
-
     //************
     // Variables
     //************
     var changelog = "";
     var selected_library = -1;
     var selected_library_tag = "Wall";
-    var page = undefined;
+    var page;
+    var scenario;
     var locked = {{ locked_javascript }}; // populated via Django template
-    scenario = ""; //I put it here to be clear this is a global variable, it will be set later on from the hash in URL
     var data = {};
     var keys = {};
 
@@ -271,12 +265,9 @@
 
     var p = mhep_helper.get(projectid);
 
-    $("#project-title").html(p.name);
-    $("#project-description").html(p.description);
-    $("#project-author").html(p.author);
-
     if (p.data == false || p.data == null || Object.keys(p.data).length == 0)
-        p.data = {'master': {}};
+        p.data = {'master': { scenario_name: 'Baseline'}};
+
     var project = p.data;
 
     //********************************
@@ -333,7 +324,19 @@
         }, 1);
     }
 
+    // Don't show reports to people who can't issue reports to avoid
+    // confusion
+    if (!p.organisation) {
+        $('[href="#master/report"]').hide();
+    }
 
+    $("#project-title").html(p.name);
+    $("#project-description").html(p.description);
+    if (p.organisation) {
+        $("#project-author").html(`${p.author}, ${p.organisation.name}`);
+    } else {
+        $("#project-author").html(`by ${p.author}`);
+    }
 
     //**********
     // Events
@@ -353,7 +356,7 @@
         // Disable measures if master
         show_hide_if_master();
 
-        update(false, false);
+        update();
     });
     $("#openbem").on("change", '[key]', function () {
         if (data.locked == true && page != "librariesmanager" && page != 'imagegallery' && page != 'export' && page != 'householdquestionnaire' && page != 'currentenergy' && page != 'commentary')
@@ -383,7 +386,7 @@
               redraw_scenario_menu();
             }
         }
-        update(false, false);
+        update();
     });
     $(window).on('hashchange', function () {
         load_page_from_hash();
@@ -429,8 +432,10 @@
         $('#select-scenario').html("");
 
         // Fill up the select
-        for (z in project)
-            $('#select-scenario').append("<option value='" + z + "'>" + z + "</option>");
+        for (z in project) {
+            const name = project[z].scenario_name || z;
+            $('#select-scenario').append(`<option value='${z}'>${name}</option>`);
+        }
 
         $('#modal-create-scenario').modal('show');
     });
@@ -542,7 +547,7 @@
     //*************
     // Functions
     //*************
-    function update(undo_redo = false, reload_menu = false) {
+    function update(undo_redo = false) {
         // We need to calculate the periods of heating off here because if we try to do it in household.js it happens after the update
         if (project.master.household != undefined) {
             for (var s in project) { // we ensure all the scenarios have the same household data and heating off periods
@@ -568,7 +573,8 @@
 
         $("#saving_status").text("Saving...");
 
-        mhep_helper.set(projectid, project, function (err, result) {
+        const inputs = extract_assessment_inputs(project);
+        mhep_helper.set(projectid, inputs, function (err, result) {
             if (err) {
                 $("#saving_status").text("Failed to save");
             } else {
@@ -604,14 +610,14 @@
         const locked = project[id].locked
         const menu_class = id === currently_open ? "active" : ""
         const is_master = id === "master"
+        const created_from = project[id].created_from == "master" ? "baseline" : project[id].created_from
 
-        const created_from = project[id].created_from
         let created_from_html = ""
         if (created_from) {
             let created_from_extra = ""
             let created_from_title = ""
 
-            if (project[created_from] == undefined) {
+            if (project[created_from] == undefined && created_from != "baseline") {
                 // If the parent scenario has been deleted
                 created_from_extra = " - deleted"
             } else if (has_changed_base_scenario(id)) {
@@ -632,7 +638,7 @@
                     ${created_from_html}
                 </div>
 
-                <div style="text-align: right; font-weight: normal" class="block_emissions"></div>
+                <div style="text-align: right; font-weight: normal" class="shd"></div>
             </div>
 
             <div class="menu-content" class="${menu_class}">
@@ -689,27 +695,34 @@
     }
     function redraw_emissions() {
         for (let s in project) {
-            const $emissions = $(`[scenario="${s}"] .block_emissions`)
-            const kgco2perm2 = project[s].kgco2perm2
-            if (typeof(kgco2perm2) == "number" && !isNaN(kgco2perm2)) {
-              $emissions.html(kgco2perm2.toFixed(0));
+            const $emissions = $(`[scenario="${s}"] .shd`)
+            const space_heating_demand_m2 = project[s].space_heating_demand_m2
+            if (typeof(space_heating_demand_m2) == "number" && !isNaN(space_heating_demand_m2)) {
+              $emissions.html(space_heating_demand_m2.toFixed(0));
             } else {
               $emissions.html("-")
             }
         }
     }
     function load_page_from_hash() {
-        var tmp = (window.location.hash).substring(1).split('/');
-        page = tmp[1];
-        scenario = tmp[0];
+        let oldPage = page;
+        let oldScenario = scenario;
 
-        if (!scenario)
-            scenario = "master";
-        if (!page)
-            page = "context";
+        var tmp = (window.location.hash).substring(1).split('/');
+        page = tmp[1] || "context";
+        scenario = tmp[0] || "master";
 
         if (project[scenario] == undefined)
             scenario = 'master';
+
+        if (oldPage === page && oldScenario === scenario) {
+            return;
+        }
+
+        // Unload previous view
+        if (oldPage && oldScenario) {
+            UnloadUI();
+        }
 
         data = project[scenario];
 

@@ -48,7 +48,7 @@
     }
 </style>
 
-<script src="{% static VERSION|add:'/js/mhep-helper.js' %}"></script>
+<script src="{% static VERSION|add:'/js/api.js' %}"></script>
 
 {% endblock %}
 
@@ -162,7 +162,7 @@
             <tr>
                 <th width="15%">Name</th>
                 <th>Description</th>
-                <th>Author</th>
+                <th>Owner</th>
                 <th width="10%">Modified</th>
                 <th>Status <i class="icon-question-sign" title="Completed assessments are locked"></i></th>
                 <th>Actions</th>
@@ -190,6 +190,12 @@
         <p>
             <span class="muted">Description</span>
             <br><input id="assessment-description-input" type="text" style="width:82%" />
+        </p>
+
+        <p>
+            <span class="muted">Organisation</span>
+            <br><select id="assessment-org-input" type="text" style="width:82%">
+            </select>
         </p>
     </div>
     <div class="modal-footer">
@@ -231,6 +237,13 @@
     $("#new-assessment").click(function () {
         $("#modal-assessment-create").modal("show");
         $("#assessment-name-input").focus();
+
+        let selected = (organisations.length === 1) ? organisations[0].id : "";
+        let orgList = document.querySelector("#assessment-org-input");
+
+        orgList.innerHTML = '<option value="">Private</option>' + organisations.map(org =>
+            `<option value="${org.id}" ${org.id==selected?'selected':''}>${org.name}</option>`
+        ).join("")
     });
 
     $('#modal-assessment-create').on('keypress', function (e) {
@@ -242,13 +255,14 @@
     $("#assessment-create").click(function () {
         var name = $("#assessment-name-input").val();
         var description = $("#assessment-description-input").val();
+        var organisation = $("#assessment-org-input").val();
 
         if (name == "") {
             alert("Please enter an assessment name");
             return;
         }
 
-        mhep_helper.create(name, description, orgid, assessment => {
+        mhep_helper.create(name, description, organisation, assessment => {
             assessments.push(assessment);
             draw_assessments("#assessments", assessments);
             $("#noassessments").hide();
@@ -365,17 +379,22 @@
             let statusColour = status_colours[assessment.status]
             let assessmentURL = urlHelper.html.assessment(assessment.id);
 
+            let owner = `${assessment.author}`;
+            if (assessment.organisation) {
+                owner += `<br><small>(${assessment.organisation.name})</small>`
+            }
+
             out +=
                 `<tr>
                     <td>
-                        <a href="${assessmentURL}" target="_blank" class="underline d-b unpad-8">
+                        <a href="${assessmentURL}" class="underline d-b unpad-8">
                             ${assessment.name}</td>
                         </a>
                     </td>
                     <td>
                         ${assessment.description}
                     </td>
-                    <td style='color:#888'>${assessment.author}</td>
+                    <td style='color:#888'>${owner}</td>
                     <td style='color:#888'>${getDate(assessment.mdate * 1000)}</td>
                     <td>
                         <select class='assessment-status ${statusColour}'

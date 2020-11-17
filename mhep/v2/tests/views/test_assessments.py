@@ -17,8 +17,8 @@ User = get_user_model()
 
 class TestCreateAssessment(CreateAssessmentTestsMixin, APITestCase):
     """
-    note that the actual tests are provided by the CreateAssessmentTestsMixin, since they are
-    common with the tests for TestCreateAssessmentForOrganisation
+    note that the actual tests are provided by the CreateAssessmentTestsMixin, since
+    they are common with the tests for TestCreateAssessmentForOrganisation
     """
 
     def post_to_create_endpoint(self, assessment):
@@ -52,11 +52,44 @@ class TestListAssessments(APITestCase):
             "description": "test description",
             "author": user.username,
             "userid": f"{user.id}",
+            "organisation": None,
         }
 
         assert expected_structure == response.data.pop()
 
-    def test_doesnt_return_assessments_in_connected_organisation(self):
+    def test_returns_organisation_assessments(self):
+        user = UserFactory.create()
+        organisation = OrganisationFactory.create()
+        organisation.members.add(user)
+
+        self.client.force_authenticate(user)
+
+        with freeze_time("2019-06-01T16:35:34Z"):
+            a1 = AssessmentFactory.create(
+                name="test assessment 1",
+                description="test description",
+                data={"foo": "bar"},
+                owner=user,
+                organisation=organisation,
+            )
+
+        response = self.client.get(f"/{VERSION}/api/assessments/")
+
+        expected_structure = {
+            "id": "{}".format(a1.pk),
+            "created_at": "2019-06-01T16:35:34Z",
+            "updated_at": "2019-06-01T16:35:34Z",
+            "mdate": "1559406934",
+            "status": "In progress",
+            "name": "test assessment 1",
+            "description": "test description",
+            "author": user.username,
+            "userid": f"{user.id}",
+            "organisation": {"id": organisation.pk, "name": organisation.name},
+        }
+        assert expected_structure == response.data.pop()
+
+    def test_returns_assessments_in_connected_organisation(self):
         user = UserFactory.create()
         organisation = OrganisationFactory.create()
         organisation.members.add(user)
@@ -71,7 +104,7 @@ class TestListAssessments(APITestCase):
         response = self.client.get(f"/{VERSION}/api/assessments/")
         assert response.status_code == status.HTTP_200_OK
 
-        assert 2 == len(response.data)
+        assert 3 == len(response.data)
 
     def test_only_returns_assessments_for_logged_in_user(self):
         me = UserFactory.create()
@@ -124,6 +157,7 @@ class TestGetAssessment(APITestCase):
             "description": "test description",
             "author": self.me.username,
             "userid": f"{self.me.id}",
+            "organisation": None,
             "images": [
                 {
                     "id": i.id,
@@ -157,6 +191,7 @@ class TestGetAssessment(APITestCase):
             "updated_at": "2019-06-01T16:35:34Z",
             "mdate": "1559406934",
             "name": "test name",
+            "organisation": None,
             # defaults:
             "description": "",
             "author": self.me.username,

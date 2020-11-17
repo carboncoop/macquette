@@ -49,15 +49,15 @@ class Report {
             reportPreviewFrame: document.querySelector('iframe'),
         };
 
-        this.organsations = [];
-        mhep_helper.list_organisations()
-            .then(orgs => this.organisations = orgs)
-            .then(() => this.draw_organisations());
-
+        this.get_template();
         this.draw_scenarios();
 
         this.element.generateReport.addEventListener('click', () => {
-            this.render_report();
+            this.element.reportPreview.style.display = 'block';
+            report_show(
+                this.element.reportPreviewFrame.contentDocument.querySelector('body'),
+                this.report_template
+            );
         });
 
         this.element.printReport.addEventListener('click', () => {
@@ -66,28 +66,12 @@ class Report {
         });
     }
 
-    draw_organisations() {
-        if (this.organisations.length === 0) {
-            document.querySelector('#organisation-choices').innerHTML = "Reports belong to organisations, and you are not in any organisations, so you can't generate reports.";
-            return;
-        }
-
-        this.organisations[0].checked = true;
-
-        let html = this.organisations
-            .map(org =>`
-                <li>
-                    <input type="radio"
-                           name="report-organisation"
-                           value="${org.id}"
-                           class="big-checkbox"
-                           id="org-choice-${org.id}"
-                           ${org.checked ? 'checked': ''}>
-                    <label class="d-i" for="org-choice-${org.id}">${org.name}</label>
-                </li>`)
-            .join('');
-
-        document.querySelector('#organisation-choices').innerHTML = html;
+    get_template() {
+        mhep_helper.list_organisations()
+            .then(orgs => {
+                let f = orgs.find(e => e.id == p.organisation.id);
+                this.report_template = f.report_template;
+            });
     }
 
     draw_scenarios() {
@@ -118,25 +102,6 @@ class Report {
         }
 
         document.querySelector('#scenario-choices').innerHTML = scenarioOpts;
-    }
-
-    render_report() {
-        const selected = document.querySelector('input[name=report-organisation]:checked');
-        if (!selected) {
-            return;
-        }
-
-        const selected_id = selected.value;
-        const org = this.organisations.find(e => e.id === selected_id);
-        if (!org) {
-            this.element.reportPreview.style.display = 'none';
-        } else {
-            this.element.reportPreview.style.display = 'block';
-            report_show(
-                this.element.reportPreviewFrame.contentDocument.querySelector('body'),
-                org.report_template
-            );
-        }
     }
 }
 
@@ -208,12 +173,17 @@ function report_show(root, template) {
 }
 
 function filter_comfort_table(selected, left, right) {
+    const hatching = (selected === 'VAR' || selected === 'DK' || selected === 'NA');
     return new nunjucks.runtime.SafeString(`
         <div style="width: 7em; text-align: right; margin-right: 0.5em;">${left}</div>
         <svg viewBox="0 0 92 32" class="comfort-table">
+            <pattern id="hatch" width="10" height="10" patternTransform="rotate(45 0 0)" patternUnits="userSpaceOnUse">
+                <line x1="0" y1="0" x2="0" y2="10" style="stroke: #777; stroke-width: 1;"></line>
+            </pattern>
             <rect y="1" x="1"  width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'LOW' ? 'red' : 'white'}"></rect>
             <rect y="1" x="31" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'MID' ? 'green' : 'white'}"></rect>
             <rect y="1" x="61" width="30" height="30" stroke-width="1" stroke="#777" fill="${selected === 'HIGH' ? 'red' : 'white'}"></rect>
+            <rect y="1" x="1" width="90" height="30" fill="${hatching ? 'url(#hatch)' : 'transparent'}"></rect>
         </svg>
         <div style="width: 7em; margin-left: 0.5em;">${right}</div>`);
 }
@@ -701,7 +671,7 @@ function add_energy_usage(root, scenarios) {
             'Appliances': 'rgb(240,212,156)',
             'Lighting': 'rgb(236,102,79)',
             'Fans and Pumps': 'rgb(246, 167, 7)',
-            'Non categorized': 'rgb(131, 51, 47)',
+            'Not Categorised': 'rgb(131, 51, 47)',
             // 'Generation': 'rgb(200,213,203)'
         },
         data: dataGraph,
@@ -1181,11 +1151,11 @@ function getEnergyUseData(scenarios) {
     energyUseData.bills = [
         {
             value: data.currentenergy.enduse_annual_kwhm2,
-            label: 'Non-categorized'
+            label: 'Not Categorised'
         },
         {
             value: -data.currentenergy.generation.primaryenergy / data.TFA,
-            label: 'Non-categorized'
+            label: 'Not Categorised'
         }
     ];
 
