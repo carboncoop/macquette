@@ -229,7 +229,7 @@ function UpdateUI(data) {
 function getkeys(key, val) {
     switch (typeof val) {
         case 'object':
-            for (subkey in val) {
+            for (let subkey in val) {
                 getkeys(key + '.' + subkey, val[subkey]);
             }
             break;
@@ -297,7 +297,7 @@ function get_fuels_for_select(category_to_show) {
         for (category in fuels_by_category) {
             if (category != 'generation') {
                 options += '<optgroup label="' + category + '">';
-                for (index in fuels_by_category[category]) {
+                for (let index in fuels_by_category[category]) {
                     options += '<option value="' + fuels_by_category[category][index] + '">' + fuels_by_category[category][index] + '</option>';
                 }
                 options += '</optgroup>';
@@ -651,7 +651,7 @@ function _extract_scenario_inputs(data) {
     inputdata.locked = data.locked;
     inputdata.created_from = data.created_from;
     inputdata.creation_hash = data.creation_hash;
-    for (z in data.floors) {
+    for (let z in data.floors) {
         inputdata.floors[z] = {name: data.floors[z].name, area: data.floors[z].area, height: data.floors[z].height};
     }
 
@@ -662,7 +662,7 @@ function _extract_scenario_inputs(data) {
         elements: [],
         measures: data.fabric.measures
     };
-    for (z in data.fabric.elements) {
+    for (let z in data.fabric.elements) {
         inputdata.fabric.elements[z] = {
             type: data.fabric.elements[z].type,
             name: data.fabric.elements[z].name,
@@ -759,7 +759,7 @@ function _extract_scenario_inputs(data) {
     };
 
     inputdata.appliancelist = {list: []};
-    for (z in data.appliancelist.list) {
+    for (let z in data.appliancelist.list) {
         inputdata.appliancelist.list[z] = {
             name: data.appliancelist.list[z].name,
             category: data.appliancelist.list[z].category,
@@ -771,7 +771,7 @@ function _extract_scenario_inputs(data) {
     }
 
     inputdata.applianceCarbonCoop = {list: []};
-    for (z in data.applianceCarbonCoop.list) {
+    for (let z in data.applianceCarbonCoop.list) {
         inputdata.applianceCarbonCoop.list[z] = {
             category: data.applianceCarbonCoop.list[z].category,
             name: data.applianceCarbonCoop.list[z].name,
